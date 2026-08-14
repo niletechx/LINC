@@ -639,7 +639,7 @@ LINC is being developed by **Nile Tech**, a technology team focused on software 
 
 | # | Name                | CTC Number       | Classroom |
 | - | ------------------- | ---------------- | --------- |
-| 1 | **Eserom Demissew** | **[CTC NUMBER]** | **R-003** |
+| 1 | **Eserom Demissew** | **CTC-7346-26** | **R-003** |
 | 2 | **[Team Member 2]** | **[CTC NUMBER]** | **R-003** |
 | 3 | **[Team Member 3]** | **[CTC NUMBER]** | **R-003** |
 | 4 | **[Team Member 4]** | **[CTC NUMBER]** | **R-003** |
