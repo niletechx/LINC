@@ -35,7 +35,9 @@ LINC aims to make access to everyday services **faster, smarter, more reliable, 
 | | Direct messaging (conversations, participants) | ✅ Done |
 | | Real-time communication (Socket.IO) | ✅ Done |
 | | Provider availability toggle | ✅ Done |
-| **Phase 5 — Trust** | Provider verification (document submission workflow) | ✅ Done |
+| | Escrow payment integration (Chapa API, webhook, checkout) | ✅ Done |
+| **Phase 5 — Trust** | Escrow protection (72h auto-release, anti-fraud dispute resolution) | ✅ Done |
+| | Provider verification (document submission workflow) | ✅ Done |
 | | Ratings & reviews (polymorphic, booking-linked) | ✅ Done |
 | | @AI Trust Advisor in DMs | ✅ Done |
 | | Reporting & moderation system | ✅ Done |
