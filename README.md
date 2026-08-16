@@ -660,6 +660,19 @@ The main goals of LINC are to:
 * [ ] Deployment
 * [x] Documentation
 
+## Phase 8 — Mobile
+
+* [x] Flutter project scaffold
+* [x] Project structure (screens, models, services, providers, widgets)
+* [ ] Authentication screens
+* [ ] User & provider profile screens
+* [ ] Service listings & search
+* [ ] Booking & request flow
+* [ ] Messaging & real-time communication
+* [ ] Ratings & reviews
+* [ ] Push notifications
+* [ ] App store deployment (Android & iOS)
+
 ---
 
 # 👨‍💻 Project Team
