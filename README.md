@@ -642,7 +642,7 @@ LINC is being developed by **Nile Tech**, a technology team focused on software 
 | 1 | **Eserom Demissew** | **CTC-7346-26** | **R-003** |
 | 2 | **Ermyas Misiker]** | **CTC-5553-26** | **R-003** |
 | 3 | **Hani Kiros** | **CTC-458-26** | **R-003** |
-| 4 | **Feysal Jeylaa** | **CTC-6717-26** | **R-003** |
+| 4 | **Feysal Jeylan** | **CTC-6717-26** | **R-003** |
 
 > The remaining team members' information will be added to this README once their details are provided.
 
