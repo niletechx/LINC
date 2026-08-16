@@ -9,4 +9,7 @@ router.get('/:id', bookingController.getById);
 router.post('/', bookingController.createBooking);
 router.put('/:id', bookingController.updateBooking);
 
+// Provider marks a booking as complete (starts 72h escrow window if applicable)
+router.post('/:id/complete', bookingController.markComplete);
+
 module.exports = router;

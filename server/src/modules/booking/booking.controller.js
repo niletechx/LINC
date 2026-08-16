@@ -1,25 +1,30 @@
 const bookingService = require('./booking.service');
-const { success } = require('../../utils/apiResponse');
+const { success, error } = require('../../utils/apiResponse');
 const asyncHandler = require('../../utils/asyncHandler');
 
 const listBookings = asyncHandler(async (req, res) => {
-  const bookings = await bookingService.listBookings(req.user.id);
-  return success(res, bookings);
+  const result = await bookingService.listBookings(req.user.id);
+  return success(res, result);
 });
 
 const getById = asyncHandler(async (req, res) => {
-  const booking = await bookingService.getBookingById(req.user.id, req.params.id);
-  return success(res, booking);
+  const result = await bookingService.getBookingById(req.user.id, req.params.id);
+  return success(res, result);
 });
 
 const createBooking = asyncHandler(async (req, res) => {
-  const booking = await bookingService.createBooking(req.user.id, req.body);
-  return success(res, booking, 'Booking created successfully', 201);
+  const result = await bookingService.createBooking(req.user.id, req.body);
+  return success(res, result, 'Booking created', 201);
 });
 
 const updateBooking = asyncHandler(async (req, res) => {
-  const booking = await bookingService.updateBooking(req.user.id, req.params.id, req.body);
-  return success(res, booking, 'Booking updated successfully');
+  const result = await bookingService.updateBooking(req.user.id, req.params.id, req.body);
+  return success(res, result);
 });
 
-module.exports = { listBookings, getById, createBooking, updateBooking };
+const markComplete = asyncHandler(async (req, res) => {
+  const result = await bookingService.markComplete(req.params.id, req.user.id);
+  return success(res, result, 'Booking marked as complete. 72-hour confirmation window started.');
+});
+
+module.exports = { listBookings, getById, createBooking, updateBooking, markComplete };

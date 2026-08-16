@@ -3,6 +3,9 @@ const required = [
   'SUPABASE_SERVICE_ROLE_KEY',
   'GEMINI_API_KEY',
   'JWT_SECRET',
+  'CHAPA_SECRET_KEY',
+  'SERVER_URL',
+  'CLIENT_URL',
 ];
 
 function validateEnv() {

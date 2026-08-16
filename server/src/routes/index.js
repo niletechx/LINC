@@ -1,7 +1,6 @@
 const express = require('express');
 const { apiLimiter } = require('../middleware/rateLimiter.middleware');
 
-// Module routers
 const authRouter = require('../modules/auth/auth.routes');
 const usersRouter = require('../modules/users/users.routes');
 const providersRouter = require('../modules/providers/providers.routes');
@@ -19,9 +18,9 @@ const reportsRouter = require('../modules/reports/reports.routes');
 const notificationsRouter = require('../modules/notifications/notifications.routes');
 const adminRouter = require('../modules/admin/admin.routes');
 const aiRouter = require('../ai/chat/ai.routes');
+const paymentsRouter = require('../modules/payments/payments.routes');
 
 const router = express.Router();
-
 router.use(apiLimiter);
 
 router.use('/auth', authRouter);
@@ -41,5 +40,6 @@ router.use('/reports', reportsRouter);
 router.use('/notifications', notificationsRouter);
 router.use('/admin', adminRouter);
 router.use('/ai', aiRouter);
+router.use('/payments', paymentsRouter);
 
 module.exports = router;
