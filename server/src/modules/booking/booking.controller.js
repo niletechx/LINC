@@ -1,0 +1,2 @@
+// booking controller
+module.exports = {};

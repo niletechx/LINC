@@ -1,0 +1,2 @@
+// organizations controller
+module.exports = {};

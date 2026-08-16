@@ -1,0 +1,2 @@
+// messaging controller
+module.exports = {};

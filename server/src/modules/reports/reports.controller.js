@@ -1,0 +1,2 @@
+// reports controller
+module.exports = {};

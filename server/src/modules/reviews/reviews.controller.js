@@ -1,0 +1,2 @@
+// reviews controller
+module.exports = {};

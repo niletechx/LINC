@@ -1,0 +1,2 @@
+// businesses controller
+module.exports = {};

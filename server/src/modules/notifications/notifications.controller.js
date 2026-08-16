@@ -1,0 +1,2 @@
+// notifications controller
+module.exports = {};

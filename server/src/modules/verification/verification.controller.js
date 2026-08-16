@@ -1,0 +1,2 @@
+// verification controller
+module.exports = {};

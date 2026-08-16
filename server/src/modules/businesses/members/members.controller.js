@@ -1,0 +1,2 @@
+// members controller
+module.exports = {};
