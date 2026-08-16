@@ -42,4 +42,18 @@ async function createCategory({ name, slug, description, icon, parent_id }) {
   return data;
 }
 
-module.exports = { findAll, findById, findBySlug, createCategory };
+async function findByIds(ids = []) {
+  const uniqueIds = [...new Set((ids || []).filter(Boolean))];
+  if (uniqueIds.length === 0) return [];
+
+  const { data, error } = await supabase
+    .from('categories')
+    .select('id')
+    .in('id', uniqueIds)
+    .eq('is_active', true);
+
+  if (error) throw error;
+  return data || [];
+}
+
+module.exports = { findAll, findById, findBySlug, createCategory, findByIds };
