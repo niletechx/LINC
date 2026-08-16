@@ -10,6 +10,48 @@ LINC aims to make access to everyday services **faster, smarter, more reliable, 
 
 ---
 
+## 📊 Build Status & Milestone Tracker
+
+| Phase | Milestone | Status |
+| ----- | --------- | ------ |
+| **Phase 1 — Foundation** | Project architecture (monorepo, workspaces) | ✅ Done |
+| | Database design (20-table PostgreSQL schema) | ✅ Done |
+| | Authentication (JWT register/login) | ✅ Done |
+| | User roles (requester, provider, business, admin) | ✅ Done |
+| | Basic frontend (Vite + React scaffolded) | ✅ Done |
+| | Backend API (Express + all route modules) | ✅ Done |
+| **Phase 2 — Core Platform** | User profiles (CRUD, status) | ✅ Done |
+| | Provider profiles (CRUD, availability, filters) | ✅ Done |
+| | Business & Organization profiles + team members | ✅ Done |
+| | Service listings (polymorphic, categories, pricing) | ✅ Done |
+| | Service categories (hierarchy, slugs) | ✅ Done |
+| | Request system (lifecycle, status, urgency) | ✅ Done |
+| **Phase 3 — Intelligence** | AI intent extraction (Gemini 1.5 Flash) | ✅ Done |
+| | Category-filtered provider retrieval (RAG) | ✅ Done |
+| | 6-factor intelligent matching & scoring | ✅ Done |
+| | Structured AI response (message + provider cards) | ✅ Done |
+| | Gemini retry logic & error resilience | ✅ Done |
+| **Phase 4 — Connection** | Booking system (scheduling, pricing, statuses) | ✅ Done |
+| | Direct messaging (conversations, participants) | ✅ Done |
+| | Real-time communication (Socket.IO) | ✅ Done |
+| | Provider availability toggle | ✅ Done |
+| **Phase 5 — Trust** | Provider verification (document submission workflow) | ✅ Done |
+| | Ratings & reviews (polymorphic, booking-linked) | ✅ Done |
+| | @AI Trust Advisor in DMs | ✅ Done |
+| | Reporting & moderation system | ✅ Done |
+| **Phase 6 — Administration** | Admin dashboard (overview, users, reports) | ✅ Done |
+| | Verification management | ✅ Done |
+| | Security hardening (Helmet, rate limiting, Zod) | ✅ Done |
+| | Documentation (README, context.md, Figma brief) | ✅ Done |
+| **Phase 7 — Optimization** | Performance optimization | ⏳ Pending |
+| | UI/UX (Flutter + React frontend) | ⏳ Pending |
+| | Testing (unit + integration) | ⏳ Pending |
+| | Deployment | ⏳ Pending |
+
+> **Backend: 100% complete.** Frontend (Flutter + React) and testing are the active next steps.
+
+---
+
 ## 🚀 Project Vision
 
 Our vision is to build a unified digital infrastructure where people can easily discover and access the services and resources they need.
@@ -603,7 +645,7 @@ The main goals of LINC are to:
 
 # 🗺️ Development Roadmap
 
-## Phase 1 — Foundation
+## Phase 1 — Foundation ✅
 
 * [x] Project architecture
 * [x] Database design
@@ -612,7 +654,7 @@ The main goals of LINC are to:
 * [x] Basic frontend
 * [x] Backend API
 
-## Phase 2 — Core Platform
+## Phase 2 — Core Platform ✅
 
 * [x] User profiles
 * [x] Provider profiles
@@ -621,43 +663,46 @@ The main goals of LINC are to:
 * [x] Service categories
 * [x] Request system
 
-## Phase 3 — Intelligence
+## Phase 3 — Intelligence ✅
 
-* [x] AI request understanding
-* [x] Need classification
-* [x] Intelligent matching
-* [x] Recommendation system
+* [x] AI request understanding (Gemini 1.5 Flash + intent extraction)
+* [x] Need classification (category, budget, urgency, keywords)
+* [x] Intelligent matching (6-factor scoring, category-filtered RAG retrieval)
+* [x] Structured AI responses (message + provider cards + match scores)
+* [x] Gemini retry logic & error resilience
 
-## Phase 4 — Connection
+## Phase 4 — Connection ✅
 
 * [x] Booking system
 * [x] Messaging
-* [x] Real-time communication
+* [x] Real-time communication (Socket.IO)
 * [x] Provider availability
 
-## Phase 5 — Trust
+## Phase 5 — Trust ✅
 
 * [x] Provider verification
-* [x] Ratings
-* [x] Reviews
+* [x] Ratings & reviews (polymorphic, booking-linked)
+* [x] @AI Trust Advisor in DMs
 * [x] Reporting system
 
-## Phase 6 — Administration
+## Phase 6 — Administration ✅
 
 * [x] Admin dashboard
 * [x] User management
 * [x] Provider management
 * [x] Service management
 * [x] Verification management
-* [x] Platform analytics
+* [x] Security hardening (Helmet, rate limiting, Zod validation)
+* [x] Documentation (README, context.md, Figma design brief)
 
-## Phase 7 — Optimization
+## Phase 7 — Optimization ⏳ In Progress
 
 * [ ] Performance optimization
-* [x] Security improvements
-* [ ] UI/UX improvements
-* [ ] Testing
+* [ ] Flutter mobile app
+* [ ] React web frontend
+* [ ] Unit & integration testing
 * [ ] Deployment
+* [x] Security improvements
 * [x] Documentation
 
 ## Phase 8 — Mobile
