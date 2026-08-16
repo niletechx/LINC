@@ -640,9 +640,9 @@ LINC is being developed by **Nile Tech**, a technology team focused on software 
 | # | Name                | CTC Number       | Classroom |
 | - | ------------------- | ---------------- | --------- |
 | 1 | **Eserom Demissew** | **CTC-7346-26** | **R-003** |
-| 2 | **[Team Member 2]** | **[CTC NUMBER]** | **R-003** |
-| 3 | **[Team Member 3]** | **[CTC NUMBER]** | **R-003** |
-| 4 | **[Team Member 4]** | **[CTC NUMBER]** | **R-003** |
+| 2 | **Ermyas Misiker]** | **CTC-5553-26** | **R-003** |
+| 3 | **Hani Kiros** | **CTC-458-26** | **R-003** |
+| 4 | **Feysal Jeylaa** | **CTC-6717-26** | **R-003** |
 
 > The remaining team members' information will be added to this README once their details are provided.
 
