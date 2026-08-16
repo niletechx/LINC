@@ -4,14 +4,15 @@
   "description": "LINC — Life Infrastructure Network. AI-powered service discovery platform.",
   "private": true,
   "workspaces": [
-    "client",
+    "client/web",
     "server",
     "shared"
   ],
   "scripts": {
-    "dev": "concurrently \"npm run dev --workspace=server\" \"npm run dev --workspace=client\"",
+    "dev": "concurrently \"npm run dev --workspace=server\" \"npm run dev --workspace=linc-web\"",
     "dev:server": "npm run dev --workspace=server",
-    "dev:client": "npm run dev --workspace=client",
+    "dev:web": "npm run dev --workspace=linc-web",
+    "build:web": "npm run build --workspace=linc-web",
     "install:all": "npm install --workspaces"
   },
   "devDependencies": {
