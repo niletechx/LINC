@@ -421,6 +421,39 @@ LINC is planned around a scalable modern web architecture.
 
 ---
 
+# 🏗️ Architecture & Design Decisions
+
+Throughout the initial phase of development, several key design and architectural decisions were made to ensure scalability, security, and a seamless developer experience:
+
+### 1. Monorepo Structure
+We adopted an **NPM Workspaces** monorepo setup containing three main packages:
+- `client/`: A Vite + React application for the frontend.
+- `server/`: An Express.js backend.
+- `shared/`: Shared constants (e.g., roles, status codes) that ensure consistency between the client and server.
+
+### 2. Entity Management & Roles
+Instead of forcing users to create entirely separate accounts to provide services, we opted for a unified identity system.
+- **Unified User Identity:** One user account represents a single identity.
+- **Multiple Roles:** Users can seamlessly switch between being a requester and a provider by creating a `provider_profile` linked to their main account.
+- **Separate Entities for Businesses & Orgs:** Businesses and organizations are treated as distinct entities that can be owned and managed by multiple users (owners, managers, staff). This prevents tying a corporate entity directly to a single personal profile.
+
+### 3. Database Schema (PostgreSQL on Supabase)
+We designed a robust 20-table schema to support the complex relationships in the LINC ecosystem.
+- **Polymorphic Services & Bookings:** Services, bookings, and reviews use polymorphic associations (`entity_type` + `entity_id`) to cleanly link to either a provider, a business, or an organization without creating redundant tables.
+- **Data Integrity:** Strict SQL `CHECK` constraints ensure that a service always has exactly one owner, and status fields (like urgency, booking status) are strictly validated at the database level.
+
+### 4. Embedded AI Integration (RAG Pipeline & Trust Advisor)
+We integrated **Google Gemini 1.5 Flash** directly into the core workflow:
+- **Pipeline:** An intent extraction engine analyzes user requests to pull out category, budget, urgency, and location. This intent is used to query the database, and the results are fed back into Gemini (RAG) to provide intelligent matches.
+- **Trust Advisor:** To build trust, the AI operates as a silent advisor in Direct Messages. By mentioning `@AI`, a user can ask the AI to summarize the provider's ratings, reviews, and verification status without the provider seeing the query.
+
+### 5. API Layer & Clean Architecture
+The Node.js/Express backend follows a modular, 4-layer clean architecture (`Routes → Controller → Service → Repository`).
+- **Security & Reliability:** The API is hardened with Helmet, Rate Limiting (separate limits for Auth, standard API, and expensive AI endpoints), Zod payload validation, and centralized error handling.
+- **Real-Time:** Integrated `Socket.IO` handles both real-time chat between users and live system notifications.
+
+---
+
 # 🛠️ Technology Stack
 
 ### Frontend
@@ -706,9 +739,14 @@ The long-term goal is to evolve LINC into a scalable digital infrastructure that
 
 # 📌 Project Status
 
-🚧 **LINC is currently under development.**
+🚧 **LINC is currently in active development.**
 
-The current focus is on establishing the core architecture, user experience, backend infrastructure, database structure, and intelligent matching foundation.
+**Recent Milestones Achieved:**
+- Monorepo initialized with `client`, `server`, and `shared` workspaces.
+- Complete 20-table PostgreSQL database schema deployed to Supabase.
+- Core backend infrastructure (Express, Socket.IO, Winston logger) established.
+- Feature modules (Auth, Users, Providers, Services, Categories) implemented with a clean architecture pattern.
+- AI Module built featuring Gemini integration (Intent extraction, RAG retrieval, Trust Advisor in DMs).
 
 ---
 
