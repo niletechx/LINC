@@ -3,27 +3,47 @@ const { extractIntent } = require('../pipeline/intentExtractor');
 const { retrieveMatches } = require('../pipeline/retriever');
 const { buildPrompt } = require('../pipeline/promptBuilder');
 const { parseResponse } = require('../pipeline/responseParser');
-const { loadHistory, saveMessages } = require('../memory/conversationStore');
+const { loadHistory, saveMessages, updateConversationTitle } = require('../memory/conversationStore');
 const { trimHistory } = require('../memory/contextWindow');
-const { chat } = require('../llm/geminiClient');
+const { chat, streamChat } = require('../llm/geminiClient');
+const logger = require('../../utils/logger');
 
+// ── Title generation ────────────────────────────────────────────────────────
+const TITLE_PROMPT = `You are a conversation titler. Given the first user message and the AI's first reply,
+generate a concise 4-6 word title that captures the topic of the conversation.
+Respond ONLY with the title text. No quotes, no punctuation at the end.`;
+
+async function generateTitle(userMessage, aiMessage) {
+  try {
+    const { chat: titleChat } = require('../llm/geminiClient');
+    const raw = await titleChat([
+      { role: 'user', parts: [{ text: `User: ${userMessage}\nAI: ${aiMessage}` }] },
+    ], TITLE_PROMPT);
+    return raw.trim().slice(0, 80);
+  } catch {
+    return userMessage.slice(0, 60);
+  }
+}
+
+// ── Core orchestrator (non-streaming) ───────────────────────────────────────
 /**
- * Full RAG pipeline orchestrator.
- *
- * Flow:
- *   1. Get or create AI conversation record
- *   2. Load + trim conversation history
- *   3. Extract intent from the user message (Gemini call #1)
- *   4. Retrieve & score matching providers from DB (RAG retrieval)
- *   5. Build grounded system prompt with provider context
- *   6. Call Gemini with full history + grounded prompt (Gemini call #2)
- *   7. Parse structured response (message + provider_ids)
- *   8. Persist messages to DB
- *   9. Return { conversationId, message, provider_ids, providers, intent }
+ * Full RAG pipeline:
+ *   1. Get/create conversation
+ *   2. Load history + last intent (multi-turn accumulation)
+ *   3. Extract intent (merged with previous)
+ *   4. Retrieve matching providers/businesses/orgs
+ *   5. Build grounded prompt
+ *   6. Call Gemini
+ *   7. Parse structured response
+ *   8. Persist messages
+ *   9. Generate title on first turn
+ *  10. Return enriched result
  */
 async function processMessage({ userId, message, conversationId, userLat, userLng }) {
   // 1. Get or create conversation
   let convId = conversationId;
+  let isFirstTurn = false;
+
   if (!convId) {
     const { data, error } = await supabase
       .from('ai_conversations')
@@ -32,16 +52,19 @@ async function processMessage({ userId, message, conversationId, userLat, userLn
       .single();
     if (error) throw error;
     convId = data.id;
+    isFirstTurn = true;
   }
 
-  // 2. Load and trim conversation history
-  const rawHistory = await loadHistory(convId);
+  // 2. Load history + last intent
+  const { messages: rawHistory, lastIntent } = await loadHistory(convId);
   const history = trimHistory(rawHistory);
 
-  // 3. Extract intent
-  const intent = await extractIntent(message);
+  if (rawHistory.length === 0) isFirstTurn = true;
 
-  // 4. Retrieve matching providers
+  // 3. Extract intent (multi-turn: inherit from last turn)
+  const intent = await extractIntent(message, lastIntent);
+
+  // 4. Retrieve matches (providers + businesses + orgs)
   const providers = await retrieveMatches(intent, userLat, userLng);
 
   // 5. Build grounded prompt
@@ -57,10 +80,17 @@ async function processMessage({ userId, message, conversationId, userLat, userLn
   // 7. Parse structured response
   const parsed = parseResponse(rawResponse, providers);
 
-  // 8. Persist to DB
+  // 8. Persist messages
   await saveMessages(convId, message, parsed.message, { intent, providers });
 
-  // 9. Return enriched result
+  // 9. Generate title on first turn (async, don't block response)
+  if (isFirstTurn) {
+    generateTitle(message, parsed.message)
+      .then((title) => updateConversationTitle(convId, title))
+      .catch((err) => logger.warn('Title generation failed: ' + err.message));
+  }
+
+  // 10. Return
   return {
     conversationId: convId,
     message: parsed.message,
@@ -70,19 +100,72 @@ async function processMessage({ userId, message, conversationId, userLat, userLn
   };
 }
 
+// ── Streaming orchestrator ───────────────────────────────────────────────────
+/**
+ * Same RAG pipeline as processMessage but streams the Gemini response
+ * chunk-by-chunk via the onChunk callback.
+ * The caller (controller) writes each chunk to the SSE response.
+ */
+async function processMessageStream({ userId, message, conversationId, userLat, userLng, onChunk }) {
+  let convId = conversationId;
+  let isFirstTurn = false;
+
+  if (!convId) {
+    const { data, error } = await supabase
+      .from('ai_conversations')
+      .insert({ user_id: userId, title: message.slice(0, 80) })
+      .select()
+      .single();
+    if (error) throw error;
+    convId = data.id;
+    isFirstTurn = true;
+  }
+
+  const { messages: rawHistory, lastIntent } = await loadHistory(convId);
+  const history = trimHistory(rawHistory);
+  if (rawHistory.length === 0) isFirstTurn = true;
+
+  const intent = await extractIntent(message, lastIntent);
+  const providers = await retrieveMatches(intent, userLat, userLng);
+  const { systemInstruction } = buildPrompt(message, providers, history);
+
+  const messages = [
+    ...history,
+    { role: 'user', parts: [{ text: message }] },
+  ];
+
+  // Stream Gemini response
+  const fullText = await streamChat(messages, systemInstruction, onChunk);
+
+  const parsed = parseResponse(fullText, providers);
+  await saveMessages(convId, message, parsed.message, { intent, providers });
+
+  if (isFirstTurn) {
+    generateTitle(message, parsed.message)
+      .then((title) => updateConversationTitle(convId, title))
+      .catch((err) => logger.warn('Title generation failed: ' + err.message));
+  }
+
+  return {
+    conversationId: convId,
+    provider_ids: parsed.provider_ids,
+    providers: parsed.providers,
+    intent,
+  };
+}
+
+// ── Conversation queries ─────────────────────────────────────────────────────
 async function getUserConversations(userId) {
   const { data, error } = await supabase
     .from('ai_conversations')
     .select('id, title, created_at, updated_at')
     .eq('user_id', userId)
     .order('updated_at', { ascending: false });
-
   if (error) throw error;
   return data;
 }
 
 async function getConversationMessages(userId, conversationId) {
-  // Verify ownership first
   const { data: convo, error: convoErr } = await supabase
     .from('ai_conversations')
     .select('id')
@@ -106,4 +189,9 @@ async function getConversationMessages(userId, conversationId) {
   return data;
 }
 
-module.exports = { processMessage, getUserConversations, getConversationMessages };
+module.exports = {
+  processMessage,
+  processMessageStream,
+  getUserConversations,
+  getConversationMessages,
+};
