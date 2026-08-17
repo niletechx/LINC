@@ -218,9 +218,9 @@ class _BookingFlowScreenState extends State<BookingFlowScreen> {
             return GestureDetector(
               onTap: () => setState(() => selectedService = i),
               child: Container(
-                color: isSelected ? const Color(0xFFFAFBFF) : Colors.white,
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 decoration: BoxDecoration(
+                  color: isSelected ? const Color(0xFFFAFBFF) : Colors.white,
                   border: Border(bottom: isLast ? BorderSide.none : const BorderSide(color: Color(0xFFE2E8F0))),
                 ),
                 child: Row(

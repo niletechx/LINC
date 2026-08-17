@@ -119,9 +119,9 @@ class _SearchScreenState extends State<SearchScreen> {
 
             // 1. Filter Chips
             Container(
-              color: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
               decoration: const BoxDecoration(
+                color: Colors.white,
                 border: Border(bottom: BorderSide(color: Color(0xFFE2E8F0))),
               ),
               child: SingleChildScrollView(
@@ -140,9 +140,9 @@ class _SearchScreenState extends State<SearchScreen> {
 
             // 2. Sort + count bar
             Container(
-              color: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
               decoration: const BoxDecoration(
+                color: Colors.white,
                 border: Border(bottom: BorderSide(color: Color(0xFFE2E8F0))),
               ),
               child: Row(

@@ -183,9 +183,9 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
 
   Widget _buildStats(ProviderModel p) {
     return Container(
-      color: Colors.white,
       margin: const EdgeInsets.only(bottom: 8),
       decoration: const BoxDecoration(
+        color: Colors.white,
         border: Border(bottom: BorderSide(color: Color(0xFFE2E8F0))),
       ),
       child: IntrinsicHeight(

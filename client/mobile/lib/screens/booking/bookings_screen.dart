@@ -32,8 +32,8 @@ class BookingsScreen extends ConsumerWidget {
       body: Column(
         children: [
           Container(
-            color: Colors.white,
             decoration: const BoxDecoration(
+              color: Colors.white,
               border: Border(bottom: BorderSide(color: Color(0xFFE2E8F0))),
             ),
             child: SafeArea(

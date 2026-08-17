@@ -406,9 +406,9 @@ class _AiScreenState extends ConsumerState<AiScreen> with SingleTickerProviderSt
   Widget _buildSuggestionsRow() {
     final suggestions = ['Find a plumber', 'House cleaning today', 'IT support', 'Math tutor'];
     return Container(
-      color: Colors.white,
       width: double.infinity,
       decoration: const BoxDecoration(
+        color: Colors.white,
         border: Border(top: BorderSide(color: Color(0xFFE2E8F0))),
       ),
       child: SingleChildScrollView(
@@ -447,9 +447,9 @@ class _AiScreenState extends ConsumerState<AiScreen> with SingleTickerProviderSt
 
   Widget _buildInputBar() {
     return Container(
-      color: Colors.white,
       padding: const EdgeInsets.fromLTRB(12, 10, 14, 10),
       decoration: const BoxDecoration(
+        color: Colors.white,
         border: Border(top: BorderSide(color: Color(0xFFE2E8F0))),
       ),
       child: SafeArea(

@@ -16,9 +16,9 @@ class MessagesScreen extends ConsumerWidget {
       body: Column(
         children: [
           Container(
-            color: Colors.white,
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: const BoxDecoration(
+              color: Colors.white,
               border: Border(
                 bottom: BorderSide(color: Color(0xFFF1F5F9)),
               ),

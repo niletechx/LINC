@@ -122,9 +122,9 @@ class ProfileScreen extends ConsumerWidget {
               ),
             ),
             Container(
-              color: Colors.white,
               margin: const EdgeInsets.only(bottom: 8),
               decoration: const BoxDecoration(
+                color: Colors.white,
                 border: Border(bottom: BorderSide(color: Color(0xFFE2E8F0))),
               ),
               child: IntrinsicHeight(
@@ -213,9 +213,9 @@ class ProfileScreen extends ConsumerWidget {
 
   Widget _buildMenuGroup(List<Map<String, dynamic>> items) {
     return Container(
-      color: Colors.white,
       margin: const EdgeInsets.only(bottom: 8),
       decoration: const BoxDecoration(
+        color: Colors.white,
         border: Border(
           top: BorderSide(color: Color(0xFFE2E8F0)),
           bottom: BorderSide(color: Color(0xFFE2E8F0)),

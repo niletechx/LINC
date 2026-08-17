@@ -223,10 +223,10 @@ class _VerificationScreenState extends State<VerificationScreen> {
                                 }
                               : null,
                           child: Container(
-                            color: isActive ? const Color(0xFFFAFBFF) : Colors.white,
                             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                            decoration: const BoxDecoration(
-                              border: Border(bottom: BorderSide(color: Color(0xFFF1F5F9))),
+                            decoration: BoxDecoration(
+                              color: isActive ? const Color(0xFFFAFBFF) : Colors.white,
+                              border: const Border(bottom: BorderSide(color: Color(0xFFF1F5F9))),
                             ),
                             child: Row(
                               children: [
@@ -276,9 +276,9 @@ class _VerificationScreenState extends State<VerificationScreen> {
                         ),
                         if (isActive && !isDone)
                           Container(
-                            color: const Color(0xFFF8FBFF),
                             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                             decoration: const BoxDecoration(
+                              color: Color(0xFFF8FBFF),
                               border: Border(bottom: BorderSide(color: Color(0xFFF1F5F9))),
                             ),
                             child: Column(

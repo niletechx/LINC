@@ -167,9 +167,9 @@ class HomeScreen extends ConsumerWidget {
 
               // 2. QUICK CHIPS
               Container(
-                color: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                 decoration: const BoxDecoration(
+                  color: Colors.white,
                   border: Border(bottom: BorderSide(color: Color(0xFFE2E8F0))),
                 ),
                 child: SingleChildScrollView(
