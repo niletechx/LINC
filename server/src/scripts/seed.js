@@ -241,11 +241,52 @@ async function seed() {
       .insert(requestsData)
       .select();
 
-    if (reqsError) {
-      console.error('Error inserting requests:', reqsError.message);
-    } else {
-      console.log(`✓ Inserted/Updated ${reqs?.length} open requests`);
+    // 5. Seed Bookings & Customer Reviews
+    console.log('Inserting demo bookings & customer reviews...');
+    const reviewerId = userMap['yonas_m'];
+
+    for (const prov of (providers || [])) {
+      // Create a completed booking first
+      const { data: booking } = await supabase
+        .from('bookings')
+        .insert({
+          requester_id: reviewerId,
+          entity_type: 'provider',
+          entity_id: prov.id,
+          scheduled_at: new Date(Date.now() - 86400000 * 3).toISOString(),
+          duration_hours: 2,
+          agreed_price: prov.hourly_rate * 2,
+          currency: 'ETB',
+          status: 'completed',
+        })
+        .select()
+        .single();
+
+      if (booking) {
+        let reviewComment = 'Excellent work, very professional and punctual!';
+        if (prov.headline.includes('Plumber')) {
+          reviewComment = 'Samuel arrived within 25 minutes during our urgent pipe leak in Bole. Fixed the burst joint cleanly and tested everything thoroughly. Highly recommended for emergencies!';
+        } else if (prov.headline.includes('Cleaner')) {
+          reviewComment = 'Helen did a spotless deep clean of our 3-bedroom apartment. Super thorough, trustworthy, and brought eco-friendly supplies!';
+        } else if (prov.headline.includes('Laptop')) {
+          reviewComment = 'Dawit diagnosed my motherboard issue and replaced my damaged display with a 6-month warranty. Honest and master technician!';
+        } else if (prov.headline.includes('Tutor')) {
+          reviewComment = 'Bethelhem is an amazing tutor! Helped my younger brother raise his calculus score to an A in just 6 weeks.';
+        } else if (prov.headline.includes('Electrician')) {
+          reviewComment = 'Abebe solved an intricate circuit trip in our main distribution board safely and quickly. True professional.';
+        }
+
+        await supabase.from('reviews').insert({
+          booking_id: booking.id,
+          reviewer_id: reviewerId,
+          target_entity_type: 'provider',
+          target_entity_id: prov.id,
+          rating: 5,
+          comment: reviewComment,
+        });
+      }
     }
+    console.log('✓ Inserted demo bookings and customer reviews');
   }
 
   console.log('🎉 Database Seeding Completed Successfully!');

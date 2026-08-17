@@ -237,14 +237,34 @@ async function retrieveMatches(intent, userLat, userLng) {
   // Take top 5 from the full sorted list
   const top5 = scored.slice(0, 5);
 
-  // If no new entity made it into the top 5 organically, inject the best one
-  const hasNewInTop5 = top5.some((e) => e.is_new);
-  if (!hasNewInTop5 && newEntities.length > 0) {
-    // Replace position 3 (index 3) — visible but not overriding the top spots
-    // Only inject if we have at least 4 established results
-    if (establishedEntities.length >= 4) {
-      top5[3] = newEntities[0];
-    }
+  // ── 7. Enrich with authentic client reviews and feedback ─────────────────
+  const topProviderIds = top5.filter((e) => e.type === 'provider').map((e) => e.id);
+  if (topProviderIds.length > 0) {
+    try {
+      const { data: reviewsData } = await supabase
+        .from('reviews')
+        .select('target_entity_id, rating, comment, created_at, reviewer:users(full_name)')
+        .eq('target_entity_type', 'provider')
+        .in('target_entity_id', topProviderIds)
+        .order('created_at', { ascending: false })
+        .limit(20);
+
+      const reviewsByProvider = {};
+      (reviewsData || []).forEach((r) => {
+        if (!reviewsByProvider[r.target_entity_id]) reviewsByProvider[r.target_entity_id] = [];
+        reviewsByProvider[r.target_entity_id].push({
+          rating: r.rating,
+          comment: r.comment,
+          reviewer: r.reviewer?.full_name || 'Verified Client',
+        });
+      });
+
+      top5.forEach((e) => {
+        if (reviewsByProvider[e.id]) {
+          e.customer_reviews = reviewsByProvider[e.id];
+        }
+      });
+    } catch (_) {}
   }
 
   return top5.slice(0, 5);

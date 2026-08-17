@@ -35,10 +35,36 @@ class FormattedMarkdownText extends StatelessWidget {
         continue;
       }
 
+      // Check for header
+      if (line.trimLeft().startsWith('### ') || line.trimLeft().startsWith('## ')) {
+        final headerContent = line.trimLeft().replaceFirst(RegExp(r'^#{2,3}\s*'), '');
+        widgets.add(
+          Padding(
+            padding: const EdgeInsets.only(top: 6, bottom: 4),
+            child: RichText(
+              text: TextSpan(
+                children: _parseInlineMarkdown(
+                  headerContent,
+                  style.copyWith(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                    color: const Color(0xFF0F172A),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+        continue;
+      }
+
       // Check for bullet list item
       final isBullet = line.trimLeft().startsWith('* ') ||
           line.trimLeft().startsWith('- ') ||
           line.trimLeft().startsWith('• ');
+
+      // Check for numbered list item
+      final numberedMatch = RegExp(r'^(\d+)\.\s*(.*)').firstMatch(line.trimLeft());
 
       if (isBullet) {
         final content = line.trimLeft().replaceFirst(RegExp(r'^[\*\-•]\s*'), '');
@@ -68,8 +94,44 @@ class FormattedMarkdownText extends StatelessWidget {
             ),
           ),
         );
+      } else if (numberedMatch != null) {
+        final numStr = numberedMatch.group(1)!;
+        final content = numberedMatch.group(2)!;
+        widgets.add(
+          Padding(
+            padding: const EdgeInsets.only(left: 2, bottom: 5),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  margin: const EdgeInsets.only(top: 2, right: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFE0F2FE),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    numStr,
+                    style: const TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF0369A1),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: RichText(
+                    text: TextSpan(
+                      children: _parseInlineMarkdown(content, style),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
       } else {
-        // Normal paragraph or heading
+        // Normal paragraph
         widgets.add(
           Padding(
             padding: const EdgeInsets.only(bottom: 4),
