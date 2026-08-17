@@ -80,10 +80,11 @@ class WelcomeScreen extends ConsumerWidget {
                         const SizedBox(height: 24),
                         Text(
                           'LINC',
-                          style: AppTextStyles.h1.copyWith(
+                          style: AppTextStyles.display(
                             color: AppColors.textPrimary,
+                          ).copyWith(
                             fontWeight: FontWeight.w800,
-                            letterSpacing: -0.02,
+                            letterSpacing: -0.7,
                             fontSize: 36,
                           ),
                         ),

@@ -28,7 +28,7 @@ class _SearchScreenState extends State<SearchScreen> {
   Widget build(BuildContext context) {
     // Filter providers
     var filteredProviders = MockData.allProviders.where((p) {
-      if (_activeFilter == 'verified' && !p.isVerified) return false;
+      if (_activeFilter == 'verified' && !p.verified) return false;
       if (_activeFilter == 'nearby') {
         double dist = double.tryParse(p.distance.split(' ')[0]) ?? 0;
         if (dist >= 2) return false;
@@ -38,7 +38,7 @@ class _SearchScreenState extends State<SearchScreen> {
       // Simple text filter
       if (_queryController.text.isNotEmpty) {
         final query = _queryController.text.toLowerCase();
-        if (!p.name.toLowerCase().contains(query) && !p.service.toLowerCase().contains(query)) {
+        if (!p.name.toLowerCase().contains(query) && !p.headline.toLowerCase().contains(query)) {
           return false;
         }
       }
