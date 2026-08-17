@@ -10,19 +10,15 @@
         "cached_network_image",
         "cupertino_icons",
         "dio",
-        "file_picker",
         "flutter",
-        "flutter_map",
         "flutter_riverpod",
         "flutter_secure_storage",
         "flutter_svg",
-        "geolocator",
         "go_router",
         "google_fonts",
         "http",
         "image_picker",
         "intl",
-        "latlong2",
         "lottie",
         "riverpod_annotation",
         "shared_preferences",
@@ -126,21 +122,6 @@
       "dependencies": []
     },
     {
-      "name": "file_picker",
-      "version": "8.3.7",
-      "dependencies": [
-        "cross_file",
-        "ffi",
-        "flutter",
-        "flutter_plugin_android_lifecycle",
-        "flutter_web_plugins",
-        "path",
-        "plugin_platform_interface",
-        "web",
-        "win32"
-      ]
-    },
-    {
       "name": "image_picker",
       "version": "1.2.3",
       "dependencies": [
@@ -175,42 +156,6 @@
         "clock",
         "meta",
         "path"
-      ]
-    },
-    {
-      "name": "latlong2",
-      "version": "0.9.1",
-      "dependencies": [
-        "intl"
-      ]
-    },
-    {
-      "name": "flutter_map",
-      "version": "7.0.2",
-      "dependencies": [
-        "async",
-        "collection",
-        "dart_earcut",
-        "flutter",
-        "http",
-        "latlong2",
-        "logger",
-        "meta",
-        "polylabel",
-        "proj4dart",
-        "vector_math"
-      ]
-    },
-    {
-      "name": "geolocator",
-      "version": "12.0.0",
-      "dependencies": [
-        "flutter",
-        "geolocator_android",
-        "geolocator_apple",
-        "geolocator_platform_interface",
-        "geolocator_web",
-        "geolocator_windows"
       ]
     },
     {
@@ -803,47 +748,6 @@
       ]
     },
     {
-      "name": "cross_file",
-      "version": "0.3.5+4",
-      "dependencies": [
-        "meta",
-        "web"
-      ]
-    },
-    {
-      "name": "win32",
-      "version": "5.15.0",
-      "dependencies": [
-        "ffi"
-      ]
-    },
-    {
-      "name": "ffi",
-      "version": "2.2.0",
-      "dependencies": []
-    },
-    {
-      "name": "plugin_platform_interface",
-      "version": "2.1.8",
-      "dependencies": [
-        "meta"
-      ]
-    },
-    {
-      "name": "flutter_plugin_android_lifecycle",
-      "version": "2.0.35",
-      "dependencies": [
-        "flutter"
-      ]
-    },
-    {
-      "name": "flutter_web_plugins",
-      "version": "0.0.0",
-      "dependencies": [
-        "flutter"
-      ]
-    },
-    {
       "name": "image_picker_windows",
       "version": "0.2.2",
       "dependencies": [
@@ -969,81 +873,6 @@
         "flutter",
         "meta",
         "url_launcher_platform_interface"
-      ]
-    },
-    {
-      "name": "proj4dart",
-      "version": "2.1.0",
-      "dependencies": [
-        "meta",
-        "mgrs_dart",
-        "wkt_parser"
-      ]
-    },
-    {
-      "name": "polylabel",
-      "version": "1.0.1",
-      "dependencies": [
-        "collection"
-      ]
-    },
-    {
-      "name": "logger",
-      "version": "2.7.0",
-      "dependencies": [
-        "clock",
-        "meta"
-      ]
-    },
-    {
-      "name": "dart_earcut",
-      "version": "1.2.0",
-      "dependencies": []
-    },
-    {
-      "name": "geolocator_windows",
-      "version": "0.2.5",
-      "dependencies": [
-        "flutter",
-        "geolocator_platform_interface"
-      ]
-    },
-    {
-      "name": "geolocator_web",
-      "version": "4.1.4",
-      "dependencies": [
-        "flutter",
-        "flutter_web_plugins",
-        "geolocator_platform_interface",
-        "web"
-      ]
-    },
-    {
-      "name": "geolocator_apple",
-      "version": "2.3.14",
-      "dependencies": [
-        "flutter",
-        "geolocator_platform_interface"
-      ]
-    },
-    {
-      "name": "geolocator_android",
-      "version": "4.6.2",
-      "dependencies": [
-        "flutter",
-        "geolocator_platform_interface",
-        "meta",
-        "uuid"
-      ]
-    },
-    {
-      "name": "geolocator_platform_interface",
-      "version": "4.2.8",
-      "dependencies": [
-        "flutter",
-        "meta",
-        "plugin_platform_interface",
-        "vector_math"
       ]
     },
     {
@@ -1236,6 +1065,13 @@
       "dependencies": [
         "flutter",
         "flutter_secure_storage_platform_interface"
+      ]
+    },
+    {
+      "name": "flutter_web_plugins",
+      "version": "0.0.0",
+      "dependencies": [
+        "flutter"
       ]
     },
     {
@@ -1463,6 +1299,21 @@
       ]
     },
     {
+      "name": "plugin_platform_interface",
+      "version": "2.1.8",
+      "dependencies": [
+        "meta"
+      ]
+    },
+    {
+      "name": "cross_file",
+      "version": "0.3.5+4",
+      "dependencies": [
+        "meta",
+        "web"
+      ]
+    },
+    {
       "name": "file_selector_macos",
       "version": "0.9.5",
       "dependencies": [
@@ -1481,23 +1332,10 @@
       ]
     },
     {
-      "name": "wkt_parser",
-      "version": "2.0.0",
-      "dependencies": []
-    },
-    {
-      "name": "mgrs_dart",
-      "version": "2.0.0",
+      "name": "flutter_plugin_android_lifecycle",
+      "version": "2.0.35",
       "dependencies": [
-        "unicode"
-      ]
-    },
-    {
-      "name": "uuid",
-      "version": "4.6.0",
-      "dependencies": [
-        "crypto",
-        "fixnum"
+        "flutter"
       ]
     },
     {
@@ -1577,6 +1415,14 @@
       ]
     },
     {
+      "name": "uuid",
+      "version": "4.6.0",
+      "dependencies": [
+        "crypto",
+        "fixnum"
+      ]
+    },
+    {
       "name": "sqflite",
       "version": "2.4.3",
       "dependencies": [
@@ -1591,6 +1437,18 @@
     {
       "name": "rxdart",
       "version": "0.28.0",
+      "dependencies": []
+    },
+    {
+      "name": "win32",
+      "version": "5.15.0",
+      "dependencies": [
+        "ffi"
+      ]
+    },
+    {
+      "name": "ffi",
+      "version": "2.2.0",
       "dependencies": []
     },
     {
@@ -1621,13 +1479,6 @@
       "name": "vm_service",
       "version": "15.2.0",
       "dependencies": []
-    },
-    {
-      "name": "unicode",
-      "version": "0.3.1",
-      "dependencies": [
-        "lists"
-      ]
     },
     {
       "name": "platform",
@@ -1724,13 +1575,6 @@
         "path",
         "sqflite_common",
         "sqflite_platform_interface"
-      ]
-    },
-    {
-      "name": "lists",
-      "version": "1.0.1",
-      "dependencies": [
-        "meta"
       ]
     },
     {

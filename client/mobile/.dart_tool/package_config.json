@@ -182,12 +182,6 @@
       "languageVersion": "3.0"
     },
     {
-      "name": "dart_earcut",
-      "rootUri": "file:///C:/Users/hp/AppData/Local/Pub/Cache/hosted/pub.dev/dart_earcut-1.2.0",
-      "packageUri": "lib/",
-      "languageVersion": "3.0"
-    },
-    {
       "name": "dart_style",
       "rootUri": "file:///C:/Users/hp/AppData/Local/Pub/Cache/hosted/pub.dev/dart_style-3.1.1",
       "packageUri": "lib/",
@@ -222,12 +216,6 @@
       "rootUri": "file:///C:/Users/hp/AppData/Local/Pub/Cache/hosted/pub.dev/file-7.0.1",
       "packageUri": "lib/",
       "languageVersion": "3.0"
-    },
-    {
-      "name": "file_picker",
-      "rootUri": "file:///C:/Users/hp/AppData/Local/Pub/Cache/hosted/pub.dev/file_picker-8.3.7",
-      "packageUri": "lib/",
-      "languageVersion": "3.4"
     },
     {
       "name": "file_selector_linux",
@@ -276,12 +264,6 @@
       "rootUri": "file:///C:/Users/hp/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_lints-4.0.0",
       "packageUri": "lib/",
       "languageVersion": "3.1"
-    },
-    {
-      "name": "flutter_map",
-      "rootUri": "file:///C:/Users/hp/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_map-7.0.2",
-      "packageUri": "lib/",
-      "languageVersion": "3.0"
     },
     {
       "name": "flutter_plugin_android_lifecycle",
@@ -360,42 +342,6 @@
       "rootUri": "file:///C:/Users/hp/AppData/Local/Pub/Cache/hosted/pub.dev/frontend_server_client-4.0.0",
       "packageUri": "lib/",
       "languageVersion": "3.0"
-    },
-    {
-      "name": "geolocator",
-      "rootUri": "file:///C:/Users/hp/AppData/Local/Pub/Cache/hosted/pub.dev/geolocator-12.0.0",
-      "packageUri": "lib/",
-      "languageVersion": "2.15"
-    },
-    {
-      "name": "geolocator_android",
-      "rootUri": "file:///C:/Users/hp/AppData/Local/Pub/Cache/hosted/pub.dev/geolocator_android-4.6.2",
-      "packageUri": "lib/",
-      "languageVersion": "3.5"
-    },
-    {
-      "name": "geolocator_apple",
-      "rootUri": "file:///C:/Users/hp/AppData/Local/Pub/Cache/hosted/pub.dev/geolocator_apple-2.3.14",
-      "packageUri": "lib/",
-      "languageVersion": "3.5"
-    },
-    {
-      "name": "geolocator_platform_interface",
-      "rootUri": "file:///C:/Users/hp/AppData/Local/Pub/Cache/hosted/pub.dev/geolocator_platform_interface-4.2.8",
-      "packageUri": "lib/",
-      "languageVersion": "3.5"
-    },
-    {
-      "name": "geolocator_web",
-      "rootUri": "file:///C:/Users/hp/AppData/Local/Pub/Cache/hosted/pub.dev/geolocator_web-4.1.4",
-      "packageUri": "lib/",
-      "languageVersion": "3.5"
-    },
-    {
-      "name": "geolocator_windows",
-      "rootUri": "file:///C:/Users/hp/AppData/Local/Pub/Cache/hosted/pub.dev/geolocator_windows-0.2.5",
-      "packageUri": "lib/",
-      "languageVersion": "3.5"
     },
     {
       "name": "glob",
@@ -536,12 +482,6 @@
       "languageVersion": "3.9"
     },
     {
-      "name": "latlong2",
-      "rootUri": "file:///C:/Users/hp/AppData/Local/Pub/Cache/hosted/pub.dev/latlong2-0.9.1",
-      "packageUri": "lib/",
-      "languageVersion": "3.0"
-    },
-    {
       "name": "leak_tracker",
       "rootUri": "file:///C:/Users/hp/AppData/Local/Pub/Cache/hosted/pub.dev/leak_tracker-11.0.2",
       "packageUri": "lib/",
@@ -564,18 +504,6 @@
       "rootUri": "file:///C:/Users/hp/AppData/Local/Pub/Cache/hosted/pub.dev/lints-4.0.0",
       "packageUri": "lib/",
       "languageVersion": "3.1"
-    },
-    {
-      "name": "lists",
-      "rootUri": "file:///C:/Users/hp/AppData/Local/Pub/Cache/hosted/pub.dev/lists-1.0.1",
-      "packageUri": "lib/",
-      "languageVersion": "2.12"
-    },
-    {
-      "name": "logger",
-      "rootUri": "file:///C:/Users/hp/AppData/Local/Pub/Cache/hosted/pub.dev/logger-2.7.0",
-      "packageUri": "lib/",
-      "languageVersion": "2.17"
     },
     {
       "name": "logging",
@@ -606,12 +534,6 @@
       "rootUri": "file:///C:/Users/hp/AppData/Local/Pub/Cache/hosted/pub.dev/meta-1.18.0",
       "packageUri": "lib/",
       "languageVersion": "3.5"
-    },
-    {
-      "name": "mgrs_dart",
-      "rootUri": "file:///C:/Users/hp/AppData/Local/Pub/Cache/hosted/pub.dev/mgrs_dart-2.0.0",
-      "packageUri": "lib/",
-      "languageVersion": "2.12"
     },
     {
       "name": "mime",
@@ -704,12 +626,6 @@
       "languageVersion": "3.0"
     },
     {
-      "name": "polylabel",
-      "rootUri": "file:///C:/Users/hp/AppData/Local/Pub/Cache/hosted/pub.dev/polylabel-1.0.1",
-      "packageUri": "lib/",
-      "languageVersion": "2.13"
-    },
-    {
       "name": "pool",
       "rootUri": "file:///C:/Users/hp/AppData/Local/Pub/Cache/hosted/pub.dev/pool-1.5.2",
       "packageUri": "lib/",
@@ -720,12 +636,6 @@
       "rootUri": "file:///C:/Users/hp/AppData/Local/Pub/Cache/hosted/pub.dev/posix-6.5.2",
       "packageUri": "lib/",
       "languageVersion": "3.0"
-    },
-    {
-      "name": "proj4dart",
-      "rootUri": "file:///C:/Users/hp/AppData/Local/Pub/Cache/hosted/pub.dev/proj4dart-2.1.0",
-      "packageUri": "lib/",
-      "languageVersion": "2.12"
     },
     {
       "name": "pub_semver",
@@ -956,12 +866,6 @@
       "languageVersion": "3.5"
     },
     {
-      "name": "unicode",
-      "rootUri": "file:///C:/Users/hp/AppData/Local/Pub/Cache/hosted/pub.dev/unicode-0.3.1",
-      "packageUri": "lib/",
-      "languageVersion": "2.12"
-    },
-    {
       "name": "url_launcher",
       "rootUri": "file:///C:/Users/hp/AppData/Local/Pub/Cache/hosted/pub.dev/url_launcher-6.3.2",
       "packageUri": "lib/",
@@ -1074,12 +978,6 @@
       "rootUri": "file:///C:/Users/hp/AppData/Local/Pub/Cache/hosted/pub.dev/win32-5.15.0",
       "packageUri": "lib/",
       "languageVersion": "3.8"
-    },
-    {
-      "name": "wkt_parser",
-      "rootUri": "file:///C:/Users/hp/AppData/Local/Pub/Cache/hosted/pub.dev/wkt_parser-2.0.0",
-      "packageUri": "lib/",
-      "languageVersion": "2.12"
     },
     {
       "name": "xdg_directories",
