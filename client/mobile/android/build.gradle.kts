@@ -19,15 +19,13 @@ subprojects {
     project.evaluationDependsOn(":app")
 }
 
-// Force all plugin subprojects to compile against SDK 36
-// Required by flutter_plugin_android_lifecycle (needed by file_picker, geolocator, etc.)
+// Force all Flutter plugin library subprojects to compile against SDK 36.
+// Uses plugins.withId() which fires at plugin-apply time (before evaluation),
+// avoiding the "already evaluated" error that afterEvaluate causes.
 subprojects {
-    afterEvaluate {
-        if (project.hasProperty("android")) {
-            val androidExt = project.extensions.findByName("android")
-            if (androidExt is com.android.build.gradle.LibraryExtension) {
-                androidExt.compileSdk = 36
-            }
+    plugins.withId("com.android.library") {
+        extensions.configure<com.android.build.gradle.LibraryExtension> {
+            compileSdk = 36
         }
     }
 }
