@@ -106,14 +106,14 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/provider/:id',
         builder: (context, state) {
-          final id = int.parse(state.pathParameters['id']!);
+          final id = state.pathParameters['id'] ?? '1';
           return ProviderProfileScreen(providerId: id);
         },
       ),
       GoRoute(
         path: '/dm/:id',
         builder: (context, state) {
-          final id = int.parse(state.pathParameters['id']!);
+          final id = state.pathParameters['id'] ?? '1';
           return DmScreen(conversationId: id);
         },
       ),
@@ -121,7 +121,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/booking/:id',
         builder: (context, state) {
-          final id = int.parse(state.pathParameters['id']!);
+          final id = state.pathParameters['id'] ?? '1';
           return BookingFlowScreen(providerId: id);
         },
       ),

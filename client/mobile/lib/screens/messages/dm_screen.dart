@@ -8,8 +8,8 @@ import '../../providers/dm_provider.dart';
 import '../../models/conversation_model.dart';
 
 class DmScreen extends ConsumerStatefulWidget {
-  final int conversationId;
-  const DmScreen({Key? key, required this.conversationId}) : super(key: key);
+  final dynamic conversationId;
+  const DmScreen({super.key, required this.conversationId});
 
   @override
   ConsumerState<DmScreen> createState() => _DmScreenState();
@@ -41,7 +41,10 @@ class _DmScreenState extends ConsumerState<DmScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final conv = MockData.conversations.firstWhere((c) => c.id == widget.conversationId);
+    final conv = MockData.conversations.firstWhere(
+      (c) => c.id.toString() == widget.conversationId.toString(),
+      orElse: () => MockData.conversations.first,
+    );
     final dmState = ref.watch(dmProvider);
     final messages = dmState.messages[widget.conversationId] ?? [];
     final showTrust = dmState.showAITrust[widget.conversationId] == true;

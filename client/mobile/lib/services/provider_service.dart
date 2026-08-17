@@ -42,7 +42,7 @@ class ProviderService {
 
   ProviderModel _mapJsonToProvider(Map<String, dynamic> json) {
     final user = json['users'] as Map<String, dynamic>? ?? {};
-    final id = int.tryParse(json['id']?.toString() ?? '1') ?? 1;
+    final id = json['id']?.toString() ?? '1';
     final name = user['full_name'] as String? ?? user['username'] as String? ?? 'Service Provider';
     final headline = json['headline'] as String? ?? 'Verified Specialist';
     final bio = json['bio'] as String? ?? '';

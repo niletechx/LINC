@@ -6,7 +6,7 @@ import '../../models/provider_model.dart';
 import '../../providers/data_providers.dart';
 
 class ProviderProfileScreen extends ConsumerStatefulWidget {
-  final int providerId;
+  final dynamic providerId;
   const ProviderProfileScreen({super.key, required this.providerId});
 
   @override
@@ -23,7 +23,7 @@ class _ProviderProfileScreenState extends ConsumerState<ProviderProfileScreen> {
         ? providersAsync.value!
         : MockData.providers;
     final p = sourceList.firstWhere(
-      (prov) => prov.id == widget.providerId,
+      (prov) => prov.id.toString() == widget.providerId.toString(),
       orElse: () => sourceList.first,
     );
 

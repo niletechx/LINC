@@ -7,7 +7,7 @@ import '../../services/booking_service.dart';
 import '../../providers/data_providers.dart';
 
 class BookingFlowScreen extends ConsumerStatefulWidget {
-  final int providerId;
+  final dynamic providerId;
   const BookingFlowScreen({super.key, required this.providerId});
 
   @override
@@ -29,7 +29,7 @@ class _BookingFlowScreenState extends ConsumerState<BookingFlowScreen> {
         ? providersAsync.value!
         : MockData.providers;
     final p = sourceList.firstWhere(
-      (prov) => prov.id == widget.providerId,
+      (prov) => prov.id.toString() == widget.providerId.toString(),
       orElse: () => sourceList.first,
     );
 

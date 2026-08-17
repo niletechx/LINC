@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'service_model.dart';
 
 class ProviderModel {
-  final int id;
+  final dynamic id;
   final String initials;
   final Color color;
   final String name;
