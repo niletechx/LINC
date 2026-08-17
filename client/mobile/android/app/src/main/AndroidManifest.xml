@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="linc_mobile"
+        android:label="LINC"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
