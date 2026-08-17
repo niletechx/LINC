@@ -199,7 +199,7 @@ class BookingsScreen extends ConsumerWidget {
             decoration: const BoxDecoration(
               border: Border(top: BorderSide(color: Color(0xFFF1F5F9))),
             ),
-            child: b.status != 'completed'
+            child: b.status != BookingStatus.completed
                 ? Row(
                     children: [
                       Expanded(

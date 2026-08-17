@@ -83,17 +83,18 @@ class _SearchScreenState extends State<SearchScreen> {
                     child: TextField(
                       controller: _queryController,
                       onChanged: (_) => setState(() {}),
-                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+                      style: const TextStyle(color: Color(0xFF0F172A), fontWeight: FontWeight.w600, fontSize: 13.5),
                       decoration: InputDecoration(
                         filled: true,
-                        fillColor: const Color(0x40000000), // rgba(0,0,0,0.25)
+                        fillColor: Colors.white.withValues(alpha: 0.45),
+                        prefixIcon: const Icon(Icons.search, color: Color(0xFF1E5F7A), size: 18),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide.none,
                         ),
                         contentPadding: const EdgeInsets.symmetric(vertical: 11, horizontal: 14),
                         hintText: 'Search providers, services…',
-                        hintStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+                        hintStyle: const TextStyle(color: Color(0xFF1E5F7A), fontWeight: FontWeight.w500, fontSize: 13),
                         isDense: true,
                       ),
                     ),
@@ -105,8 +106,8 @@ class _SearchScreenState extends State<SearchScreen> {
                       width: 42,
                       height: 42,
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.40),
-                        border: Border.all(color: Colors.white.withOpacity(0.60)),
+                        color: Colors.white.withValues(alpha: 0.40),
+                        border: Border.all(color: Colors.white.withValues(alpha: 0.60)),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       alignment: Alignment.center,

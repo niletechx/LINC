@@ -211,7 +211,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
       child: Container(
         height: 4,
         decoration: BoxDecoration(
-          color: _step >= step ? AppColors.textPrimary : AppColors.textPrimary.withOpacity(0.1),
+          color: _step >= step ? AppColors.textPrimary : AppColors.textPrimary.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(2),
         ),
       ),
@@ -357,15 +357,15 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: AppColors.amber.withOpacity(0.1),
+            color: AppColors.amber.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.amber.withOpacity(0.3)),
+            border: Border.all(color: AppColors.amber.withValues(alpha: 0.3)),
           ),
-          child: Row(
+          child: const Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Icon(Icons.info_outline, color: AppColors.amber, size: 20),
-              const SizedBox(width: 12),
+              SizedBox(width: 12),
               Expanded(
                 child: Text(
                   'You can always switch roles or be both from your account settings later.',
@@ -397,7 +397,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
             width: isSelected ? 2 : 1,
           ),
           boxShadow: isSelected
-              ? [BoxShadow(color: AppColors.primaryBlue.withOpacity(0.1), blurRadius: 10)]
+              ? [BoxShadow(color: AppColors.primaryBlue.withValues(alpha: 0.1), blurRadius: 10)]
               : [],
         ),
         child: Row(

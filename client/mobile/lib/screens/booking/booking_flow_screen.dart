@@ -288,7 +288,7 @@ class _BookingFlowScreenState extends State<BookingFlowScreen> {
                     ),
                     child: Column(
                       children: [
-                        Text(lines[0], style: TextStyle(fontSize: 10, color: isSelected ? const Color(0xFFFCA5A5) : const Color(0xFF94A3B8))),
+                        Text(lines[0], style: TextStyle(fontSize: 10, color: isSelected ? Colors.white70 : const Color(0xFF94A3B8))),
                         const SizedBox(height: 4),
                         Text(lines[1], style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: isSelected ? Colors.white : const Color(0xFF334155))),
                       ],
@@ -425,9 +425,9 @@ class _BookingFlowScreenState extends State<BookingFlowScreen> {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 14),
           decoration: BoxDecoration(
-            color: isSelected ? const Color(0xFFFEF2F2) : const Color(0xFFF8FAFC),
+            color: isSelected ? const Color(0xFFE0F2FE) : const Color(0xFFF8FAFC),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: isSelected ? const Color(0xFF7EC8E3) : Colors.transparent, width: 1.5),
+            border: Border.all(color: isSelected ? const Color(0xFF38BDF8) : Colors.transparent, width: 1.5),
           ),
           alignment: Alignment.center,
           child: Column(
@@ -439,7 +439,7 @@ class _BookingFlowScreenState extends State<BookingFlowScreen> {
                 style: TextStyle(
                   fontSize: 11.5,
                   fontWeight: FontWeight.w700,
-                  color: isSelected ? const Color(0xFF7EC8E3) : const Color(0xFF475569),
+                  color: isSelected ? const Color(0xFF0284C7) : const Color(0xFF475569),
                 ),
                 textAlign: TextAlign.center,
               ),

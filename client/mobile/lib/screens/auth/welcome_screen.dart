@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../config/colors.dart';
 import '../../config/text_styles.dart';
-import '../../providers/auth_provider.dart';
 
 class WelcomeScreen extends ConsumerWidget {
   const WelcomeScreen({super.key});
@@ -24,7 +23,7 @@ class WelcomeScreen extends ConsumerWidget {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    Colors.white.withOpacity(0.12),
+                    Colors.white.withValues(alpha: 0.12),
                     Colors.transparent,
                   ],
                 ),
@@ -41,7 +40,7 @@ class WelcomeScreen extends ConsumerWidget {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    Colors.black.withOpacity(0.10),
+                    Colors.black.withValues(alpha: 0.10),
                     Colors.transparent,
                   ],
                 ),
@@ -53,95 +52,97 @@ class WelcomeScreen extends ConsumerWidget {
               children: [
                 Expanded(
                   child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: 76,
-                          height: 76,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(24),
-                            border: Border.all(color: Colors.white, width: 1.5),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                blurRadius: 20,
-                                offset: const Offset(0, 10),
-                              )
-                            ],
-                          ),
-                          child: const Icon(
-                            Icons.hub_rounded,
-                            size: 38,
-                            color: Colors.white,
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-                        Text(
-                          'LINC',
-                          style: AppTextStyles.display(
-                            color: AppColors.textPrimary,
-                          ).copyWith(
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: -0.7,
-                            fontSize: 36,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'LIFE INFRASTRUCTURE NETWORK',
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.slateBlue,
-                            letterSpacing: 1.4, // 0.14em approx
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-                        Container(
-                          width: 280,
-                          margin: const EdgeInsets.only(bottom: 36),
-                          child: Text(
-                            'Connect with top-tier professionals for your everyday needs. Fast, secure, and reliable.',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 15,
-                              color: AppColors.slateBlue,
-                              height: 1.5,
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: 76,
+                            height: 76,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.2),
+                              borderRadius: BorderRadius.circular(24),
+                              border: Border.all(color: Colors.white, width: 1.5),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.1),
+                                  blurRadius: 20,
+                                  offset: const Offset(0, 10),
+                                )
+                              ],
+                            ),
+                            child: const Icon(
+                              Icons.hub_rounded,
+                              size: 38,
+                              color: Colors.white,
                             ),
                           ),
-                        ),
-                        Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 24),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 14),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.04),
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                                color: Colors.white.withOpacity(0.07)),
+                          const SizedBox(height: 24),
+                          Text(
+                            'LINC',
+                            style: AppTextStyles.display(
+                              color: AppColors.textPrimary,
+                            ).copyWith(
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: -0.7,
+                              fontSize: 36,
+                            ),
                           ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              _buildTrustItem(Icons.shield_outlined, 'Verified'),
-                              Container(
-                                width: 1,
-                                height: 32,
-                                color: Colors.white.withOpacity(0.07),
-                              ),
-                              _buildTrustItem(Icons.bolt_outlined, 'Fast Match'),
-                              Container(
-                                width: 1,
-                                height: 32,
-                                color: Colors.white.withOpacity(0.07),
-                              ),
-                              _buildTrustItem(Icons.chat_bubble_outline, 'Secure Chat'),
-                            ],
+                          const SizedBox(height: 8),
+                          const Text(
+                            'LIFE INFRASTRUCTURE NETWORK',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.slateBlue,
+                              letterSpacing: 1.4,
+                            ),
                           ),
-                        ),
-                      ],
+                          const SizedBox(height: 24),
+                          Container(
+                            width: 280,
+                            margin: const EdgeInsets.only(bottom: 36),
+                            child: const Text(
+                              'Connect with top-tier professionals for your everyday needs. Fast, secure, and reliable.',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: AppColors.slateBlue,
+                                height: 1.5,
+                              ),
+                            ),
+                          ),
+                          Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 24),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 14),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.04),
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                  color: Colors.white.withValues(alpha: 0.07)),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                _buildTrustItem(Icons.shield_outlined, 'Verified'),
+                                Container(
+                                  width: 1,
+                                  height: 32,
+                                  color: Colors.white.withValues(alpha: 0.07),
+                                ),
+                                _buildTrustItem(Icons.bolt_outlined, 'Fast Match'),
+                                Container(
+                                  width: 1,
+                                  height: 32,
+                                  color: Colors.white.withValues(alpha: 0.07),
+                                ),
+                                _buildTrustItem(Icons.chat_bubble_outline, 'Secure Chat'),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -159,7 +160,7 @@ class WelcomeScreen extends ConsumerWidget {
                             backgroundColor: Colors.white,
                             foregroundColor: AppColors.headerBg,
                             elevation: 4,
-                            shadowColor: Colors.black.withOpacity(0.15),
+                            shadowColor: Colors.black.withValues(alpha: 0.15),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
                             ),
@@ -180,12 +181,12 @@ class WelcomeScreen extends ConsumerWidget {
                         child: TextButton(
                           onPressed: () => context.go('/login'),
                           style: TextButton.styleFrom(
-                            backgroundColor: Colors.white.withOpacity(0.15),
+                            backgroundColor: Colors.white.withValues(alpha: 0.15),
                             foregroundColor: AppColors.textPrimary,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
                               side: BorderSide(
-                                color: Colors.white.withOpacity(0.2),
+                                color: Colors.white.withValues(alpha: 0.2),
                               ),
                             ),
                           ),
@@ -204,7 +205,7 @@ class WelcomeScreen extends ConsumerWidget {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 12,
-                          color: AppColors.slateBlue.withOpacity(0.8),
+                          color: AppColors.slateBlue.withValues(alpha: 0.8),
                           height: 1.5,
                         ),
                       ),

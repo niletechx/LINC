@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../config/colors.dart';
-import '../../config/text_styles.dart';
 
 class ForgotScreen extends ConsumerStatefulWidget {
   const ForgotScreen({super.key});
@@ -48,8 +47,8 @@ class _ForgotScreenState extends ConsumerState<ForgotScreen> {
                   icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
                 ),
                 const SizedBox(height: 16),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16),
                   child: Text(
                     'Forgot Password?',
                     style: TextStyle(
@@ -80,13 +79,13 @@ class _ForgotScreenState extends ConsumerState<ForgotScreen> {
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: AppColors.primaryBlue.withOpacity(0.1),
+            color: AppColors.primaryBlue.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
           ),
-          child: Row(
+          child: const Row(
             children: [
               Icon(Icons.mail_outline, color: AppColors.primaryBlue),
-              const SizedBox(width: 12),
+              SizedBox(width: 12),
               Expanded(
                 child: Text(
                   'Enter your email address and we will send you a link to reset your password.',
@@ -101,7 +100,7 @@ class _ForgotScreenState extends ConsumerState<ForgotScreen> {
           ),
         ),
         const SizedBox(height: 32),
-        Text(
+        const Text(
           'Email Address',
           style: TextStyle(
             fontSize: 13,
@@ -116,21 +115,21 @@ class _ForgotScreenState extends ConsumerState<ForgotScreen> {
           style: const TextStyle(fontSize: 14),
           decoration: InputDecoration(
             hintText: 'Enter your email',
-            hintStyle: TextStyle(color: AppColors.muted),
+            hintStyle: const TextStyle(color: AppColors.muted),
             filled: true,
             fillColor: Colors.white,
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(13),
-              borderSide: BorderSide(color: AppColors.divider, width: 1.5),
+              borderSide: const BorderSide(color: AppColors.divider, width: 1.5),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(13),
-              borderSide: BorderSide(color: AppColors.divider, width: 1.5),
+              borderSide: const BorderSide(color: AppColors.divider, width: 1.5),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(13),
-              borderSide: BorderSide(color: AppColors.primaryBlue, width: 1.5),
+              borderSide: const BorderSide(color: AppColors.primaryBlue, width: 1.5),
             ),
           ),
         ),
@@ -171,13 +170,13 @@ class _ForgotScreenState extends ConsumerState<ForgotScreen> {
           width: 80,
           height: 80,
           decoration: BoxDecoration(
-            color: AppColors.emerald.withOpacity(0.1),
+            color: AppColors.emerald.withValues(alpha: 0.1),
             shape: BoxShape.circle,
           ),
-          child: Icon(Icons.check_circle, color: AppColors.emerald, size: 40),
+          child: const Icon(Icons.check_circle, color: AppColors.emerald, size: 40),
         ),
         const SizedBox(height: 24),
-        Text(
+        const Text(
           'Check your inbox',
           style: TextStyle(
             fontSize: 20,
@@ -189,7 +188,7 @@ class _ForgotScreenState extends ConsumerState<ForgotScreen> {
         Text(
           'We have sent a password reset link to\n$_email',
           textAlign: TextAlign.center,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 14,
             color: AppColors.secondaryText,
             height: 1.5,

@@ -106,7 +106,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
             decoration: BoxDecoration(
               color: p.color,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: Colors.white.withOpacity(0.12), width: 2.5),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.12), width: 2.5),
             ),
             alignment: Alignment.center,
             child: Text(
@@ -141,8 +141,8 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF59E0B).withOpacity(0.15),
-                        border: Border.all(color: const Color(0xFFF59E0B).withOpacity(0.25)),
+                        color: const Color(0xFFF59E0B).withValues(alpha: 0.15),
+                        border: Border.all(color: const Color(0xFFF59E0B).withValues(alpha: 0.25)),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: const Text(
@@ -158,8 +158,8 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF10B981).withOpacity(0.12),
-                        border: Border.all(color: const Color(0xFF10B981).withOpacity(0.20)),
+                        color: const Color(0xFF10B981).withValues(alpha: 0.12),
+                        border: Border.all(color: const Color(0xFF10B981).withValues(alpha: 0.20)),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
@@ -305,7 +305,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
                                 Wrap(
                                   spacing: 4,
                                   runSpacing: 4,
-                                  children: (service.tags ?? []).map((tag) => Container(
+                                  children: service.tags.map((tag) => Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                                     decoration: BoxDecoration(
                                       color: const Color(0xFFF1F5F9),

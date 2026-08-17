@@ -13,16 +13,17 @@ class LincBottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      top: false,
-      child: Container(
-        decoration: const BoxDecoration(
-          color: AppColors.cardSurface,
-          border: Border(top: BorderSide(color: AppColors.divider, width: 1)),
-        ),
+    return Container(
+      decoration: const BoxDecoration(
+        color: AppColors.cardSurface,
+        border: Border(top: BorderSide(color: AppColors.divider, width: 1)),
+      ),
+      child: SafeArea(
+        top: false,
         child: SizedBox(
-          height: 60,
+          height: 62,
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               _NavItem(icon: _homeIcon, label: 'Home', active: currentIndex == 0, onTap: () => onTap(0)),
               _NavItem(icon: _chatIcon, label: 'Chat', active: currentIndex == 1, onTap: () => onTap(1)),
@@ -71,11 +72,13 @@ class _NavItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
+      child: InkWell(
         onTap: onTap,
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
             icon(active),
             const SizedBox(height: 3),
@@ -100,52 +103,59 @@ class _AiNavItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
+      child: InkWell(
         onTap: onTap,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            // Elevated AI button — floats above the bar
-            Transform.translate(
-              offset: const Offset(0, -10),
-              child: Container(
-                width: 46,
-                height: 46,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(15),
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: active
-                        ? [const Color(0xFF4338CA), const Color(0xFF0891B2)]
-                        : [AppColors.primaryBlue, AppColors.cyan],
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: active
-                          ? const Color(0xFF4F46E5).withOpacity(0.5)
-                          : const Color(0xFF4F46E5).withOpacity(0.3),
-                      blurRadius: active ? 18 : 10,
-                      offset: const Offset(0, 4),
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
+        child: SizedBox(
+          height: 62,
+          child: Stack(
+            clipBehavior: Clip.none,
+            alignment: Alignment.center,
+            children: [
+              Positioned(
+                top: -12,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(14),
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: active
+                              ? const [Color(0xFF4338CA), Color(0xFF0891B2)]
+                              : const [AppColors.primaryBlue, AppColors.cyan],
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: active
+                                ? const Color(0xFF4F46E5).withValues(alpha: 0.45)
+                                : const Color(0xFF4F46E5).withValues(alpha: 0.25),
+                            blurRadius: active ? 16 : 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: const Center(
+                        child: Text('✨', style: TextStyle(fontSize: 19)),
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      'AI',
+                      style: active
+                          ? AppTextStyles.navLabelActive()
+                          : AppTextStyles.navLabel(),
                     ),
                   ],
                 ),
-                child: const Center(
-                  child: Text('✨', style: TextStyle(fontSize: 20)),
-                ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 6),
-              child: Text(
-                'AI',
-                style: active
-                    ? AppTextStyles.navLabelActive()
-                    : AppTextStyles.navLabel(),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

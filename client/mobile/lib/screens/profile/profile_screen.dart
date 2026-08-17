@@ -266,7 +266,7 @@ class ProfileScreen extends ConsumerWidget {
                     width: 34,
                     height: 34,
                     decoration: BoxDecoration(
-                      color: isHighlight ? const Color(0xFFFEF2F2) : const Color(0xFFF8FAFC),
+                      color: isHighlight ? const Color(0xFFE0F2FE) : const Color(0xFFF8FAFC),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     alignment: Alignment.center,
@@ -279,7 +279,7 @@ class ProfileScreen extends ConsumerWidget {
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: isHighlight ? FontWeight.w700 : FontWeight.w600,
-                        color: isHighlight ? const Color(0xFF7EC8E3) : const Color(0xFF1E293B),
+                        color: isHighlight ? const Color(0xFF0284C7) : const Color(0xFF1E293B),
                       ),
                     ),
                   ),

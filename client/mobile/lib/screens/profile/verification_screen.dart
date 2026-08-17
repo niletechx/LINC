@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import '../../config/colors.dart';
-import '../../config/text_styles.dart';
 
 class VerificationScreen extends StatefulWidget {
-  const VerificationScreen({Key? key}) : super(key: key);
+  const VerificationScreen({super.key});
 
   @override
   State<VerificationScreen> createState() => _VerificationScreenState();
@@ -62,10 +59,10 @@ class _VerificationScreenState extends State<VerificationScreen> {
                         child: const Text('🛡️', style: TextStyle(fontSize: 24)),
                       ),
                       const SizedBox(width: 14),
-                      Expanded(
+                      const Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
+                          children: [
                             Text(
                               'LINC Verified Badge',
                               style: TextStyle(
@@ -123,7 +120,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                       fontSize: 12,
                       fontWeight: FontWeight.w800,
                       color: Color(0xFF0F172A),
-                      letterSpacing: 0.04, // 0.04em
+                      letterSpacing: 0.04,
                     ),
                   ),
                   const SizedBox(height: 14),
@@ -131,7 +128,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                     children: [
                       Positioned(
                         top: 15,
-                        left: MediaQuery.of(context).size.width * 0.1667, // rough 16.67%
+                        left: MediaQuery.of(context).size.width * 0.1667,
                         right: MediaQuery.of(context).size.width * 0.1667,
                         child: Container(
                           height: 2,
@@ -209,7 +206,6 @@ class _VerificationScreenState extends State<VerificationScreen> {
                   ...docs.map((doc) {
                     bool isDone = doc['status'] == 'done';
                     bool isRequired = doc['status'] == 'required';
-                    bool isOptional = doc['status'] == 'optional';
                     bool isActive = activeDoc == doc['id'];
 
                     return Column(
@@ -295,8 +291,8 @@ class _VerificationScreenState extends State<VerificationScreen> {
                                   ],
                                 ),
                                 const SizedBox(height: 10),
-                                Row(
-                                  children: const [
+                                const Row(
+                                  children: [
                                     Icon(Icons.info_outline, color: Color(0xFF94A3B8), size: 12),
                                     SizedBox(width: 5),
                                     Text(
@@ -310,7 +306,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                           ),
                       ],
                     );
-                  }).toList(),
+                  }),
                 ],
               ),
             ),
@@ -344,7 +340,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: GestureDetector(
                 onTap: () {
-                  // Submit
+                  // Submit logic
                 },
                 child: Container(
                   width: double.infinity,
@@ -374,23 +370,21 @@ class _VerificationScreenState extends State<VerificationScreen> {
   Widget _buildUploadButton(IconData icon, String label) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: const Color(0xFFF0F9FF),
         borderRadius: BorderRadius.circular(10),
-        // Dashed border effect could be implemented via a custom painter or package, 
-        // using solid here for simplicity in raw flutter
-        border: Border.all(color: const Color(0xFFFECACA)),
+        border: Border.all(color: const Color(0xFFBAE6FD)),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 14),
       child: Column(
         children: [
-          Icon(icon, color: const Color(0xFF7EC8E3), size: 20),
+          Icon(icon, color: const Color(0xFF0284C7), size: 20),
           const SizedBox(height: 4),
           Text(
             label,
             style: const TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.w700,
-              color: Color(0xFF7EC8E3),
+              color: Color(0xFF0284C7),
             ),
           ),
         ],

@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import '../../config/colors.dart';
-import '../../config/text_styles.dart';
 import '../../providers/app_provider.dart';
 
-// Assuming there's a simple StateProvider for availability
 final availabilityProvider = StateProvider<bool>((ref) => true);
 
 class ProviderDashboard extends ConsumerStatefulWidget {
@@ -19,16 +15,107 @@ class _ProviderDashboardState extends ConsumerState<ProviderDashboard> {
   @override
   Widget build(BuildContext context) {
     final isAvailable = ref.watch(availabilityProvider);
+    final topPadding = MediaQuery.of(context).padding.top;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF1F5F9), // AppColors.appBackground
+      backgroundColor: const Color(0xFFF1F5F9),
       body: SafeArea(
+        top: false,
         bottom: false,
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // 1. AVAILABILITY BANNER
+              // 1. CYAN HEADER (with Location, Notification, Mode Switcher & Title)
+              Container(
+                width: double.infinity,
+                color: const Color(0xFF7EC8E3),
+                padding: EdgeInsets.fromLTRB(16, topPadding + 14, 16, 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // Location dropdown
+                        const Row(
+                          children: [
+                            Icon(Icons.location_on, size: 14, color: Color(0xFF1E5F7A)),
+                            SizedBox(width: 4),
+                            Text(
+                              'Addis Ababa, ET',
+                              style: TextStyle(
+                                fontSize: 12.5,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF1E5F7A),
+                              ),
+                            ),
+                            SizedBox(width: 2),
+                            Icon(Icons.keyboard_arrow_down, size: 16, color: Color(0xFF1E5F7A)),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            // Notification bell with red dot
+                            Stack(
+                              children: [
+                                const Icon(Icons.notifications_none, color: Color(0xFF0F172A), size: 24),
+                                Positioned(
+                                  top: 0,
+                                  right: 0,
+                                  child: Container(
+                                    width: 7,
+                                    height: 7,
+                                    decoration: const BoxDecoration(
+                                      color: Color(0xFFEF4444),
+                                      shape: BoxShape.circle,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(width: 12),
+                            // Mode Switcher Pill
+                            GestureDetector(
+                              onTap: () {
+                                ref.read(appModeProvider.notifier).state = AppMode.client;
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 11),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.50),
+                                  border: Border.all(color: Colors.white.withValues(alpha: 0.70)),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: const Text(
+                                  '💼 Provider',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700,
+                                    color: Color(0xFF0F172A),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 14),
+                    const Text(
+                      'Provider Dashboard',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF0F172A),
+                        letterSpacing: -0.02,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // 2. AVAILABILITY BANNER
               Container(
                 padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
                 decoration: BoxDecoration(
@@ -36,18 +123,27 @@ class _ProviderDashboardState extends ConsumerState<ProviderDashboard> {
                   border: Border(
                     bottom: BorderSide(
                       color: isAvailable ? const Color(0xFF10B981) : const Color(0xFFEF4444),
-                      width: 2,
+                      width: 1.5,
                     ),
                   ),
                 ),
                 child: Row(
                   children: [
+                    Container(
+                      width: 10,
+                      height: 10,
+                      decoration: BoxDecoration(
+                        color: isAvailable ? const Color(0xFF10B981) : const Color(0xFFEF4444),
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            isAvailable ? '🟢 Available for Instant Booking' : '🔴 Currently Unavailable',
+                            isAvailable ? 'Available for Instant Booking' : 'Currently Unavailable',
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w800,
@@ -92,7 +188,7 @@ class _ProviderDashboardState extends ConsumerState<ProviderDashboard> {
                                   shape: BoxShape.circle,
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.black.withOpacity(0.1),
+                                      color: Colors.black.withValues(alpha: 0.1),
                                       blurRadius: 4,
                                       offset: const Offset(0, 2),
                                     ),
@@ -108,7 +204,7 @@ class _ProviderDashboardState extends ConsumerState<ProviderDashboard> {
                 ),
               ),
 
-              // 2. METRICS 2x2 GRID
+              // 3. METRICS 2x2 GRID
               Container(
                 color: Colors.white,
                 margin: const EdgeInsets.only(bottom: 8),
@@ -134,7 +230,7 @@ class _ProviderDashboardState extends ConsumerState<ProviderDashboard> {
                 ),
               ),
 
-              // 3. INCOMING REQUESTS
+              // 4. INCOMING REQUESTS
               Container(
                 color: Colors.white,
                 child: Column(
@@ -201,6 +297,7 @@ class _ProviderDashboardState extends ConsumerState<ProviderDashboard> {
                 fontSize: 22,
                 fontWeight: FontWeight.w800,
                 color: valueColor,
+                letterSpacing: -0.02,
               ),
             ),
             const SizedBox(height: 2),
@@ -239,7 +336,7 @@ class _ProviderDashboardState extends ConsumerState<ProviderDashboard> {
                 width: 42,
                 height: 42,
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.15),
+                  color: color.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(14),
                 ),
                 alignment: Alignment.center,
@@ -277,7 +374,7 @@ class _ProviderDashboardState extends ConsumerState<ProviderDashboard> {
                           budget,
                           style: const TextStyle(
                             fontSize: 12,
-                            fontWeight: FontWeight.w600,
+                            fontWeight: FontWeight.w700,
                             color: Color(0xFF10B981),
                           ),
                         ),
@@ -287,19 +384,26 @@ class _ProviderDashboardState extends ConsumerState<ProviderDashboard> {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 8),
+                padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
                 decoration: BoxDecoration(
                   color: const Color(0xFFFFFBEB),
                   border: Border.all(color: const Color(0xFFFDE68A)),
                   borderRadius: BorderRadius.circular(6),
                 ),
-                child: Text(
-                  '⏱ $timeLeft',
-                  style: const TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFFD97706),
-                  ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.timer_outlined, size: 12, color: Color(0xFFD97706)),
+                    const SizedBox(width: 3),
+                    Text(
+                      timeLeft,
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFFD97706),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -312,9 +416,9 @@ class _ProviderDashboardState extends ConsumerState<ProviderDashboard> {
                 child: GestureDetector(
                   onTap: () {},
                   child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 9),
+                    padding: const EdgeInsets.symmetric(vertical: 10),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF1F5F9),
+                      color: const Color(0xFFF8FAFC),
                       border: Border.all(color: const Color(0xFFE2E8F0)),
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -336,14 +440,14 @@ class _ProviderDashboardState extends ConsumerState<ProviderDashboard> {
                 child: GestureDetector(
                   onTap: () {},
                   child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 9),
+                    padding: const EdgeInsets.symmetric(vertical: 10),
                     decoration: BoxDecoration(
                       color: const Color(0xFF0F172A),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     alignment: Alignment.center,
                     child: const Text(
-                      'Accept',
+                      'Accept Request',
                       style: TextStyle(
                         fontSize: 12.5,
                         fontWeight: FontWeight.w800,

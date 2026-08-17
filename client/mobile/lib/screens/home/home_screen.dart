@@ -15,7 +15,7 @@ class HomeScreen extends ConsumerWidget {
     // Assuming appModeProvider provides a boolean or enum, we'll try to handle it.
     // We'll treat it as a boolean for simplicity if the type is unknown.
     final appMode = ref.watch(appModeProvider);
-    final isProvider = appMode.toString().toLowerCase().contains('provider') || appMode == true;
+    final isProvider = appMode == AppMode.provider;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF1F5F9), // AppColors.appBackground
@@ -83,8 +83,8 @@ class HomeScreen extends ConsumerWidget {
                               child: Container(
                                 padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 11),
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.50),
-                                  border: Border.all(color: Colors.white.withOpacity(0.70)),
+                                  color: Colors.white.withValues(alpha: 0.50),
+                                  border: Border.all(color: Colors.white.withValues(alpha: 0.70)),
                                   borderRadius: BorderRadius.circular(20),
                                 ),
                                 child: Text(
@@ -125,7 +125,7 @@ class HomeScreen extends ConsumerWidget {
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 14),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.45),
+                          color: Colors.white.withValues(alpha: 0.45),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Row(
@@ -370,7 +370,7 @@ class HomeScreen extends ConsumerWidget {
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.12),
+                  color: color.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(14),
                 ),
                 alignment: Alignment.center,
@@ -459,13 +459,13 @@ class HomeScreen extends ConsumerWidget {
           Container(
             padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 12),
             decoration: BoxDecoration(
-              color: const Color(0xFFFEF2F2),
+              color: const Color(0xFFE0F2FE),
               borderRadius: BorderRadius.circular(8),
             ),
             child: const Text(
               'Offer',
               style: TextStyle(
-                color: Color(0xFF7EC8E3),
+                color: Color(0xFF0284C7),
                 fontSize: 11.5,
                 fontWeight: FontWeight.w800,
               ),

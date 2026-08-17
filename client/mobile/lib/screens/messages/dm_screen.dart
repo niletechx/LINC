@@ -246,7 +246,7 @@ class _DmScreenState extends ConsumerState<DmScreen> {
                       decoration: BoxDecoration(
                         color: const Color(0xEB0F172A),
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: const Color(0x4DDC2626)),
+                        border: Border.all(color: const Color(0x337EC8E3)),
                       ),
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                       child: Column(
@@ -376,7 +376,7 @@ class _DmScreenState extends ConsumerState<DmScreen> {
                       children: [
                         TextSpan(
                           text: '@AI',
-                          style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFF87171)),
+                          style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF0284C7)),
                         ),
                         TextSpan(text: ' for a private trust insight'),
                       ],
