@@ -234,11 +234,25 @@ async function retrieveMatches(intent, userLat, userLng) {
   const newEntities        = scored.filter((e) => e.is_new);
   const establishedEntities = scored.filter((e) => !e.is_new);
 
-  // Take top 5 from the full sorted list
-  const top5 = scored.slice(0, 5);
+  // Take top 10 from the full sorted list
+  let top10 = scored.slice(0, 10);
+
+  // If the query specifically targeted a @username or specific name, prioritize them
+  const targetMention = (keywords || []).find((k) => k.startsWith('@') || /^[a-zA-Z0-9_]{3,}$/.test(k));
+  if (targetMention) {
+    const cleanMention = targetMention.replace('@', '').toLowerCase();
+    const exactMatchIndex = top10.findIndex(
+      (e) => (e.username && e.username.toLowerCase() === cleanMention) ||
+             (e.name && e.name.toLowerCase().includes(cleanMention))
+    );
+    if (exactMatchIndex > 0) {
+      const [matched] = top10.splice(exactMatchIndex, 1);
+      top10.unshift(matched);
+    }
+  }
 
   // ── 7. Enrich with authentic client reviews and feedback ─────────────────
-  const topProviderIds = top5.filter((e) => e.type === 'provider').map((e) => e.id);
+  const topProviderIds = top10.filter((e) => e.entity_type === 'provider').map((e) => e.id);
   if (topProviderIds.length > 0) {
     try {
       const { data: reviewsData } = await supabase
@@ -247,7 +261,7 @@ async function retrieveMatches(intent, userLat, userLng) {
         .eq('target_entity_type', 'provider')
         .in('target_entity_id', topProviderIds)
         .order('created_at', { ascending: false })
-        .limit(20);
+        .limit(40);
 
       const reviewsByProvider = {};
       (reviewsData || []).forEach((r) => {
@@ -259,7 +273,7 @@ async function retrieveMatches(intent, userLat, userLng) {
         });
       });
 
-      top5.forEach((e) => {
+      top10.forEach((e) => {
         if (reviewsByProvider[e.id]) {
           e.customer_reviews = reviewsByProvider[e.id];
         }
@@ -267,7 +281,7 @@ async function retrieveMatches(intent, userLat, userLng) {
     } catch (_) {}
   }
 
-  return top5.slice(0, 5);
+  return top10.slice(0, 10);
 }
 
 module.exports = { retrieveMatches };

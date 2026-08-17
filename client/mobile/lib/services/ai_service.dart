@@ -34,4 +34,33 @@ class AiService {
       throw _client.extractErrorMessage(e);
     }
   }
+
+  Future<List<dynamic>> getConversationMessages(String conversationId) async {
+    try {
+      final response = await _client.dio.get('/ai/conversations/$conversationId/messages');
+      return response.data['data'] as List<dynamic>? ?? [];
+    } catch (e) {
+      throw _client.extractErrorMessage(e);
+    }
+  }
+
+  Future<Map<String, dynamic>> createConversation([String? title]) async {
+    try {
+      final response = await _client.dio.post(
+        '/ai/conversations',
+        data: {'title': title ?? 'New Conversation'},
+      );
+      return response.data['data'] as Map<String, dynamic>;
+    } catch (e) {
+      throw _client.extractErrorMessage(e);
+    }
+  }
+
+  Future<void> deleteConversation(String conversationId) async {
+    try {
+      await _client.dio.delete('/ai/conversations/$conversationId');
+    } catch (e) {
+      throw _client.extractErrorMessage(e);
+    }
+  }
 }

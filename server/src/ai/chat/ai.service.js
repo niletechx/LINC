@@ -205,9 +205,31 @@ async function getConversationMessages(userId, conversationId) {
   return data;
 }
 
+async function createConversation(userId, title = 'New Conversation') {
+  const { data, error } = await supabase
+    .from('ai_conversations')
+    .insert({ user_id: userId, title })
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+async function deleteConversation(userId, conversationId) {
+  const { error } = await supabase
+    .from('ai_conversations')
+    .delete()
+    .eq('id', conversationId)
+    .eq('user_id', userId);
+  if (error) throw error;
+  return { success: true };
+}
+
 module.exports = {
   processMessage,
   processMessageStream,
   getUserConversations,
   getConversationMessages,
+  createConversation,
+  deleteConversation,
 };

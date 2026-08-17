@@ -94,4 +94,30 @@ const getConversationMessages = asyncHandler(async (req, res) => {
   return success(res, result);
 });
 
-module.exports = { chat, chatStream, getConversations, getConversationMessages };
+/**
+ * POST /api/ai/conversations
+ * Creates a new conversation thread.
+ */
+const createConversation = asyncHandler(async (req, res) => {
+  const { title } = req.body;
+  const result = await aiService.createConversation(req.user.id, title || 'New Conversation');
+  return success(res, result, 'Conversation created', 201);
+});
+
+/**
+ * DELETE /api/ai/conversations/:id
+ * Deletes a conversation thread.
+ */
+const deleteConversation = asyncHandler(async (req, res) => {
+  const result = await aiService.deleteConversation(req.user.id, req.params.id);
+  return success(res, result, 'Conversation deleted');
+});
+
+module.exports = {
+  chat,
+  chatStream,
+  getConversations,
+  getConversationMessages,
+  createConversation,
+  deleteConversation,
+};
