@@ -4,7 +4,7 @@ const { signToken } = require('../../utils/tokenUtils');
 
 const SALT_ROUNDS = 12;
 
-async function register({ email, password, full_name, username }) {
+async function register({ email, password, full_name, username, phone, location_city, role, headline }) {
   // Check duplicates
   const [existingEmail, existingUsername] = await Promise.all([
     authRepo.findByEmail(email),
@@ -12,18 +12,27 @@ async function register({ email, password, full_name, username }) {
   ]);
 
   if (existingEmail) {
-    const err = new Error('Email is already registered');
+    const err = new Error('Email is already registered. Please sign in instead.');
     err.statusCode = 409;
     throw err;
   }
   if (existingUsername) {
-    const err = new Error('Username is already taken');
+    const err = new Error('Username is already taken. Please choose another.');
     err.statusCode = 409;
     throw err;
   }
 
   const password_hash = await bcrypt.hash(password, SALT_ROUNDS);
-  const user = await authRepo.createUser({ email, password_hash, full_name, username });
+  const user = await authRepo.createUser({
+    email,
+    password_hash,
+    full_name,
+    username,
+    phone,
+    location_city,
+    role,
+    headline,
+  });
 
   const token = signToken({ id: user.id, email: user.email, is_admin: user.is_admin });
   return { user, token };

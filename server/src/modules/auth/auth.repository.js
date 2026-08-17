@@ -30,7 +30,7 @@ async function findById(id) {
   return data;
 }
 
-async function createUser({ email, password_hash, full_name, username }) {
+async function createUser({ email, password_hash, full_name, username, phone, location_city, role = 'client', headline }) {
   const { data, error } = await supabase
     .from('users')
     .insert({
@@ -38,10 +38,25 @@ async function createUser({ email, password_hash, full_name, username }) {
       password_hash,
       full_name,
       username: username.toLowerCase(),
+      phone: phone || null,
+      location_city: location_city || 'Addis Ababa',
     })
-    .select('id, email, full_name, username, avatar_url, is_admin, created_at')
+    .select('id, email, full_name, username, avatar_url, phone, location_city, is_admin, created_at')
     .single();
   if (error) throw error;
+
+  if (role === 'provider') {
+    await supabase.from('provider_profiles').insert({
+      user_id: data.id,
+      headline: headline || `${full_name} Services`,
+      location_city: location_city || 'Addis Ababa',
+      hourly_rate: 250,
+      currency: 'ETB',
+      availability_status: 'available',
+      is_verified: false,
+    });
+  }
+
   return data;
 }
 

@@ -17,6 +17,10 @@ class AuthService {
     required String password,
     required String fullName,
     required String username,
+    String? phone,
+    String? locationCity,
+    String? role,
+    String? headline,
   }) async {
     try {
       final response = await _client.dio.post(
@@ -26,6 +30,10 @@ class AuthService {
           'password': password,
           'full_name': fullName.trim(),
           'username': username.trim(),
+          if (phone != null && phone.isNotEmpty) 'phone': phone.trim(),
+          if (locationCity != null && locationCity.isNotEmpty) 'location_city': locationCity.trim(),
+          if (role != null) 'role': role,
+          if (headline != null && headline.isNotEmpty) 'headline': headline.trim(),
         },
       );
 

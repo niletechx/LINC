@@ -70,6 +70,9 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
         password: _password,
         fullName: _name.trim(),
         username: cleanUsername,
+        phone: _phone.trim(),
+        role: _mode,
+        locationCity: 'Addis Ababa',
       );
 
       if (mounted) {
