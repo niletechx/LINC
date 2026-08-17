@@ -65,9 +65,11 @@ class _AiScreenState extends ConsumerState<AiScreen> with SingleTickerProviderSt
       body: SafeArea(
         bottom: false,
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
           // ── AI Header ──────────────────────────────────────────────
           Container(
+            width: double.infinity,
             padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
             decoration: const BoxDecoration(
               color: Color(0xFF7EC8E3),

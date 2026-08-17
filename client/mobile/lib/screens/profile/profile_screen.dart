@@ -28,8 +28,10 @@ class ProfileScreen extends ConsumerWidget {
         bottom: false,
         child: SingleChildScrollView(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Container(
+              width: double.infinity,
               decoration: const BoxDecoration(color: Color(0xFF7EC8E3)),
               padding: const EdgeInsets.fromLTRB(16, 14, 16, 20),
               child: Column(

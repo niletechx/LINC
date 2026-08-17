@@ -16,9 +16,11 @@ class MessagesScreen extends ConsumerWidget {
       body: SafeArea(
         bottom: false,
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
           // Messages header
           Container(
+            width: double.infinity,
             padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
             decoration: const BoxDecoration(
               color: Color(0xFF7EC8E3),
