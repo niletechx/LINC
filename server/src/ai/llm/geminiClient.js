@@ -19,7 +19,7 @@ async function chat(messages, systemInstruction = '') {
   while (attempt < MAX_RETRIES) {
     attempt++;
     try {
-      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash', systemInstruction });
+      const model = genAI.getGenerativeModel({ model: 'gemini-3.6-flash', systemInstruction });
       const history = messages.slice(0, -1);
       const lastMessage = messages[messages.length - 1];
 
@@ -59,7 +59,7 @@ async function chat(messages, systemInstruction = '') {
  */
 async function streamChat(messages, systemInstruction = '', onChunk = () => {}) {
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash', systemInstruction });
+    const model = genAI.getGenerativeModel({ model: 'gemini-3.6-flash', systemInstruction });
     const history = messages.slice(0, -1);
     const lastMessage = messages[messages.length - 1];
 
