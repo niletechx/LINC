@@ -11,8 +11,8 @@ validateEnv();
 const app = express();
 
 // Security
-app.use(helmet());
-app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
+app.use(helmet({ crossOriginResourcePolicy: false }));
+app.use(cors({ origin: true, credentials: true }));
 
 // Logging
 app.use(morgan('dev'));

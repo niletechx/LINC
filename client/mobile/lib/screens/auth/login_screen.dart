@@ -144,14 +144,30 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               border: Border.all(color: Colors.red.shade200),
                               borderRadius: BorderRadius.circular(10),
                             ),
-                            child: Row(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Icon(Icons.error_outline, color: Colors.red, size: 20),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: Text(
-                                    _error,
-                                    style: const TextStyle(color: Colors.red, fontSize: 14),
+                                Row(
+                                  children: [
+                                    const Icon(Icons.error_outline, color: Colors.red, size: 20),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        _error,
+                                        style: const TextStyle(color: Colors.red, fontSize: 13),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                InkWell(
+                                  onTap: () {
+                                    ref.read(authProvider.notifier).signIn();
+                                    context.go('/home');
+                                  },
+                                  child: const Text(
+                                    '👉 Or Continue in Demo Mode',
+                                    style: TextStyle(color: Color(0xFF0284C7), fontWeight: FontWeight.bold, fontSize: 12),
                                   ),
                                 ),
                               ],
@@ -314,23 +330,35 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         Row(
                           children: [
                             Expanded(
-                              child: _buildSocialBtn(
-                                iconWidget: const Text(
-                                  'G',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w800,
-                                    color: Color(0xFF4285F4),
+                              child: GestureDetector(
+                                onTap: () {
+                                  ref.read(authProvider.notifier).signIn();
+                                  context.go('/home');
+                                },
+                                child: _buildSocialBtn(
+                                  iconWidget: const Text(
+                                    'G',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w800,
+                                      color: Color(0xFF4285F4),
+                                    ),
                                   ),
+                                  label: 'Google',
                                 ),
-                                label: 'Google',
                               ),
                             ),
                             const SizedBox(width: 14),
                             Expanded(
-                              child: _buildSocialBtn(
-                                iconWidget: const Icon(Icons.apple, color: Color(0xFF0F172A), size: 20),
-                                label: 'Apple',
+                              child: GestureDetector(
+                                onTap: () {
+                                  ref.read(authProvider.notifier).signIn();
+                                  context.go('/home');
+                                },
+                                child: _buildSocialBtn(
+                                  iconWidget: const Icon(Icons.apple, color: Color(0xFF0F172A), size: 20),
+                                  label: 'Apple',
+                                ),
                               ),
                             ),
                           ],
