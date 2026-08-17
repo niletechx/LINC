@@ -13,26 +13,21 @@ class LincBottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.cardSurface,
-        border: Border(top: BorderSide(color: AppColors.divider, width: 1)),
-      ),
-      child: SafeArea(
-        top: false,
+    return SafeArea(
+      top: false,
+      child: Container(
+        decoration: const BoxDecoration(
+          color: AppColors.cardSurface,
+          border: Border(top: BorderSide(color: AppColors.divider, width: 1)),
+        ),
         child: SizedBox(
           height: 60,
           child: Row(
             children: [
-              // Home
               _NavItem(icon: _homeIcon, label: 'Home', active: currentIndex == 0, onTap: () => onTap(0)),
-              // Chat
               _NavItem(icon: _chatIcon, label: 'Chat', active: currentIndex == 1, onTap: () => onTap(1)),
-              // AI Center
               _AiNavItem(active: currentIndex == 2, onTap: () => onTap(2)),
-              // Bookings
               _NavItem(icon: _bookingsIcon, label: 'Bookings', active: currentIndex == 3, onTap: () => onTap(3)),
-              // Me
               _NavItem(icon: _profileIcon, label: 'Me', active: currentIndex == 4, onTap: () => onTap(4)),
             ],
           ),
