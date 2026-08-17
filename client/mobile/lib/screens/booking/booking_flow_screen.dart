@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../data/mock_data.dart';
 import '../../models/provider_model.dart';
 import '../../services/booking_service.dart';
+import '../../providers/data_providers.dart';
 
-class BookingFlowScreen extends StatefulWidget {
+class BookingFlowScreen extends ConsumerStatefulWidget {
   final int providerId;
   const BookingFlowScreen({super.key, required this.providerId});
 
   @override
-  State<BookingFlowScreen> createState() => _BookingFlowScreenState();
+  ConsumerState<BookingFlowScreen> createState() => _BookingFlowScreenState();
 }
 
-class _BookingFlowScreenState extends State<BookingFlowScreen> {
+class _BookingFlowScreenState extends ConsumerState<BookingFlowScreen> {
   int selectedService = 0;
   int selectedDay = 0;
   String? selectedTime;
@@ -22,7 +24,14 @@ class _BookingFlowScreenState extends State<BookingFlowScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final p = MockData.providers.firstWhere((p) => p.id == widget.providerId, orElse: () => MockData.providers.first);
+    final providersAsync = ref.watch(providerListProvider);
+    final sourceList = (providersAsync.value != null && providersAsync.value!.isNotEmpty)
+        ? providersAsync.value!
+        : MockData.providers;
+    final p = sourceList.firstWhere(
+      (prov) => prov.id == widget.providerId,
+      orElse: () => sourceList.first,
+    );
 
     if (confirmed) {
       return Scaffold(

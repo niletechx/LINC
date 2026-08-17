@@ -1,22 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../config/colors.dart';
-import '../../config/text_styles.dart';
 import '../../data/mock_data.dart';
 import '../../widgets/provider_card.dart';
+import '../../providers/data_providers.dart';
 
-class SearchScreen extends StatefulWidget {
+class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key});
 
   @override
-  State<SearchScreen> createState() => _SearchScreenState();
+  ConsumerState<SearchScreen> createState() => _SearchScreenState();
 }
 
-class _SearchScreenState extends State<SearchScreen> {
+class _SearchScreenState extends ConsumerState<SearchScreen> {
   final TextEditingController _queryController = TextEditingController();
   String _activeFilter = 'all';
-  String _sortBy = 'match'; // best, near, rated
+  String _sortBy = 'match';
 
   @override
   void dispose() {
@@ -26,8 +25,12 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Filter providers
-    var filteredProviders = MockData.allProviders.where((p) {
+    final providersAsync = ref.watch(providerListProvider);
+    final sourceProviders = (providersAsync.value != null && providersAsync.value!.isNotEmpty)
+        ? providersAsync.value!
+        : MockData.allProviders;
+
+    var filteredProviders = sourceProviders.where((p) {
       if (_activeFilter == 'verified' && !p.verified) return false;
       if (_activeFilter == 'nearby') {
         double dist = double.tryParse(p.distance.split(' ')[0]) ?? 0;
@@ -35,7 +38,6 @@ class _SearchScreenState extends State<SearchScreen> {
       }
       if (_activeFilter == 'toprated' && p.rating < 4.8) return false;
       
-      // Simple text filter
       if (_queryController.text.isNotEmpty) {
         final query = _queryController.text.toLowerCase();
         if (!p.name.toLowerCase().contains(query) && !p.headline.toLowerCase().contains(query)) {

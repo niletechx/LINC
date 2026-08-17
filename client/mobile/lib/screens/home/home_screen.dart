@@ -1,24 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../config/colors.dart';
-import '../../config/text_styles.dart';
 import '../../data/mock_data.dart';
 import '../../widgets/provider_card.dart';
 import '../../providers/app_provider.dart';
+import '../../providers/auth_provider.dart';
+import '../../providers/data_providers.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Assuming appModeProvider provides a boolean or enum, we'll try to handle it.
-    // We'll treat it as a boolean for simplicity if the type is unknown.
     final appMode = ref.watch(appModeProvider);
     final isProvider = appMode == AppMode.provider;
+    final authState = ref.watch(authProvider);
+    final user = authState.user;
+    final providersAsync = ref.watch(providerListProvider);
+    final requestsAsync = ref.watch(requestListProvider);
+
+    final firstName = user?.fullName.trim().split(' ').first ?? 'Yonas';
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF1F5F9), // AppColors.appBackground
+      backgroundColor: const Color(0xFFF1F5F9),
       body: SafeArea(
         bottom: false,
         child: SingleChildScrollView(
@@ -27,7 +31,7 @@ class HomeScreen extends ConsumerWidget {
             children: [
               // 1. CYAN HEADER SECTION
               Container(
-                color: const Color(0xFF7EC8E3), // AppColors.headerBg
+                color: const Color(0xFF7EC8E3),
                 padding: const EdgeInsets.fromLTRB(16, 14, 16, 20),
                 child: Column(
                   children: [
@@ -56,7 +60,7 @@ class HomeScreen extends ConsumerWidget {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                isProvider ? 'Provider Dashboard' : 'Good morning, Yonas',
+                                isProvider ? 'Provider Dashboard' : 'Good morning, $firstName',
                                 style: const TextStyle(
                                   color: Color(0xFF0F172A),
                                   fontSize: 18,
@@ -271,7 +275,10 @@ class HomeScreen extends ConsumerWidget {
                       scrollDirection: Axis.horizontal,
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Row(
-                        children: MockData.providers.map((p) {
+                        children: (providersAsync.value != null && providersAsync.value!.isNotEmpty
+                                ? providersAsync.value!
+                                : MockData.providers)
+                            .map((p) {
                           return Padding(
                             padding: const EdgeInsets.only(right: 12),
                             child: GestureDetector(
@@ -304,7 +311,7 @@ class HomeScreen extends ConsumerWidget {
                           ),
                           const Spacer(),
                           GestureDetector(
-                            onTap: () {},
+                            onTap: () => context.push('/search'),
                             child: const Text(
                               'Browse',
                               style: TextStyle(color: Color(0xFF7EC8E3), fontSize: 13, fontWeight: FontWeight.w600),
@@ -313,9 +320,18 @@ class HomeScreen extends ConsumerWidget {
                         ],
                       ),
                     ),
-                    _buildOpenRequestRow('⚡', 'Electrician needed in Kazanchis', '500 ETB', '12m ago', '3 offers', false),
-                    _buildOpenRequestRow('❄️', 'Urgent AC repair — Bole road office', '800–1,200 ETB', '28m ago', '1 offer', true),
-                    _buildOpenRequestRow('📚', 'Math tutor, 9th grade — twice a week', '350 ETB/session', '1h ago', '5 offers', false),
+                    if (requestsAsync.value != null && requestsAsync.value!.isNotEmpty)
+                      ...requestsAsync.value!.map((r) {
+                        final isUrgent = r.urgency == 'urgent';
+                        return _buildOpenRequestRow(
+                          isUrgent ? '⚡' : '🔧',
+                          r.title,
+                          '${r.budgetMin.toInt()}–${r.budgetMax.toInt()} ${r.currency}',
+                          r.time,
+                          '2 offers',
+                          isUrgent,
+                        );
+                      }),
                   ],
                 ),
               ),

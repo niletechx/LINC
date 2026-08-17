@@ -1,24 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../config/colors.dart';
-import '../../config/text_styles.dart';
 import '../../data/mock_data.dart';
 import '../../models/provider_model.dart';
+import '../../providers/data_providers.dart';
 
-class ProviderProfileScreen extends StatefulWidget {
+class ProviderProfileScreen extends ConsumerStatefulWidget {
   final int providerId;
   const ProviderProfileScreen({super.key, required this.providerId});
 
   @override
-  State<ProviderProfileScreen> createState() => _ProviderProfileScreenState();
+  ConsumerState<ProviderProfileScreen> createState() => _ProviderProfileScreenState();
 }
 
-class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
+class _ProviderProfileScreenState extends ConsumerState<ProviderProfileScreen> {
   int? expandedService;
 
   @override
   Widget build(BuildContext context) {
-    final p = MockData.providers.firstWhere((p) => p.id == widget.providerId, orElse: () => MockData.providers.first);
+    final providersAsync = ref.watch(providerListProvider);
+    final sourceList = (providersAsync.value != null && providersAsync.value!.isNotEmpty)
+        ? providersAsync.value!
+        : MockData.providers;
+    final p = sourceList.firstWhere(
+      (prov) => prov.id == widget.providerId,
+      orElse: () => sourceList.first,
+    );
 
     return Scaffold(
       backgroundColor: const Color(0xFFF1F5F9),
