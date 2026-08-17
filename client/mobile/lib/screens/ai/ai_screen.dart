@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../models/chat_message_model.dart';
 import '../../models/provider_model.dart';
 import '../../providers/ai_provider.dart';
+import '../../widgets/formatted_markdown_text.dart';
 
 class AiScreen extends ConsumerStatefulWidget {
   const AiScreen({super.key});
@@ -244,14 +245,15 @@ class _AiScreenState extends ConsumerState<AiScreen> with SingleTickerProviderSt
                       ),
                     ],
                   ),
-                  child: Text(
-                    msg.text,
-                    style: const TextStyle(
+                  child: FormattedMarkdownText(
+                    text: msg.text,
+                    baseStyle: const TextStyle(
                       fontSize: 14.5,
                       height: 1.45,
                       color: Color(0xFF1E293B),
-                      fontWeight: FontWeight.w500,
+                      fontWeight: FontWeight.w400,
                     ),
+                    boldColor: const Color(0xFF0F172A),
                   ),
                 ),
 

@@ -28,23 +28,32 @@ async function getBookingById(userId, id) {
 
 async function createBooking(userId, payload = {}) {
   const data = normalizeBookingInput(payload);
-  if (!data.service_id) { const err = new Error('service_id is required'); err.statusCode = 400; throw err; }
+  
+  let service = null;
+  if (data.service_id && data.service_id.length === 36) {
+    service = await servicesRepo.findById(data.service_id);
+  }
+  if (!service && data.entity_id && data.entity_id.length === 36) {
+    const { data: svcList } = await supabase
+      .from('services')
+      .select('*')
+      .eq('provider_id', data.entity_id)
+      .limit(1);
+    if (svcList && svcList.length > 0) service = svcList[0];
+  }
 
-  const service = await servicesRepo.findById(data.service_id);
-  if (!service) { const err = new Error('Service not found'); err.statusCode = 404; throw err; }
-
-  const entityType = service.provider_id ? 'provider' : service.business_id ? 'business' : 'organization';
-  const entityId = service.provider_id || service.business_id || service.organization_id;
+  const entityType = data.entity_type || (service?.provider_id ? 'provider' : service?.business_id ? 'business' : 'organization');
+  const entityId = data.entity_id || service?.provider_id || service?.business_id || service?.organization_id;
 
   return bookingRepo.createBooking({
     requester_id: userId,
-    service_id: data.service_id,
-    entity_type: data.entity_type || entityType,
-    entity_id: data.entity_id || entityId,
+    service_id: service ? service.id : null,
+    entity_type: entityType,
+    entity_id: entityId,
     scheduled_at: data.scheduled_at,
-    duration_hours: data.duration_hours,
-    agreed_price: data.agreed_price ?? service.price_amount,
-    currency: data.currency || service.currency || 'ETB',
+    duration_hours: data.duration_hours || 1,
+    agreed_price: data.agreed_price ?? (service ? service.price_amount : 350),
+    currency: data.currency || (service ? service.currency : 'ETB'),
     notes: data.notes,
     status: data.status || 'pending',
   });
