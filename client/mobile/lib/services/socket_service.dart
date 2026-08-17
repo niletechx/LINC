@@ -1,79 +1,102 @@
-import 'package:socket_io_client/socket_io_client.dart' as io;
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import '../config/app_config.dart';
+import 'dart:io';
+import 'package:flutter/foundation.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'storage_service.dart';
 
-/// Manages the Socket.IO connection to the LINC real-time server.
-/// Handles both chat messages and system notifications.
+typedef MessageCallback = void Function(Map<String, dynamic> message);
+typedef AiAdvisorCallback = void Function(Map<String, dynamic> response);
+
 class SocketService {
-  SocketService._();
-  static final SocketService instance = SocketService._();
+  static final SocketService _instance = SocketService._internal();
+  factory SocketService() => _instance;
 
-  io.Socket? _socket;
-  final _storage = const FlutterSecureStorage();
+  IO.Socket? _socket;
+  bool _isConnected = false;
 
-  io.Socket? get socket => _socket;
-  bool get isConnected => _socket?.connected ?? false;
+  bool get isConnected => _isConnected;
+
+  SocketService._internal();
 
   Future<void> connect() async {
-    if (isConnected) return;
+    if (_socket != null && _isConnected) return;
 
-    final token = await _storage.read(key: 'access_token');
+    final token = await StorageService.getToken();
+    final baseUrl = _resolveSocketUrl();
 
-    _socket = io.io(
-      AppConfig.socketUrl,
-      io.OptionBuilder()
+    _socket = IO.io(
+      baseUrl,
+      IO.OptionBuilder()
           .setTransports(['websocket'])
           .disableAutoConnect()
-          .setAuth({'token': token})
+          .setExtraHeaders(token != null ? {'Authorization': 'Bearer $token'} : {})
           .build(),
     );
 
-    _socket!.connect();
-
     _socket!.onConnect((_) {
-      // ignore: avoid_print
-      print('[LINC Socket] Connected');
+      _isConnected = true;
+      debugPrint('🟢 Socket.IO connected to $baseUrl');
     });
 
     _socket!.onDisconnect((_) {
-      // ignore: avoid_print
-      print('[LINC Socket] Disconnected');
+      _isConnected = false;
+      debugPrint('🔴 Socket.IO disconnected');
     });
 
-    _socket!.onConnectError((data) {
-      // ignore: avoid_print
-      print('[LINC Socket] Connection error: $data');
+    _socket!.connect();
+  }
+
+  void joinConversation(int conversationId) {
+    if (_socket == null) return;
+    _socket!.emit('join_conversation', {'conversationId': conversationId});
+  }
+
+  void sendMessage({
+    required int conversationId,
+    required String senderId,
+    required String senderType,
+    required String content,
+  }) {
+    if (_socket == null) return;
+    _socket!.emit('send_message', {
+      'conversationId': conversationId,
+      'senderId': senderId,
+      'senderType': senderType,
+      'content': content,
+    });
+  }
+
+  void onNewMessage(MessageCallback callback) {
+    _socket?.on('new_message', (data) {
+      if (data is Map<String, dynamic>) {
+        callback(data);
+      }
+    });
+  }
+
+  void onAiAdvisorResponse(AiAdvisorCallback callback) {
+    _socket?.on('ai_advisor_response', (data) {
+      if (data is Map<String, dynamic>) {
+        callback(data);
+      }
     });
   }
 
   void disconnect() {
     _socket?.disconnect();
+    _socket?.dispose();
     _socket = null;
+    _isConnected = false;
   }
 
-  /// Join a conversation room for real-time messaging
-  void joinConversation(String conversationId) {
-    _socket?.emit('join_conversation', {'conversationId': conversationId});
-  }
-
-  /// Send a chat message
-  void sendMessage({
-    required String conversationId,
-    required String content,
-  }) {
-    _socket?.emit('send_message', {
-      'conversationId': conversationId,
-      'content': content,
-    });
-  }
-
-  /// Listen to incoming messages
-  void onMessage(void Function(Map<String, dynamic>) callback) {
-    _socket?.on('new_message', (data) => callback(Map<String, dynamic>.from(data)));
-  }
-
-  /// Listen to notifications
-  void onNotification(void Function(Map<String, dynamic>) callback) {
-    _socket?.on('notification', (data) => callback(Map<String, dynamic>.from(data)));
+  static String _resolveSocketUrl() {
+    if (kIsWeb) {
+      return 'http://127.0.0.1:5000';
+    }
+    try {
+      if (Platform.isAndroid) {
+        return 'http://10.0.2.2:5000';
+      }
+    } catch (_) {}
+    return 'http://127.0.0.1:5000';
   }
 }

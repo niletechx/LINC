@@ -54,11 +54,39 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
   }
 
   Future<void> _handleSignup() async {
-    setState(() => _loading = true);
-    await Future.delayed(const Duration(seconds: 1)); // simulate loading
-    ref.read(authProvider.notifier).signIn();
-    if (mounted) {
-      context.go('/home');
+    setState(() {
+      _loading = true;
+      _error = '';
+    });
+    
+    try {
+      String cleanUsername = _name.replaceAll(RegExp(r'[^a-zA-Z0-9_]'), '').toLowerCase();
+      if (cleanUsername.length < 3) {
+        cleanUsername = '${cleanUsername}_${DateTime.now().millisecondsSinceEpoch % 10000}';
+      }
+
+      await ref.read(authProvider.notifier).register(
+        email: _email.trim(),
+        password: _password,
+        fullName: _name.trim(),
+        username: cleanUsername,
+      );
+
+      if (mounted) {
+        context.go('/home');
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _error = e.toString();
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _loading = false;
+        });
+      }
     }
   }
 

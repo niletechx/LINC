@@ -10,6 +10,9 @@ class ProfileScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authProvider);
+    final user = authState.user;
+
     final group1 = [
       {'icon': '🔔', 'label': 'Notifications', 'badge': '3', 'highlight': false, 'action': null},
       {'icon': '📍', 'label': 'Saved Locations', 'badge': null, 'highlight': false, 'action': null},
@@ -51,45 +54,45 @@ class ProfileScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 14),
                   Row(
-                children: [
-                  Container(
-                    width: 62,
-                    height: 62,
-                    decoration: BoxDecoration(
-                      color: const Color(0x66FFFFFF),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: const Color(0xB3FFFFFF), width: 3),
-                    ),
-                    alignment: Alignment.center,
-                    child: const Text(
-                      'YM',
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w800,
-                        color: Color(0xFF0F172A),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Yonas Molla',
-                          style: TextStyle(
-                            fontSize: 18,
+                    children: [
+                      Container(
+                        width: 62,
+                        height: 62,
+                        decoration: BoxDecoration(
+                          color: const Color(0x66FFFFFF),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: const Color(0xB3FFFFFF), width: 3),
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          user?.initials ?? 'YM',
+                          style: const TextStyle(
+                            fontSize: 22,
                             fontWeight: FontWeight.w800,
                             color: Color(0xFF0F172A),
-                            letterSpacing: -0.02,
                           ),
                         ),
-                        const SizedBox(height: 2),
-                        const Text(
-                          'yonas.molla@email.com',
-                          style: TextStyle(fontSize: 12, color: Color(0xFF1E5F7A)),
-                        ),
-                        const SizedBox(height: 7),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              user?.fullName.isNotEmpty == true ? user!.fullName : 'Yonas Molla',
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w800,
+                                color: Color(0xFF0F172A),
+                                letterSpacing: -0.02,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              user?.email.isNotEmpty == true ? user!.email : 'yonas.molla@email.com',
+                              style: const TextStyle(fontSize: 12, color: Color(0xFF1E5F7A)),
+                            ),
+                            const SizedBox(height: 7),
                         Row(
                           children: [
                             Container(

@@ -29,7 +29,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       _error = '';
     });
     
-    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+    if (_emailController.text.trim().isEmpty || _passwordController.text.trim().isEmpty) {
       setState(() {
         _error = 'Please fill in all fields';
       });
@@ -40,11 +40,26 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       _loading = true;
     });
 
-    await Future.delayed(const Duration(seconds: 1)); // Simulate API call
-
-    ref.read(authProvider.notifier).signIn();
-    if (mounted) {
-      context.go('/home');
+    try {
+      await ref.read(authProvider.notifier).login(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+      );
+      if (mounted) {
+        context.go('/home');
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _error = e.toString();
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _loading = false;
+        });
+      }
     }
   }
 

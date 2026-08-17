@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../config/colors.dart';
-import '../../config/text_styles.dart';
 import '../../data/mock_data.dart';
 import '../../models/provider_model.dart';
+import '../../services/booking_service.dart';
 
 class BookingFlowScreen extends StatefulWidget {
   final int providerId;
@@ -109,7 +108,22 @@ class _BookingFlowScreenState extends State<BookingFlowScreen> {
         ),
         child: SafeArea(
           child: InkWell(
-            onTap: selectedTime != null ? () => setState(() => confirmed = true) : null,
+            onTap: selectedTime != null
+                ? () async {
+                    setState(() => confirmed = true);
+                    try {
+                      await BookingService().createBooking(
+                        serviceId: p.services[selectedService].id,
+                        entityId: p.id.toString(),
+                        entityType: 'provider',
+                        scheduledAt: '2026-08-${16 + selectedDay}T$selectedTime',
+                        agreedPrice: 350.0,
+                        notes: note,
+                        paymentMethod: paymentMethod,
+                      );
+                    } catch (_) {}
+                  }
+                : null,
             child: Container(
               height: 50,
               color: selectedTime != null ? const Color(0xFF7EC8E3) : const Color(0xFFE2E8F0),

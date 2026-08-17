@@ -1,4 +1,5 @@
 class ServiceModel {
+  final String id;
   final String name;
   final List<String> tags;
   final String duration;
@@ -6,10 +7,11 @@ class ServiceModel {
   final bool fixed;
 
   const ServiceModel({
+    this.id = '1',
     required this.name,
     required this.tags,
     required this.duration,
     required this.price,
-    required this.fixed,
+    this.fixed = true,
   });
 }
