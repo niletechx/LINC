@@ -15,29 +15,74 @@ Rules:
 
 /**
  * Extracts and accumulates intent from the user message.
- * @param {string} userMessage - The current message
- * @param {object|null} previousIntent - Intent from the previous turn (if any)
- * @returns {object} Merged intent
+ * Uses fast-path token matching for sub-second responses,
+ * falling back to Gemini only for ambiguous queries.
  */
 async function extractIntent(userMessage, previousIntent = null) {
-  const contextNote = previousIntent
-    ? `Previous intent context (inherit unmentioned fields): ${JSON.stringify(previousIntent)}`
-    : 'No previous intent context.';
+  const lower = userMessage.toLowerCase();
 
-  const messages = [
-    {
-      role: 'user',
-      parts: [{ text: `${contextNote}\n\nNew message: ${userMessage}` }],
-    },
-  ];
+  // Fast-path 1: @username mentions
+  const mentionMatch = userMessage.match(/@([a-zA-Z0-9_]+)/);
+  if (mentionMatch) {
+    const username = mentionMatch[1].toLowerCase();
+    let detectedCategory = previousIntent?.service_category || null;
+    if (username.includes('plumb')) detectedCategory = 'plumbing';
+    else if (username.includes('clean')) detectedCategory = 'cleaning';
+    else if (username.includes('tech') || username.includes('laptop')) detectedCategory = 'laptop repair';
+    else if (username.includes('tutor')) detectedCategory = 'tutoring';
+    else if (username.includes('electr')) detectedCategory = 'electrical';
 
-  const raw = await chat(messages, SYSTEM_PROMPT);
+    return {
+      service_category: detectedCategory,
+      location: previousIntent?.location || null,
+      budget_max: previousIntent?.budget_max || null,
+      urgency: previousIntent?.urgency || 'medium',
+      keywords: [`@${username}`, username],
+    };
+  }
 
+  // Fast-path 2: Common service keywords
+  let fastCat = null;
+  if (/plumb|pipe|leak|drain|toilet|faucet|sink/i.test(lower)) fastCat = 'plumbing';
+  else if (/clean|housekeep|maid|janitor|sanitize|wash/i.test(lower)) fastCat = 'cleaning';
+  else if (/laptop|computer|macbook|pc|screen|hardware|repair/i.test(lower)) fastCat = 'laptop repair';
+  else if (/tutor|teach|math|english|calculus|lesson|study/i.test(lower)) fastCat = 'tutoring';
+  else if (/electr|wire|circuit|breaker|light|socket/i.test(lower)) fastCat = 'electrical';
+
+  let fastLoc = null;
+  if (/bole/i.test(lower)) fastLoc = 'Bole';
+  else if (/kazanchis|casanchis/i.test(lower)) fastLoc = 'Kazanchis';
+  else if (/piassa|arada/i.test(lower)) fastLoc = 'Piassa';
+  else if (/mexico/i.test(lower)) fastLoc = 'Mexico';
+  else if (/addis/i.test(lower)) fastLoc = 'Addis Ababa';
+
+  if (fastCat) {
+    return {
+      service_category: fastCat,
+      location: fastLoc || previousIntent?.location || null,
+      budget_max: previousIntent?.budget_max || null,
+      urgency: /urgent|emergency|now|asap|fast/i.test(lower) ? 'urgent' : (previousIntent?.urgency || 'medium'),
+      keywords: fastLoc ? [fastCat, fastLoc] : [fastCat],
+    };
+  }
+
+  // Fallback: Gemini LLM intent extraction
   try {
+    const contextNote = previousIntent
+      ? `Previous intent context: ${JSON.stringify(previousIntent)}`
+      : 'No previous intent context.';
+
+    const messages = [
+      {
+        role: 'user',
+        parts: [{ text: `${contextNote}\n\nNew message: ${userMessage}` }],
+      },
+    ];
+
+    const raw = await chat(messages, SYSTEM_PROMPT);
     const cleaned = raw.replace(/```json|```/g, '').trim();
     const extracted = JSON.parse(cleaned);
 
-    // Merge: fill any null fields from previousIntent as safety net
     if (previousIntent) {
       return {
         service_category: extracted.service_category ?? previousIntent.service_category ?? null,
@@ -49,10 +94,8 @@ async function extractIntent(userMessage, previousIntent = null) {
                             : (previousIntent.keywords || []),
       };
     }
-
     return extracted;
   } catch {
-    // Fallback: if JSON parse fails, return previousIntent or defaults
     return previousIntent || {
       service_category: null,
       location: null,

@@ -169,17 +169,20 @@ class AIChatNotifier extends StateNotifier<AIChatState> {
 
       // Refresh session list so the new thread appears in drawer
       loadSessions();
-    } catch (_) {
-      // Graceful fallback to rich local recommendation if offline
-      await Future.delayed(const Duration(milliseconds: 600));
+    } catch (e) {
+      // Print error to console for instant debugging
+      // ignore: avoid_print
+      print('AI chat error: $e');
+
       state = state.copyWith(
         loading: false,
+        error: e.toString(),
         messages: [
           ...state.messages,
           ChatMessage(
             role: MessageRole.ai,
-            text: 'I found top verified providers matching your request near Addis Ababa:',
-            hasProviders: true,
+            text: '⚠️ Unable to reach LINC AI service right now: $e. Please check your internet connection or try again.',
+            hasProviders: false,
           ),
         ],
       );
