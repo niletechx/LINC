@@ -62,8 +62,10 @@ class _AiScreenState extends ConsumerState<AiScreen> with SingleTickerProviderSt
 
     return Scaffold(
       backgroundColor: const Color(0xFFF1F5F9), // AppColors.appBackground
-      body: Column(
-        children: [
+      body: SafeArea(
+        bottom: false,
+        child: Column(
+          children: [
           Expanded(
             child: ListView.builder(
               controller: _scrollController,
@@ -85,6 +87,7 @@ class _AiScreenState extends ConsumerState<AiScreen> with SingleTickerProviderSt
           _buildSuggestionsRow(),
           _buildInputBar(),
         ],
+      ),
       ),
     );
   }

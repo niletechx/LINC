@@ -13,8 +13,10 @@ class MessagesScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: AppColors.cardSurface,
-      body: Column(
-        children: [
+      body: SafeArea(
+        bottom: false,
+        child: Column(
+          children: [
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: const BoxDecoration(
@@ -172,6 +174,7 @@ class MessagesScreen extends ConsumerWidget {
             ),
           ),
         ],
+      ),
       ),
     );
   }

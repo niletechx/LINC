@@ -141,8 +141,10 @@ class _DmScreenState extends ConsumerState<DmScreen> {
           ),
         ],
       ),
-      body: Column(
-        children: [
+      body: SafeArea(
+        bottom: false,
+        child: Column(
+          children: [
           Expanded(
             child: ListView(
               controller: _scrollController,
@@ -435,6 +437,7 @@ class _DmScreenState extends ConsumerState<DmScreen> {
             ),
           ),
         ],
+      ),
       ),
     );
   }

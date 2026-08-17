@@ -24,7 +24,9 @@ class ProfileScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF1F5F9),
-      body: SingleChildScrollView(
+      body: SafeArea(
+        bottom: false,
+        child: SingleChildScrollView(
         child: Column(
           children: [
             Container(
@@ -207,6 +209,7 @@ class ProfileScreen extends ConsumerWidget {
             ),
           ],
         ),
+      ),
       ),
     );
   }

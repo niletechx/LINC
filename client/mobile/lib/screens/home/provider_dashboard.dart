@@ -23,6 +23,7 @@ class _ProviderDashboardState extends ConsumerState<ProviderDashboard> {
     return Scaffold(
       backgroundColor: const Color(0xFFF1F5F9), // AppColors.appBackground
       body: SafeArea(
+        bottom: false,
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,

@@ -29,22 +29,21 @@ class BookingsScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF1F5F9),
-      body: Column(
+      body: SafeArea(
+        bottom: false,
+        child: Column(
         children: [
           Container(
             decoration: const BoxDecoration(
               color: Colors.white,
               border: Border(bottom: BorderSide(color: Color(0xFFE2E8F0))),
             ),
-            child: SafeArea(
-              bottom: false,
-              child: Row(
-                children: [
-                  _buildTab(context, ref, 'active', BookingTab.active, currentTab),
-                  _buildTab(context, ref, 'upcoming', BookingTab.upcoming, currentTab),
-                  _buildTab(context, ref, 'completed', BookingTab.completed, currentTab),
-                ],
-              ),
+            child: Row(
+              children: [
+                _buildTab(context, ref, 'active', BookingTab.active, currentTab),
+                _buildTab(context, ref, 'upcoming', BookingTab.upcoming, currentTab),
+                _buildTab(context, ref, 'completed', BookingTab.completed, currentTab),
+              ],
             ),
           ),
           Expanded(
@@ -66,6 +65,7 @@ class BookingsScreen extends ConsumerWidget {
                   ),
           ),
         ],
+      ),
       ),
     );
   }
