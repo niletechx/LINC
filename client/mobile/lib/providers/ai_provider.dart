@@ -41,6 +41,11 @@ class AIChatNotifier extends StateNotifier<AIChatState> {
 
   void setInput(String v) => state = state.copyWith(input: v);
 
+  Future<void> sendPrompt(String prompt) async {
+    state = state.copyWith(input: prompt);
+    await send();
+  }
+
   Future<void> send() async {
     final text = state.input.trim();
     if (text.isEmpty || state.loading) return;
@@ -68,6 +73,7 @@ class AIChatNotifier extends StateNotifier<AIChatState> {
             role: MessageRole.ai,
             text: replyText,
             hasProviders: providers.isNotEmpty,
+            providers: providers,
           ),
         ],
       );

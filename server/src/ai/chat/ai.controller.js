@@ -10,7 +10,7 @@ const asyncHandler = require('../../utils/asyncHandler');
  */
 const chat = asyncHandler(async (req, res) => {
   const { message, conversationId, userLat, userLng } = req.body;
-  const userId = req.user.id;
+  const userId = req.user?.id || null;
 
   if (!message || typeof message !== 'string' || !message.trim()) {
     return error(res, 'message is required and must be a non-empty string', 400);
@@ -39,11 +39,7 @@ const chat = asyncHandler(async (req, res) => {
  */
 const chatStream = async (req, res) => {
   const { message, conversationId, userLat, userLng } = req.body;
-  const userId = req.user?.id;
-
-  if (!userId) {
-    return res.status(401).json({ success: false, message: 'Unauthorized' });
-  }
+  const userId = req.user?.id || null;
 
   if (!message || typeof message !== 'string' || !message.trim()) {
     return res.status(400).json({ success: false, message: 'message is required' });

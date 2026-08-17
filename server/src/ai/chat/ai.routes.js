@@ -1,15 +1,16 @@
 const express = require('express');
 const router = express.Router();
 const aiController = require('./ai.controller');
+const { optionalAuth } = require('../../middleware/auth.middleware');
 const authMiddleware = require('../../middleware/auth.middleware');
 const { aiLimiter } = require('../../middleware/rateLimiter.middleware');
 
 // POST /api/ai/chat — standard (non-streaming) RAG pipeline
-router.post('/chat', authMiddleware, aiLimiter, aiController.chat);
+router.post('/chat', optionalAuth, aiLimiter, aiController.chat);
 
 // POST /api/ai/chat/stream — SSE streaming RAG pipeline
 // Returns tokens as they arrive via Server-Sent Events
-router.post('/chat/stream', authMiddleware, aiLimiter, aiController.chatStream);
+router.post('/chat/stream', optionalAuth, aiLimiter, aiController.chatStream);
 
 // GET /api/ai/conversations — list the user's AI conversation history
 router.get('/conversations', authMiddleware, aiController.getConversations);

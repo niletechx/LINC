@@ -106,11 +106,23 @@ async function retrieveMatches(intent, userLat, userLng) {
       .in('id', providerIds).eq('is_active', true)
       .eq('availability_status', 'available').limit(30);
     rawProviders = data || [];
-  } else if (categoryIds.length === 0) {
-    const { data } = await supabase
+  }
+  if (rawProviders.length === 0) {
+    let query = supabase
       .from('provider_profiles').select(PROVIDER_SELECT)
-      .eq('is_active', true).eq('availability_status', 'available').limit(30);
-    rawProviders = data || [];
+      .eq('is_active', true).eq('availability_status', 'available');
+    if (service_category) {
+      query = query.or(`headline.ilike.%${service_category}%,bio.ilike.%${service_category}%`);
+    }
+    const { data } = await query.limit(30);
+    if (data && data.length > 0) {
+      rawProviders = data;
+    } else {
+      const { data: allProv } = await supabase
+        .from('provider_profiles').select(PROVIDER_SELECT)
+        .eq('is_active', true).eq('availability_status', 'available').limit(15);
+      rawProviders = allProv || [];
+    }
   }
 
   // Businesses

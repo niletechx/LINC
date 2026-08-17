@@ -44,19 +44,26 @@ async function processMessage({ userId, message, conversationId, userLat, userLn
   let convId = conversationId;
   let isFirstTurn = false;
 
-  if (!convId) {
-    const { data, error } = await supabase
-      .from('ai_conversations')
-      .insert({ user_id: userId, title: message.slice(0, 80) })
-      .select()
-      .single();
-    if (error) throw error;
-    convId = data.id;
-    isFirstTurn = true;
+  if (!convId && userId) {
+    try {
+      const { data, error } = await supabase
+        .from('ai_conversations')
+        .insert({ user_id: userId, title: message.slice(0, 80) })
+        .select()
+        .single();
+      if (!error && data) {
+        convId = data.id;
+        isFirstTurn = true;
+      }
+    } catch (_) {
+      // Non-fatal if DB insert fails
+    }
   }
 
   // 2. Load history + last intent
-  const { messages: rawHistory, lastIntent } = await loadHistory(convId);
+  const { messages: rawHistory, lastIntent } = convId
+    ? await loadHistory(convId)
+    : { messages: [], lastIntent: null };
   const history = trimHistory(rawHistory);
 
   if (rawHistory.length === 0) isFirstTurn = true;
@@ -81,10 +88,14 @@ async function processMessage({ userId, message, conversationId, userLat, userLn
   const parsed = parseResponse(rawResponse, providers);
 
   // 8. Persist messages
-  await saveMessages(convId, message, parsed.message, { intent, providers });
+  if (convId) {
+    try {
+      await saveMessages(convId, message, parsed.message, { intent, providers });
+    } catch (_) {}
+  }
 
   // 9. Generate title on first turn (async, don't block response)
-  if (isFirstTurn) {
+  if (isFirstTurn && convId) {
     generateTitle(message, parsed.message)
       .then((title) => updateConversationTitle(convId, title))
       .catch((err) => logger.warn('Title generation failed: ' + err.message));
@@ -110,18 +121,23 @@ async function processMessageStream({ userId, message, conversationId, userLat, 
   let convId = conversationId;
   let isFirstTurn = false;
 
-  if (!convId) {
-    const { data, error } = await supabase
-      .from('ai_conversations')
-      .insert({ user_id: userId, title: message.slice(0, 80) })
-      .select()
-      .single();
-    if (error) throw error;
-    convId = data.id;
-    isFirstTurn = true;
+  if (!convId && userId) {
+    try {
+      const { data, error } = await supabase
+        .from('ai_conversations')
+        .insert({ user_id: userId, title: message.slice(0, 80) })
+        .select()
+        .single();
+      if (!error && data) {
+        convId = data.id;
+        isFirstTurn = true;
+      }
+    } catch (_) {}
   }
 
-  const { messages: rawHistory, lastIntent } = await loadHistory(convId);
+  const { messages: rawHistory, lastIntent } = convId
+    ? await loadHistory(convId)
+    : { messages: [], lastIntent: null };
   const history = trimHistory(rawHistory);
   if (rawHistory.length === 0) isFirstTurn = true;
 

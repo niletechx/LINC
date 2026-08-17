@@ -6,6 +6,7 @@ import '../../config/text_styles.dart';
 import '../../data/mock_data.dart';
 import '../../providers/ai_provider.dart';
 import '../../models/chat_message_model.dart';
+import '../../models/provider_model.dart';
 import '../../widgets/provider_card.dart';
 
 class AiScreen extends ConsumerStatefulWidget {
@@ -176,7 +177,10 @@ class _AiScreenState extends ConsumerState<AiScreen> with SingleTickerProviderSt
                 ),
                 if (msg.hasProviders) ...[
                   const SizedBox(height: 8),
-                  ...MockData.providers.take(2).map((p) => _buildProviderCard(p)),
+                  if (msg.providers != null && msg.providers!.isNotEmpty)
+                    ...msg.providers!.take(3).map((p) => _buildProviderCard(p))
+                  else
+                    ...MockData.providers.take(2).map((p) => _buildProviderCard(p)),
                 ],
               ],
             ),
@@ -186,7 +190,32 @@ class _AiScreenState extends ConsumerState<AiScreen> with SingleTickerProviderSt
     );
   }
 
-  Widget _buildProviderCard(provider) {
+  Widget _buildProviderCard(dynamic provider) {
+    String name = 'Samuel Girma';
+    String headline = 'Plumber';
+    String rating = '4.9';
+    String distance = '2.4 km';
+    String price = '350 ETB/hr';
+    String id = '1';
+    Color color = const Color(0xFF0284C7);
+
+    if (provider is ProviderModel) {
+      name = provider.name;
+      headline = provider.headline;
+      rating = provider.rating.toString();
+      distance = provider.distance;
+      price = provider.price;
+      id = provider.id.toString();
+      color = provider.color;
+    } else if (provider is Map) {
+      name = provider['name']?.toString() ?? 'Verified Provider';
+      headline = provider['headline']?.toString() ?? 'Professional Service';
+      rating = provider['avg_rating']?.toString() ?? '4.9';
+      distance = provider['location_city']?.toString() ?? 'Addis Ababa';
+      price = '${provider['hourly_rate'] ?? 300} ${provider['currency'] ?? 'ETB'}/hr';
+      id = provider['id']?.toString() ?? '1';
+    }
+
     return Container(
       margin: const EdgeInsets.only(left: 36, bottom: 8),
       decoration: BoxDecoration(
@@ -201,41 +230,22 @@ class _AiScreenState extends ConsumerState<AiScreen> with SingleTickerProviderSt
             padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
             child: Row(
               children: [
-                Stack(
-                  children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: provider.color,
-                        borderRadius: BorderRadius.circular(13),
-                      ),
-                      alignment: Alignment.center,
-                      child: Text(
-                        provider.name.substring(0, 1),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: color,
+                    borderRadius: BorderRadius.circular(13),
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    name.isNotEmpty ? name.substring(0, 1) : 'P',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
                     ),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: Container(
-                        width: 15,
-                        height: 15,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF59E0B),
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 2),
-                        ),
-                        alignment: Alignment.center,
-                        child: const Icon(Icons.check, color: Colors.white, size: 7),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
@@ -243,7 +253,7 @@ class _AiScreenState extends ConsumerState<AiScreen> with SingleTickerProviderSt
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        provider.name,
+                        name,
                         style: const TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w800,
@@ -251,7 +261,7 @@ class _AiScreenState extends ConsumerState<AiScreen> with SingleTickerProviderSt
                         ),
                       ),
                       Text(
-                        provider.headline,
+                        headline,
                         style: const TextStyle(
                           fontSize: 11,
                           color: Color(0xFF64748B),
@@ -262,8 +272,6 @@ class _AiScreenState extends ConsumerState<AiScreen> with SingleTickerProviderSt
                     ],
                   ),
                 ),
-                if (provider.match != null)
-                  MatchRing(match: provider.match!),
               ],
             ),
           ),
@@ -275,15 +283,15 @@ class _AiScreenState extends ConsumerState<AiScreen> with SingleTickerProviderSt
             child: Row(
               children: [
                 Text(
-                  '★ ${provider.rating}',
-                  style: const TextStyle(color: Color(0xFFF59E0B), fontSize: 11),
+                  '★ $rating',
+                  style: const TextStyle(color: Color(0xFFF59E0B), fontSize: 11, fontWeight: FontWeight.bold),
                 ),
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 4),
                   child: Text('·', style: TextStyle(color: Color(0xFF94A3B8))),
                 ),
                 Text(
-                  '📍 ${provider.distance}',
+                  '📍 $distance',
                   style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
                 ),
                 const Padding(
@@ -291,9 +299,9 @@ class _AiScreenState extends ConsumerState<AiScreen> with SingleTickerProviderSt
                   child: Text('·', style: TextStyle(color: Color(0xFF94A3B8))),
                 ),
                 Text(
-                  provider.price,
+                  price,
                   style: const TextStyle(
-                    color: Color(0xFF7EC8E3),
+                    color: Color(0xFF0284C7),
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
                   ),
@@ -305,7 +313,7 @@ class _AiScreenState extends ConsumerState<AiScreen> with SingleTickerProviderSt
             children: [
               Expanded(
                 child: GestureDetector(
-                  onTap: () {},
+                  onTap: () => context.push('/booking/$id'),
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 10),
                     color: const Color(0xFF0F172A),
@@ -323,7 +331,7 @@ class _AiScreenState extends ConsumerState<AiScreen> with SingleTickerProviderSt
               ),
               Expanded(
                 child: GestureDetector(
-                  onTap: () => context.push('/provider/${provider.id}'),
+                  onTap: () => context.push('/provider/$id'),
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 10),
                     decoration: const BoxDecoration(
@@ -459,8 +467,9 @@ class _AiScreenState extends ConsumerState<AiScreen> with SingleTickerProviderSt
           children: suggestions.map((s) {
             return GestureDetector(
               onTap: () {
-                ref.read(aiChatProvider.notifier).setInput(s);
                 _textController.text = s;
+                ref.read(aiChatProvider.notifier).sendPrompt(s);
+                _textController.clear();
               },
               child: Container(
                 margin: const EdgeInsets.only(right: 8),
