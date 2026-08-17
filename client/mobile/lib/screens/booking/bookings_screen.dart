@@ -170,9 +170,9 @@ class BookingsScreen extends ConsumerWidget {
             ),
           ),
           Container(
-            color: const Color(0xFFF8FAFC),
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: const BoxDecoration(
+              color: Color(0xFFF8FAFC),
               border: Border(top: BorderSide(color: Color(0xFFF1F5F9))),
             ),
             child: Row(
