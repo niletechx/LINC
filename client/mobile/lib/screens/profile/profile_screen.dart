@@ -30,9 +30,25 @@ class ProfileScreen extends ConsumerWidget {
         child: Column(
           children: [
             Container(
-              color: const Color(0xFF7EC8E3),
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 20),
-              child: Row(
+              decoration: const BoxDecoration(color: Color(0xFF7EC8E3)),
+              padding: const EdgeInsets.fromLTRB(16, 14, 16, 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Title row
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Profile', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: Color(0xFF0F172A))),
+                      Container(
+                        width: 36, height: 36,
+                        decoration: BoxDecoration(color: const Color(0x26FFFFFF), borderRadius: BorderRadius.circular(10)),
+                        child: const Icon(Icons.person_outline_rounded, color: Color(0xFF0F172A), size: 20),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 14),
+                  Row(
                 children: [
                   Container(
                     width: 62,
@@ -121,8 +137,10 @@ class ProfileScreen extends ConsumerWidget {
                     child: const Icon(Icons.arrow_forward_ios, color: Color(0xFF1E5F7A), size: 14),
                   ),
                 ],
-              ),
-            ),
+              ),   // close avatar Row
+                ],
+              ),   // close outer Column
+            ),     // close Container
             Container(
               margin: const EdgeInsets.only(bottom: 8),
               decoration: const BoxDecoration(

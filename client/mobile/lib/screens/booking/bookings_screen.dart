@@ -33,6 +33,14 @@ class BookingsScreen extends ConsumerWidget {
         bottom: false,
         child: Column(
         children: [
+          // Bookings header
+          Container(
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+            decoration: const BoxDecoration(
+              color: Color(0xFF7EC8E3),
+            ),
+            child: const Text('Bookings', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: Color(0xFF0F172A))),
+          ),
           Container(
             decoration: const BoxDecoration(
               color: Colors.white,

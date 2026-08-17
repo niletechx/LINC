@@ -28,7 +28,7 @@ class HomeScreen extends ConsumerWidget {
               // 1. CYAN HEADER SECTION
               Container(
                 color: const Color(0xFF7EC8E3), // AppColors.headerBg
-                padding: const EdgeInsets.fromLTRB(16, 4, 16, 20),
+                padding: const EdgeInsets.fromLTRB(16, 14, 16, 20),
                 child: Column(
                   children: [
                     Row(

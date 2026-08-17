@@ -66,6 +66,42 @@ class _AiScreenState extends ConsumerState<AiScreen> with SingleTickerProviderSt
         bottom: false,
         child: Column(
           children: [
+          // ── AI Header ──────────────────────────────────────────────
+          Container(
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
+            decoration: const BoxDecoration(
+              color: Color(0xFF7EC8E3),
+              border: Border(bottom: BorderSide(color: Color(0x1A000000))),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF0F172A),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Center(child: Text('✨', style: TextStyle(fontSize: 16))),
+                ),
+                const SizedBox(width: 10),
+                const Text(
+                  'LINC AI',
+                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
+                ),
+                const Spacer(),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: const Color(0x200F172A),
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(color: const Color(0x330F172A)),
+                  ),
+                  child: const Text('BETA', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: Color(0xFF0F172A), letterSpacing: 0.5)),
+                ),
+              ],
+            ),
+          ),
           Expanded(
             child: ListView.builder(
               controller: _scrollController,

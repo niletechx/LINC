@@ -17,6 +17,28 @@ class MessagesScreen extends ConsumerWidget {
         bottom: false,
         child: Column(
           children: [
+          // Messages header
+          Container(
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+            decoration: const BoxDecoration(
+              color: Color(0xFF7EC8E3),
+              border: Border(bottom: BorderSide(color: Color(0x1A000000))),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Messages', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: Color(0xFF0F172A))),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: const Color(0x26000000),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Text('✏️', style: TextStyle(fontSize: 14)),
+                ),
+              ],
+            ),
+          ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: const BoxDecoration(
