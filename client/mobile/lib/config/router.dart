@@ -54,6 +54,16 @@ class AppShell extends ConsumerWidget {
   }
 }
 
+class HomeModeWrapper extends ConsumerWidget {
+  const HomeModeWrapper({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final mode = ref.watch(appModeProvider);
+    return mode == AppMode.client ? const HomeScreen() : const ProviderDashboard();
+  }
+}
+
 // ── Router ────────────────────────────────────────────────────────────────────
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authProvider);
@@ -83,11 +93,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         routes: [
           GoRoute(
             path: '/home',
-            builder: (context, state) {
-              final ref = ProviderScope.containerOf(context);
-              final mode = ref.read(appModeProvider);
-              return mode == AppMode.client ? const HomeScreen() : const ProviderDashboard();
-            },
+            builder: (context, state) => const HomeModeWrapper(),
           ),
           GoRoute(path: '/ai', builder: (_, __) => const AiScreen()),
           GoRoute(path: '/messages', builder: (_, __) => const MessagesScreen()),
