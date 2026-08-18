@@ -73,6 +73,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
       body: Column(
         children: [
           Container(
+            width: double.infinity,
             color: AppColors.headerBg,
             padding: EdgeInsets.only(
               top: MediaQuery.of(context).padding.top + 16,
