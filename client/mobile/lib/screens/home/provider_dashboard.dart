@@ -28,6 +28,95 @@ class _ProviderDashboardState extends ConsumerState<ProviderDashboard> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              // 0. CYAN HEADER SECTION (Toggle to Client Mode)
+              Container(
+                width: double.infinity,
+                color: const Color(0xFF7EC8E3),
+                padding: EdgeInsets.fromLTRB(16, MediaQuery.of(context).padding.top + 14, 16, 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // Location dropdown
+                        const Row(
+                          children: [
+                            Icon(Icons.location_on, size: 14, color: Color(0xFF1E5F7A)),
+                            SizedBox(width: 4),
+                            Text(
+                              'Addis Ababa, ET',
+                              style: TextStyle(
+                                fontSize: 12.5,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF1E5F7A),
+                              ),
+                            ),
+                            SizedBox(width: 2),
+                            Icon(Icons.keyboard_arrow_down, size: 16, color: Color(0xFF1E5F7A)),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            // Notification bell with red dot
+                            Stack(
+                              children: [
+                                const Icon(Icons.notifications_none, color: Color(0xFF0F172A), size: 24),
+                                Positioned(
+                                  top: 0,
+                                  right: 0,
+                                  child: Container(
+                                    width: 7,
+                                    height: 7,
+                                    decoration: const BoxDecoration(
+                                      color: Color(0xFFEF4444),
+                                      shape: BoxShape.circle,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(width: 12),
+                            // Mode Switcher Pill
+                            GestureDetector(
+                              onTap: () {
+                                ref.read(appModeProvider.notifier).state = AppMode.client;
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 11),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.50),
+                                  border: Border.all(color: Colors.white.withOpacity(0.70)),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: const Text(
+                                  '💼 Provider',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700,
+                                    color: Color(0xFF0F172A),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    const Text(
+                      'Provider Dashboard',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF0F172A),
+                        letterSpacing: -0.02,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
               // 1. AVAILABILITY BANNER
               Container(
                 padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
