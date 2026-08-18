@@ -29,13 +29,44 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
       _error = '';
     });
     if (_step == 1) {
-      if (_name.isEmpty || _email.isEmpty || _phone.isEmpty) {
+      final name = _name.trim();
+      final email = _email.trim();
+      final phone = _phone.trim();
+
+      if (name.isEmpty || email.isEmpty || phone.isEmpty) {
         setState(() => _error = 'Please fill all fields');
         return;
       }
+
+      final nameRegex = RegExp(r'^[a-zA-Z\s]+$');
+      if (!nameRegex.hasMatch(name)) {
+        setState(() => _error = 'Please enter a valid name (letters only)');
+        return;
+      }
+
+      final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+      if (!emailRegex.hasMatch(email)) {
+        setState(() => _error = 'Please enter a valid email address');
+        return;
+      }
+
+      final phoneRegex = RegExp(r'^\+?[0-9\s\-]+$');
+      if (!phoneRegex.hasMatch(phone)) {
+        setState(() => _error = 'Please enter a valid phone number');
+        return;
+      }
+
       setState(() => _step = 2);
     } else if (_step == 2) {
-      if (_password.isEmpty || _password != _confirmPw) {
+      if (_password.isEmpty) {
+        setState(() => _error = 'Please enter a password');
+        return;
+      }
+      if (_password.length <= 6) {
+        setState(() => _error = 'Password must be more than 6 characters');
+        return;
+      }
+      if (_password != _confirmPw) {
         setState(() => _error = 'Passwords do not match');
         return;
       }

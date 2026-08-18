@@ -31,9 +31,27 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       _error = '';
     });
     
-    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
+
+    if (email.isEmpty || password.isEmpty) {
       setState(() {
         _error = 'Please fill in all fields';
+      });
+      return;
+    }
+
+    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    if (!emailRegex.hasMatch(email)) {
+      setState(() {
+        _error = 'Please enter a valid email address';
+      });
+      return;
+    }
+
+    if (password.length <= 6) {
+      setState(() {
+        _error = 'Password must be more than 6 characters';
       });
       return;
     }
