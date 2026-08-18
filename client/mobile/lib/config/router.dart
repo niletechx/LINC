@@ -54,8 +54,8 @@ class AppShell extends ConsumerWidget {
   }
 }
 
-class _HomeOrDashboard extends ConsumerWidget {
-  const _HomeOrDashboard();
+class HomeModeWrapper extends ConsumerWidget {
+  const HomeModeWrapper({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -93,7 +93,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         routes: [
           GoRoute(
             path: '/home',
-            builder: (_, __) => const _HomeOrDashboard(),
+            builder: (context, state) => const HomeModeWrapper(),
           ),
           GoRoute(path: '/ai', builder: (_, __) => const AiScreen()),
           GoRoute(path: '/messages', builder: (_, __) => const MessagesScreen()),

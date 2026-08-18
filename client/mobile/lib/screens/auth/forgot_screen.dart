@@ -32,6 +32,7 @@ class _ForgotScreenState extends ConsumerState<ForgotScreen> {
       body: Column(
         children: [
           Container(
+            width: double.infinity,
             color: AppColors.headerBg,
             padding: EdgeInsets.only(
               top: MediaQuery.of(context).padding.top + 16,

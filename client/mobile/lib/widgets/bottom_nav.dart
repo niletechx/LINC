@@ -21,7 +21,7 @@ class LincBottomNav extends StatelessWidget {
       child: SafeArea(
         top: false,
         child: SizedBox(
-          height: 62,
+          height: 68,
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
