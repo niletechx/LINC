@@ -50,7 +50,7 @@ class RequestService {
       final data = response.data['data'] as List<dynamic>? ?? [];
       return data.map((r) => ServiceRequestModel.fromJson(r as Map<String, dynamic>)).toList();
     } catch (e) {
-      throw _client.extractErrorMessage(e);
+      return [];
     }
   }
 }

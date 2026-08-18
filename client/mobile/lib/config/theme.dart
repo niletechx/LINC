@@ -26,7 +26,7 @@ class AppTheme {
         backgroundColor: AppColors.headerBg,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
-        systemOverlayStyle: SystemUiOverlayStyle(
+        systemOverlayStyle: const SystemUiOverlayStyle(
           statusBarColor: AppColors.headerBg,
           statusBarIconBrightness: Brightness.dark,
         ),

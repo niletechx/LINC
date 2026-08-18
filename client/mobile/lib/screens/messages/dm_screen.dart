@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import '../../config/colors.dart';
-import '../../config/text_styles.dart';
 import '../../data/mock_data.dart';
 import '../../providers/dm_provider.dart';
-import '../../models/conversation_model.dart';
 
 class DmScreen extends ConsumerStatefulWidget {
   final dynamic conversationId;
@@ -388,9 +385,26 @@ class _DmScreenState extends ConsumerState<DmScreen> {
                 ],
               ),
             ),
+          // Quick reply suggestion pills
           Container(
             color: Colors.white,
-            padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  _buildQuickReplyChip('@AI trust check'),
+                  _buildQuickReplyChip('Are you available today?'),
+                  _buildQuickReplyChip('Is price negotiable?'),
+                  _buildQuickReplyChip('What is your location?'),
+                  _buildQuickReplyChip('I paid via Escrow 🛡️'),
+                ],
+              ),
+            ),
+          ),
+          Container(
+            color: Colors.white,
+            padding: const EdgeInsets.fromLTRB(12, 4, 12, 12),
             child: Container(
               decoration: BoxDecoration(
                 color: const Color(0xFFF1F5F9),
@@ -411,15 +425,22 @@ class _DmScreenState extends ConsumerState<DmScreen> {
                       onSubmitted: (_) => _sendMessage(),
                     ),
                   ),
-                  Container(
-                    width: 34,
-                    height: 34,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF8FAFC),
-                      borderRadius: BorderRadius.circular(10),
+                  GestureDetector(
+                    onTap: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Attach photos / job site location'), duration: Duration(seconds: 2)),
+                      );
+                    },
+                    child: Container(
+                      width: 34,
+                      height: 34,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF8FAFC),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      alignment: Alignment.center,
+                      child: const Icon(Icons.attach_file_rounded, color: Color(0xFF94A3B8), size: 16),
                     ),
-                    alignment: Alignment.center,
-                    child: const Icon(Icons.add, color: Color(0xFF94A3B8), size: 15),
                   ),
                   const SizedBox(width: 4),
                   GestureDetector(
@@ -432,7 +453,7 @@ class _DmScreenState extends ConsumerState<DmScreen> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       alignment: Alignment.center,
-                      child: const Icon(Icons.send_rounded, color: Colors.white, size: 13),
+                      child: const Icon(Icons.send_rounded, color: Colors.white, size: 14),
                     ),
                   ),
                 ],
@@ -463,6 +484,27 @@ class _DmScreenState extends ConsumerState<DmScreen> {
           ),
           Text(value, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFFE2E8F0))),
         ],
+      ),
+    );
+  }
+
+  Widget _buildQuickReplyChip(String text) {
+    return GestureDetector(
+      onTap: () {
+        _textController.text = text;
+      },
+      child: Container(
+        margin: const EdgeInsets.only(right: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF1F5F9),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: const Color(0xFFE2E8F0)),
+        ),
+        child: Text(
+          text,
+          style: const TextStyle(fontSize: 11.5, color: Color(0xFF475569), fontWeight: FontWeight.w500),
+        ),
       ),
     );
   }

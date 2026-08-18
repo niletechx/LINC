@@ -1,6 +1,4 @@
-import 'dart:io';
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'storage_service.dart';
 
 class ApiClient {
@@ -42,14 +40,11 @@ class ApiClient {
   }
 
   static String _resolveBaseUrl() {
-    if (kIsWeb) {
-      return 'http://127.0.0.1:5000/api';
+    const customBase = String.fromEnvironment('BASE_URL');
+    if (customBase.isNotEmpty) {
+      final trimmed = customBase.endsWith('/') ? customBase.substring(0, customBase.length - 1) : customBase;
+      return trimmed.endsWith('/api') ? trimmed : '$trimmed/api';
     }
-    try {
-      if (Platform.isAndroid) {
-        return 'http://10.0.2.2:5000/api';
-      }
-    } catch (_) {}
     return 'http://127.0.0.1:5000/api';
   }
 

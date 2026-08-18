@@ -4,8 +4,8 @@ import '../data/mock_data.dart';
 import '../services/socket_service.dart';
 
 class DMState {
-  final Map<int, List<DMMessage>> messages;
-  final Map<int, bool> showAITrust;
+  final Map<dynamic, List<DMMessage>> messages;
+  final Map<dynamic, bool> showAITrust;
   final String input;
 
   const DMState({
@@ -15,8 +15,8 @@ class DMState {
   });
 
   DMState copyWith({
-    Map<int, List<DMMessage>>? messages,
-    Map<int, bool>? showAITrust,
+    Map<dynamic, List<DMMessage>>? messages,
+    Map<dynamic, bool>? showAITrust,
     String? input,
   }) =>
       DMState(
@@ -36,7 +36,7 @@ class DMNotifier extends StateNotifier<DMState> {
   void _initSocket() {
     _socketService.connect();
     _socketService.onNewMessage((data) {
-      final convId = data['conversation_id'] as int? ?? 1;
+      final convId = data['conversation_id']?.toString() ?? '1';
       final text = data['content'] as String? ?? '';
       final senderType = data['sender_type'] as String? ?? 'provider';
 
@@ -52,19 +52,19 @@ class DMNotifier extends StateNotifier<DMState> {
     });
 
     _socketService.onAiAdvisorResponse((data) {
-      final convId = data['conversation_id'] as int? ?? 1;
+      final convId = data['conversation_id']?.toString() ?? '1';
       final trust = {...state.showAITrust, convId: true};
       state = state.copyWith(showAITrust: trust);
     });
   }
 
-  void joinRoom(int convId) {
+  void joinRoom(dynamic convId) {
     _socketService.joinConversation(convId);
   }
 
   void setInput(String v) => state = state.copyWith(input: v);
 
-  Future<void> send(int convId) async {
+  Future<void> send(dynamic convId) async {
     final text = state.input.trim();
     if (text.isEmpty) return;
 
@@ -88,7 +88,7 @@ class DMNotifier extends StateNotifier<DMState> {
     }
   }
 
-  void dismissTrust(int convId) {
+  void dismissTrust(dynamic convId) {
     final trust = {...state.showAITrust, convId: false};
     state = state.copyWith(showAITrust: trust);
   }

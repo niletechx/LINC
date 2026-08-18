@@ -35,7 +35,7 @@ class CategoryService {
       final data = response.data['data'] as List<dynamic>? ?? [];
       return data.map((c) => CategoryModel.fromJson(c as Map<String, dynamic>)).toList();
     } catch (e) {
-      throw _client.extractErrorMessage(e);
+      return [];
     }
   }
 }

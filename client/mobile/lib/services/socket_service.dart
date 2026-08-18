@@ -1,6 +1,5 @@
-import 'dart:io';
 import 'package:flutter/foundation.dart';
-import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:socket_io_client/socket_io_client.dart' as socket_io;
 import 'storage_service.dart';
 
 typedef MessageCallback = void Function(Map<String, dynamic> message);
@@ -10,7 +9,7 @@ class SocketService {
   static final SocketService _instance = SocketService._internal();
   factory SocketService() => _instance;
 
-  IO.Socket? _socket;
+  socket_io.Socket? _socket;
   bool _isConnected = false;
 
   bool get isConnected => _isConnected;
@@ -23,9 +22,9 @@ class SocketService {
     final token = await StorageService.getToken();
     final baseUrl = _resolveSocketUrl();
 
-    _socket = IO.io(
+    _socket = socket_io.io(
       baseUrl,
-      IO.OptionBuilder()
+      socket_io.OptionBuilder()
           .setTransports(['websocket'])
           .disableAutoConnect()
           .setExtraHeaders(token != null ? {'Authorization': 'Bearer $token'} : {})
@@ -45,20 +44,20 @@ class SocketService {
     _socket!.connect();
   }
 
-  void joinConversation(int conversationId) {
+  void joinConversation(dynamic conversationId) {
     if (_socket == null) return;
-    _socket!.emit('join_conversation', {'conversationId': conversationId});
+    _socket!.emit('join_conversation', {'conversationId': conversationId.toString()});
   }
 
   void sendMessage({
-    required int conversationId,
+    required dynamic conversationId,
     required String senderId,
     required String senderType,
     required String content,
   }) {
     if (_socket == null) return;
     _socket!.emit('send_message', {
-      'conversationId': conversationId,
+      'conversationId': conversationId.toString(),
       'senderId': senderId,
       'senderType': senderType,
       'content': content,
@@ -89,14 +88,11 @@ class SocketService {
   }
 
   static String _resolveSocketUrl() {
-    if (kIsWeb) {
-      return 'http://127.0.0.1:5000';
+    const customBase = String.fromEnvironment('BASE_URL');
+    if (customBase.isNotEmpty) {
+      final trimmed = customBase.endsWith('/') ? customBase.substring(0, customBase.length - 1) : customBase;
+      return trimmed.endsWith('/api') ? trimmed.substring(0, trimmed.length - 4) : trimmed;
     }
-    try {
-      if (Platform.isAndroid) {
-        return 'http://10.0.2.2:5000';
-      }
-    } catch (_) {}
     return 'http://127.0.0.1:5000';
   }
 }

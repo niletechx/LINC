@@ -5,13 +5,15 @@
 class AppConfig {
   AppConfig._();
 
-  // ─── API ──────────────────────────────────────────────────────────────────
-  static const String baseUrl =
-      String.fromEnvironment('BASE_URL', defaultValue: 'http://10.0.2.2:5000');
-  static const String apiUrl = '$baseUrl/api';
+  static const String _envBaseUrl = String.fromEnvironment('BASE_URL');
+  static String get baseUrl {
+    if (_envBaseUrl.isNotEmpty) return _envBaseUrl;
+    return 'http://127.0.0.1:5000';
+  }
+  static String get apiUrl => '$baseUrl/api';
 
   // ─── Socket.IO ────────────────────────────────────────────────────────────
-  static const String socketUrl = baseUrl;
+  static String get socketUrl => baseUrl;
 
   // ─── App Info ─────────────────────────────────────────────────────────────
   static const String appName = 'LINC';

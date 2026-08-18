@@ -101,87 +101,157 @@ class _ProviderProfileScreenState extends ConsumerState<ProviderProfileScreen> {
   }
 
   Widget _buildHero(ProviderModel p) {
+    final topPadding = MediaQuery.of(context).padding.top;
     return Container(
       color: const Color(0xFF7EC8E3),
-      padding: EdgeInsets.fromLTRB(24, MediaQuery.of(context).padding.top + 20, 24, 20),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      padding: EdgeInsets.fromLTRB(16, topPadding + 8, 16, 20),
+      child: Column(
         children: [
-          Container(
-            width: 66,
-            height: 66,
-            decoration: BoxDecoration(
-              color: p.color,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.12), width: 2.5),
-            ),
-            alignment: Alignment.center,
-            child: Text(
-              p.name.substring(0, 1),
-              style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800),
-            ),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  p.name,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w800,
-                    color: Color(0xFF0F172A),
-                    letterSpacing: -0.02,
+          // Top bar with Back Button, Share & Bookmark
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              GestureDetector(
+                onTap: () {
+                  if (context.canPop()) {
+                    context.pop();
+                  } else {
+                    context.go('/home');
+                  }
+                },
+                child: Container(
+                  width: 38,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.35),
+                    borderRadius: BorderRadius.circular(10),
                   ),
+                  alignment: Alignment.center,
+                  child: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF0F172A), size: 18),
                 ),
-                Text(
-                  p.headline,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Color(0xFF1E5F7A),
-                  ),
-                ),
-                const SizedBox(height: 9),
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              ),
+              Row(
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Provider link copied to clipboard!'), duration: Duration(seconds: 2)),
+                      );
+                    },
+                    child: Container(
+                      width: 38,
+                      height: 38,
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF59E0B).withValues(alpha: 0.15),
-                        border: Border.all(color: const Color(0xFFF59E0B).withValues(alpha: 0.25)),
-                        borderRadius: BorderRadius.circular(6),
+                        color: Colors.white.withValues(alpha: 0.35),
+                        borderRadius: BorderRadius.circular(10),
                       ),
-                      child: const Text(
-                        '🛡️ VERIFIED',
-                        style: TextStyle(
-                          color: Color(0xFFF59E0B),
-                          fontSize: 10,
-                          fontWeight: FontWeight.w700,
-                        ),
+                      alignment: Alignment.center,
+                      child: const Icon(Icons.share_outlined, color: Color(0xFF0F172A), size: 18),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  GestureDetector(
+                    onTap: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Saved to your favorites!'), duration: Duration(seconds: 2)),
+                      );
+                    },
+                    child: Container(
+                      width: 38,
+                      height: 38,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.35),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      alignment: Alignment.center,
+                      child: const Icon(Icons.bookmark_border_rounded, color: Color(0xFF0F172A), size: 20),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 66,
+                height: 66,
+                decoration: BoxDecoration(
+                  color: p.color,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: Colors.white.withValues(alpha: 0.12), width: 2.5),
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  p.name.substring(0, 1),
+                  style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800),
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      p.name,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF0F172A),
+                        letterSpacing: -0.02,
                       ),
                     ),
-                    const SizedBox(width: 6),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF10B981).withValues(alpha: 0.12),
-                        border: Border.all(color: const Color(0xFF10B981).withValues(alpha: 0.20)),
-                        borderRadius: BorderRadius.circular(6),
+                    Text(
+                      p.headline,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Color(0xFF1E5F7A),
                       ),
-                      child: Text(
-                        '⚡ ${p.response}',
-                        style: const TextStyle(
-                          color: Color(0xFF34D399),
-                          fontSize: 10,
-                          fontWeight: FontWeight.w700,
+                    ),
+                    const SizedBox(height: 9),
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF59E0B).withValues(alpha: 0.15),
+                            border: Border.all(color: const Color(0xFFF59E0B).withValues(alpha: 0.25)),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: const Text(
+                            '🛡️ VERIFIED',
+                            style: TextStyle(
+                              color: Color(0xFFF59E0B),
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
                         ),
-                      ),
+                        const SizedBox(width: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF10B981).withValues(alpha: 0.12),
+                            border: Border.all(color: const Color(0xFF10B981).withValues(alpha: 0.20)),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            '⚡ ${p.response}',
+                            style: const TextStyle(
+                              color: Color(0xFF065F46),
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ],
       ),

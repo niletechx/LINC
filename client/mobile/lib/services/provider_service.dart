@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/provider_model.dart';
 import '../models/service_model.dart';
+import '../data/mock_data.dart';
 import 'api_client.dart';
 
 class ProviderService {
@@ -24,9 +25,11 @@ class ProviderService {
       );
 
       final data = response.data['data'] as List<dynamic>? ?? [];
-      return data.map((json) => _mapJsonToProvider(json as Map<String, dynamic>)).toList();
+      final list = data.map((json) => _mapJsonToProvider(json as Map<String, dynamic>)).toList();
+      return list.isNotEmpty ? list : MockData.providers;
     } catch (e) {
-      throw _client.extractErrorMessage(e);
+      debugPrint('ProviderService: using offline mock providers ($e)');
+      return MockData.providers;
     }
   }
 
@@ -36,7 +39,11 @@ class ProviderService {
       final data = response.data['data'] as Map<String, dynamic>;
       return _mapJsonToProvider(data);
     } catch (e) {
-      throw _client.extractErrorMessage(e);
+      debugPrint('ProviderService: using offline mock provider for id $id ($e)');
+      return MockData.allProviders.firstWhere(
+        (p) => p.id == id,
+        orElse: () => MockData.providers.first,
+      );
     }
   }
 
