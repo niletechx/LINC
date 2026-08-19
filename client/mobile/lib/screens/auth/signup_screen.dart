@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import '../../config/colors.dart';
 import '../../providers/app_provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/data_providers.dart';
+import '../../services/provider_service.dart';
 import '../../widgets/server_config_dialog.dart';
 
 class SignupScreen extends ConsumerStatefulWidget {
@@ -25,6 +27,43 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
   String _error = '';
   String _mode = 'client';
 
+  // Provider specific fields (Step 4)
+  final _headlineController = TextEditingController(text: 'Master Plumber & Pipe Specialist');
+  final _bioController = TextEditingController();
+  final _rateController = TextEditingController(text: '350');
+  final _cityController = TextEditingController(text: 'Addis Ababa, Bole');
+  String _selectedCategory = 'plumbing';
+  String _selectedAvailability = 'available';
+
+  final List<Map<String, dynamic>> _categories = [
+    {'id': '1', 'slug': 'plumbing', 'name': 'Plumbing & Water', 'emoji': '🔧', 'suggestedHeadline': 'Master Plumber & Pipe Specialist'},
+    {'id': '3', 'slug': 'electric', 'name': 'Electrical Work', 'emoji': '⚡', 'suggestedHeadline': 'Certified Electrician & Wiring Pro'},
+    {'id': '2', 'slug': 'cleaning', 'name': 'Cleaning & Maid', 'emoji': '🧹', 'suggestedHeadline': 'Professional Deep Cleaning Specialist'},
+    {'id': '4', 'slug': 'it-tech', 'name': 'IT & Computer', 'emoji': '💻', 'suggestedHeadline': 'Computer Repair & IT Technician'},
+    {'id': '5', 'slug': 'tutoring', 'name': 'Tutoring & Skills', 'emoji': '📚', 'suggestedHeadline': 'Experienced Academic & Language Tutor'},
+    {'id': '6', 'slug': 'transport', 'name': 'Transport & Cargo', 'emoji': '🚗', 'suggestedHeadline': 'Safe Driver & Moving Logistics Pro'},
+    {'id': '7', 'slug': 'wellness', 'name': 'Health & Wellness', 'emoji': '💆', 'suggestedHeadline': 'Certified Personal Trainer & Wellness Pro'},
+    {'id': '8', 'slug': 'creative', 'name': 'Painting & Design', 'emoji': '🎨', 'suggestedHeadline': 'Interior Painter & Decorating Specialist'},
+  ];
+
+  final List<String> _locationSuggestions = [
+    'Bole, Addis Ababa',
+    'Kazanchis, Addis Ababa',
+    'Sarbet, Addis Ababa',
+    'CMC / Ayat, Addis Ababa',
+    'Piassa / Arada, Addis Ababa',
+    'Megenagna, Addis Ababa',
+  ];
+
+  @override
+  void dispose() {
+    _headlineController.dispose();
+    _bioController.dispose();
+    _rateController.dispose();
+    _cityController.dispose();
+    super.dispose();
+  }
+
   void _showServerConfigDialog(BuildContext context) {
     ServerConfigDialog.show(context).then((_) {
       if (mounted) setState(() {});
@@ -35,6 +74,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     setState(() {
       _error = '';
     });
+
     if (_step == 1) {
       final name = _name.trim();
       final email = _email.trim();
@@ -79,6 +119,16 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
       }
       setState(() => _step = 3);
     } else if (_step == 3) {
+      if (_mode == 'provider') {
+        setState(() => _step = 4);
+      } else {
+        _handleSignup();
+      }
+    } else if (_step == 4) {
+      if (_headlineController.text.trim().isEmpty) {
+        setState(() => _error = 'Please enter your professional headline');
+        return;
+      }
       _handleSignup();
     }
   }
@@ -104,13 +154,14 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
       }
 
       if (_mode == 'provider') {
-        ref.read(needsProviderSetupProvider.notifier).state = true;
         ref.read(appModeProvider.notifier).state = AppMode.provider;
-      } else {
         ref.read(needsProviderSetupProvider.notifier).state = false;
+      } else {
         ref.read(appModeProvider.notifier).state = AppMode.client;
+        ref.read(needsProviderSetupProvider.notifier).state = false;
       }
 
+      // 1. Register base account
       await ref.read(authProvider.notifier).register(
         email: _email.trim(),
         password: _password,
@@ -118,15 +169,38 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
         username: cleanUsername,
         phone: _phone.trim(),
         role: _mode,
-        locationCity: 'Addis Ababa',
+        locationCity: _cityController.text.trim().isNotEmpty ? _cityController.text.trim() : 'Addis Ababa',
+        headline: _mode == 'provider' ? _headlineController.text.trim() : null,
       );
 
-      if (mounted) {
-        if (_mode == 'provider') {
-          context.go('/provider-setup');
-        } else {
-          context.go('/home');
+      // 2. If provider, persist full provider profile to database
+      if (_mode == 'provider') {
+        final rate = double.tryParse(_rateController.text.trim()) ?? 350.0;
+        final selectedCatObj = _categories.firstWhere(
+          (c) => c['slug'] == _selectedCategory,
+          orElse: () => _categories[0],
+        );
+
+        try {
+          await ProviderService().createMyProfile(
+            headline: _headlineController.text.trim(),
+            bio: _bioController.text.trim().isNotEmpty
+                ? _bioController.text.trim()
+                : 'Dedicated and verified professional providing high quality service across ${_cityController.text.trim()}.',
+            hourlyRate: rate,
+            currency: 'ETB',
+            locationCity: _cityController.text.trim(),
+            categoryIds: [selectedCatObj['id'].toString()],
+            availabilityStatus: _selectedAvailability,
+          );
+          ref.invalidate(providerListProvider);
+        } catch (e) {
+          debugPrint('Provider profile creation warning: $e');
         }
+      }
+
+      if (mounted) {
+        context.go('/home');
       }
     } catch (e) {
       if (mounted) {
@@ -148,6 +222,9 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     String title = 'Create Account';
     if (_step == 2) title = 'Secure Account';
     if (_step == 3) title = 'Choose Role';
+    if (_step == 4) title = 'Provider Details';
+
+    final totalSteps = _mode == 'provider' ? 4 : 3;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
@@ -207,7 +284,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                     children: [
                       Text(
                         title,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.w800,
                           color: AppColors.textPrimary,
@@ -215,13 +292,18 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                       ),
                       const SizedBox(height: 16),
                       Row(
-                        children: [
-                          _buildProgressBar(1),
-                          const SizedBox(width: 8),
-                          _buildProgressBar(2),
-                          const SizedBox(width: 8),
-                          _buildProgressBar(3),
-                        ],
+                        children: List.generate(totalSteps, (index) {
+                          return Expanded(
+                            child: Container(
+                              height: 4,
+                              margin: EdgeInsets.only(right: index < totalSteps - 1 ? 8 : 0),
+                              decoration: BoxDecoration(
+                                color: _step >= index + 1 ? AppColors.textPrimary : AppColors.textPrimary.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(2),
+                              ),
+                            ),
+                          );
+                        }),
                       ),
                     ],
                   ),
@@ -277,6 +359,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                   if (_step == 1) _buildStep1(),
                   if (_step == 2) _buildStep2(),
                   if (_step == 3) _buildStep3(),
+                  if (_step == 4) _buildStep4(),
                   
                   const SizedBox(height: 32),
                   SizedBox(
@@ -294,7 +377,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                       child: _loading
                           ? const CircularProgressIndicator(color: Colors.white)
                           : Text(
-                              _step == 3 ? 'Create My Account' : 'Continue',
+                              _getButtonLabel(),
                               style: const TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w700,
@@ -307,7 +390,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                     Center(
                       child: GestureDetector(
                         onTap: () => context.go('/login'),
-                        child: Text.rich(
+                        child: const Text.rich(
                           TextSpan(
                             text: 'Already have account? ',
                             style: TextStyle(color: AppColors.secondaryText, fontSize: 14),
@@ -334,16 +417,12 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     );
   }
 
-  Widget _buildProgressBar(int step) {
-    return Expanded(
-      child: Container(
-        height: 4,
-        decoration: BoxDecoration(
-          color: _step >= step ? AppColors.textPrimary : AppColors.textPrimary.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(2),
-        ),
-      ),
-    );
+  String _getButtonLabel() {
+    if (_step == 1 || _step == 2) return 'Continue';
+    if (_step == 3) {
+      return _mode == 'provider' ? 'Next: Service Details 👉' : 'Create My Account';
+    }
+    return 'Create Provider Account 🚀';
   }
 
   Widget _buildStep1() {
@@ -365,7 +444,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               'Phone Number',
               style: TextStyle(
                 fontSize: 13,
@@ -384,10 +463,10 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                 children: [
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       border: Border(right: BorderSide(color: AppColors.divider, width: 1.5)),
                     ),
-                    child: Text(
+                    child: const Text(
                       '🇪🇹 +251',
                       style: TextStyle(
                         fontSize: 14,
@@ -400,11 +479,11 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                     child: TextField(
                       keyboardType: TextInputType.phone,
                       onChanged: (v) => setState(() => _phone = v),
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         hintText: '9XX XXX XXX',
                         hintStyle: TextStyle(color: AppColors.muted),
                         border: InputBorder.none,
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                        contentPadding: EdgeInsets.symmetric(horizontal: 16),
                       ),
                     ),
                   ),
@@ -438,9 +517,13 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
           children: List.generate(4, (index) {
             Color c = AppColors.divider;
             if (_password.length > index * 2) {
-              if (index < 2) c = Colors.red;
-              else if (index < 3) c = AppColors.amber;
-              else c = AppColors.emerald;
+              if (index < 2) {
+                c = Colors.red;
+              } else if (index < 3) {
+                c = AppColors.amber;
+              } else {
+                c = AppColors.emerald;
+              }
             }
             return Expanded(
               child: Container(
@@ -496,7 +579,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
               SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  'You can always switch roles or be both from your account settings later.',
+                  'You can always switch roles or offer services anytime from your account settings.',
                   style: TextStyle(
                     fontSize: 13,
                     color: AppColors.textPrimary,
@@ -508,6 +591,248 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  // ── Step 4: Provider Details ──────────────────────────────────────────────
+  Widget _buildStep4() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // 1. Specialty / Trade
+        _buildCardWrapper(
+          title: '1. Primary Trade / Specialty',
+          subtitle: 'Choose what service category you provide',
+          child: Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: _categories.map((cat) {
+              final isSelected = _selectedCategory == cat['slug'];
+              return GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _selectedCategory = cat['slug'];
+                    if (_headlineController.text.isEmpty ||
+                        _categories.any((c) => c['suggestedHeadline'] == _headlineController.text)) {
+                      _headlineController.text = cat['suggestedHeadline'];
+                    }
+                  });
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: isSelected ? const Color(0xFF7EC8E3) : const Color(0xFFF1F5F9),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: isSelected ? const Color(0xFF0284C7) : const Color(0xFFE2E8F0),
+                      width: isSelected ? 1.5 : 1,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(cat['emoji'] as String, style: const TextStyle(fontSize: 14)),
+                      const SizedBox(width: 6),
+                      Text(
+                        cat['name'] as String,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                          color: isSelected ? Colors.white : const Color(0xFF334155),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+        ),
+        const SizedBox(height: 16),
+
+        // 2. Headline
+        _buildCardWrapper(
+          title: '2. Professional Headline',
+          subtitle: 'A short headline describing your expertise',
+          child: TextField(
+            controller: _headlineController,
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF0F172A)),
+            decoration: InputDecoration(
+              hintText: 'e.g. Master Plumber & Pipe Specialist',
+              filled: true,
+              fillColor: const Color(0xFFF8FAFC),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
+              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
+              focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFF7EC8E3), width: 1.5)),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+
+        // 3. Rate & City
+        _buildCardWrapper(
+          title: '3. Hourly Rate & Area',
+          subtitle: 'Starting rate in ETB and your operating location',
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    flex: 5,
+                    child: TextField(
+                      controller: _rateController,
+                      keyboardType: TextInputType.number,
+                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Color(0xFF0F172A)),
+                      decoration: InputDecoration(
+                        labelText: 'Rate',
+                        prefixText: 'ETB ',
+                        prefixStyle: const TextStyle(color: Color(0xFF059669), fontWeight: FontWeight.w800, fontSize: 12),
+                        suffixText: '/hr',
+                        filled: true,
+                        fillColor: const Color(0xFFF8FAFC),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
+                        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
+                        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFF7EC8E3), width: 1.5)),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    flex: 6,
+                    child: TextField(
+                      controller: _cityController,
+                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF0F172A)),
+                      decoration: InputDecoration(
+                        labelText: 'City / Sub-city',
+                        prefixIcon: const Icon(Icons.location_on_outlined, size: 16, color: Color(0xFF0284C7)),
+                        filled: true,
+                        fillColor: const Color(0xFFF8FAFC),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
+                        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
+                        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFF7EC8E3), width: 1.5)),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: _locationSuggestions.map((loc) {
+                    return GestureDetector(
+                      onTap: () => setState(() => _cityController.text = loc),
+                      child: Container(
+                        margin: const EdgeInsets.only(right: 6),
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF1F5F9),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          loc.split(',').first,
+                          style: const TextStyle(fontSize: 10.5, color: Color(0xFF64748B), fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+
+        // 4. Bio / Experience
+        _buildCardWrapper(
+          title: '4. Bio & Experience',
+          subtitle: 'What tools, background, and guarantees do you offer?',
+          child: TextField(
+            controller: _bioController,
+            maxLines: 3,
+            style: const TextStyle(fontSize: 13, color: Color(0xFF0F172A)),
+            decoration: InputDecoration(
+              hintText: 'e.g. Certified specialist with 5+ years experience in Addis Ababa. I carry modern tools and offer same-day emergency repairs.',
+              hintStyle: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
+              filled: true,
+              fillColor: const Color(0xFFF8FAFC),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
+              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
+              focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFF7EC8E3), width: 1.5)),
+              contentPadding: const EdgeInsets.all(12),
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+
+        // 5. Initial Availability
+        _buildCardWrapper(
+          title: '5. Initial Availability',
+          subtitle: 'Clients can see when you are open for work',
+          child: Row(
+            children: [
+              Expanded(
+                child: _buildAvailabilityChip('available', '🟢 Available', 'Accepting jobs now'),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _buildAvailabilityChip('busy', '🟡 Busy', 'Book in advance'),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCardWrapper({required String title, required String subtitle, required Widget child}) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w800, color: Color(0xFF0F172A))),
+          const SizedBox(height: 2),
+          Text(subtitle, style: const TextStyle(fontSize: 11, color: Color(0xFF64748B))),
+          const SizedBox(height: 12),
+          child,
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAvailabilityChip(String id, String label, String sub) {
+    final isSelected = _selectedAvailability == id;
+    return GestureDetector(
+      onTap: () => setState(() => _selectedAvailability = id),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFFE0F2FE) : const Color(0xFFF8FAFC),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected ? const Color(0xFF38BDF8) : const Color(0xFFE2E8F0),
+            width: isSelected ? 1.5 : 1,
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(label, style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: Color(0xFF0F172A))),
+            const SizedBox(height: 2),
+            Text(sub, style: const TextStyle(fontSize: 10, color: Color(0xFF64748B))),
+          ],
+        ),
+      ),
     );
   }
 
@@ -547,7 +872,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                 children: [
                   Text(
                     title,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
                       color: AppColors.textPrimary,
@@ -556,7 +881,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                   const SizedBox(height: 4),
                   Text(
                     subtitle,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 13,
                       color: AppColors.secondaryText,
                     ),
@@ -594,7 +919,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
       children: [
         Text(
           label,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w600,
             color: AppColors.textPrimary,
@@ -608,21 +933,21 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
           style: const TextStyle(fontSize: 14),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: TextStyle(color: AppColors.muted),
+            hintStyle: const TextStyle(color: AppColors.muted),
             filled: true,
             fillColor: Colors.white,
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(13),
-              borderSide: BorderSide(color: AppColors.divider, width: 1.5),
+              borderSide: const BorderSide(color: AppColors.divider, width: 1.5),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(13),
-              borderSide: BorderSide(color: AppColors.divider, width: 1.5),
+              borderSide: const BorderSide(color: AppColors.divider, width: 1.5),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(13),
-              borderSide: BorderSide(color: AppColors.primaryBlue, width: 1.5),
+              borderSide: const BorderSide(color: AppColors.primaryBlue, width: 1.5),
             ),
             suffixIcon: suffixIcon,
           ),
