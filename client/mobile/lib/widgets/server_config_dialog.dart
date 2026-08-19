@@ -76,8 +76,8 @@ class _ServerConfigDialogState extends State<ServerConfigDialog> {
               runSpacing: 6,
               children: [
                 _buildPresetChip(
-                  label: 'Wi-Fi PC (10.2.84.94)',
-                  url: 'http://10.2.84.94:5000',
+                  label: 'Wi-Fi PC (10.2.64.251)',
+                  url: 'http://10.2.64.251:5000',
                   icon: Icons.wifi,
                 ),
                 _buildPresetChip(

@@ -11,7 +11,7 @@ import '../services/storage_service.dart';
 class AppConfig {
   AppConfig._();
 
-  static const String defaultDevHost = '10.2.84.94:5000';
+  static const String defaultDevHost = '10.2.64.251:5000';
   static const String _envBaseUrl = String.fromEnvironment('BASE_URL');
 
   static String? _overrideBaseUrl;
@@ -86,6 +86,13 @@ class AppConfig {
     var trimmed = raw.trim();
     if (!trimmed.startsWith('http://') && !trimmed.startsWith('https://')) {
       trimmed = 'http://$trimmed';
+    }
+    // Development servers on local network / localhost use HTTP, not HTTPS
+    if (trimmed.startsWith('https://127.0.0.1') ||
+        trimmed.startsWith('https://localhost') ||
+        trimmed.startsWith('https://10.') ||
+        trimmed.startsWith('https://192.168.')) {
+      trimmed = trimmed.replaceFirst('https://', 'http://');
     }
     while (trimmed.endsWith('/')) {
       trimmed = trimmed.substring(0, trimmed.length - 1);
