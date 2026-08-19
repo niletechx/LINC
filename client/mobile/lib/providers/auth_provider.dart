@@ -42,36 +42,15 @@ class AuthState {
 class AuthNotifier extends StateNotifier<AuthState> {
   final AuthService _authService = AuthService();
 
-  AuthNotifier() : super(const AuthState()) {
+  AuthNotifier() : super(const AuthState(isInitialized: true, isAuthed: false)) {
     initialize();
   }
 
   Future<void> initialize() async {
     try {
-      final token = await StorageService.getToken();
-      final cachedUser = await StorageService.getUser();
-
-      if (token != null && token.isNotEmpty) {
-        state = state.copyWith(
-          isAuthed: true,
-          token: token,
-          user: cachedUser,
-          isInitialized: true,
-        );
-
-        // Fetch latest profile in background
-        try {
-          final liveUser = await _authService.getMe();
-          state = state.copyWith(user: liveUser);
-        } catch (_) {
-          // Keep cached profile if offline
-        }
-      } else {
-        state = state.copyWith(isInitialized: true, isAuthed: false);
-      }
-    } catch (_) {
-      state = state.copyWith(isInitialized: true, isAuthed: false);
-    }
+      await StorageService.clear();
+    } catch (_) {}
+    state = const AuthState(isInitialized: true, isAuthed: false, user: null, token: null);
   }
 
   Future<void> login({
@@ -138,7 +117,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<void> signOut() async {
     state = state.copyWith(isLoading: true);
     await _authService.logout();
-    state = const AuthState(isInitialized: true);
+    await StorageService.clear();
+    state = const AuthState(isInitialized: true, isAuthed: false, user: null, token: null);
   }
 
   void signIn() {
