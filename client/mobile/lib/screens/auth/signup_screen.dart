@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../config/colors.dart';
+import '../../providers/app_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../widgets/server_config_dialog.dart';
 
@@ -100,6 +101,14 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
       String cleanUsername = _name.replaceAll(RegExp(r'[^a-zA-Z0-9_]'), '').toLowerCase();
       if (cleanUsername.length < 3) {
         cleanUsername = '${cleanUsername}_${DateTime.now().millisecondsSinceEpoch % 10000}';
+      }
+
+      if (_mode == 'provider') {
+        ref.read(needsProviderSetupProvider.notifier).state = true;
+        ref.read(appModeProvider.notifier).state = AppMode.provider;
+      } else {
+        ref.read(needsProviderSetupProvider.notifier).state = false;
+        ref.read(appModeProvider.notifier).state = AppMode.client;
       }
 
       await ref.read(authProvider.notifier).register(

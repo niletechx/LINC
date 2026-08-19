@@ -68,6 +68,7 @@ class HomeModeWrapper extends ConsumerWidget {
 // ── Router ────────────────────────────────────────────────────────────────────
 final routerProvider = Provider<GoRouter>((ref) {
   final isAuthed = ref.watch(authProvider.select((state) => state.isAuthed));
+  final needsProviderSetup = ref.watch(needsProviderSetupProvider);
 
   return GoRouter(
     initialLocation: '/welcome',
@@ -77,7 +78,12 @@ final routerProvider = Provider<GoRouter>((ref) {
           state.uri.path.startsWith('/signup') ||
           state.uri.path.startsWith('/forgot');
       if (!isAuthed && !isAuthRoute) return '/welcome';
-      if (isAuthed && isAuthRoute) return '/home';
+      if (isAuthed && isAuthRoute) {
+        if (needsProviderSetup) {
+          return '/provider-setup';
+        }
+        return '/home';
+      }
       return null;
     },
     routes: [

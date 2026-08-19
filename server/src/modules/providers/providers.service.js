@@ -58,9 +58,7 @@ async function listProviders(filters = {}) {
 async function createProviderProfile(userId, payload = {}) {
   const profile = await providersRepo.findByUserId(userId);
   if (profile) {
-    const err = new Error('Provider profile already exists for this user');
-    err.statusCode = 409;
-    throw err;
+    return updateProviderProfile(userId, payload);
   }
 
   const data = normalizeProfileInput(payload);

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../providers/app_provider.dart';
 
 final availabilityProvider = StateProvider<bool>((ref) => true);
@@ -198,6 +199,76 @@ class _ProviderDashboardState extends ConsumerState<ProviderDashboard> {
                             ),
                           ],
                         ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // 2.5 PROFILE & SERVICES SETUP BANNER
+              Container(
+                margin: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: const Color(0xFFBAE6FD)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF0284C7).withValues(alpha: 0.05),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE0F2FE),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      alignment: Alignment.center,
+                      child: const Text('💼', style: TextStyle(fontSize: 20)),
+                    ),
+                    const SizedBox(width: 12),
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Provider Profile & Services',
+                            style: TextStyle(
+                              fontSize: 13.5,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF0F172A),
+                            ),
+                          ),
+                          SizedBox(height: 2),
+                          Text(
+                            'Edit your specialty, bio, rates & location',
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: Color(0xFF64748B),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF0284C7),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        elevation: 0,
+                      ),
+                      onPressed: () => context.push('/provider-setup'),
+                      child: const Text(
+                        'Edit',
+                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800),
                       ),
                     ),
                   ],

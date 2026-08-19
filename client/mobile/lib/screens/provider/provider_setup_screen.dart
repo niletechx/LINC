@@ -88,7 +88,8 @@ class _ProviderSetupScreenState extends ConsumerState<ProviderSetupScreen> {
         availabilityStatus: _selectedAvailability,
       );
 
-      // Set App Mode to Provider Dashboard
+      // Clear needsProviderSetup flag and set App Mode to Provider Dashboard
+      ref.read(needsProviderSetupProvider.notifier).state = false;
       ref.read(appModeProvider.notifier).state = AppMode.provider;
       ref.invalidate(providerListProvider);
 
@@ -146,6 +147,7 @@ class _ProviderSetupScreenState extends ConsumerState<ProviderSetupScreen> {
                     children: [
                       IconButton(
                         onPressed: () {
+                          ref.read(needsProviderSetupProvider.notifier).state = false;
                           if (context.canPop()) {
                             context.pop();
                           } else {
@@ -156,6 +158,7 @@ class _ProviderSetupScreenState extends ConsumerState<ProviderSetupScreen> {
                       ),
                       TextButton(
                         onPressed: () {
+                          ref.read(needsProviderSetupProvider.notifier).state = false;
                           ref.read(appModeProvider.notifier).state = AppMode.provider;
                           context.go('/home');
                         },

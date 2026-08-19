@@ -11,3 +11,6 @@ final availabilityProvider = StateProvider<bool>((ref) => true);
 /// Active booking tab
 enum BookingTab { active, upcoming, completed }
 final bookingTabProvider = StateProvider<BookingTab>((ref) => BookingTab.active);
+
+/// Tracks if new provider user needs onboarding profile setup
+final needsProviderSetupProvider = StateProvider<bool>((ref) => false);
