@@ -6,17 +6,26 @@ import '../../widgets/provider_card.dart';
 import '../../providers/data_providers.dart';
 
 class SearchScreen extends ConsumerStatefulWidget {
-  const SearchScreen({super.key});
+  final String? initialQuery;
+  final String? initialCategory;
+  const SearchScreen({super.key, this.initialQuery, this.initialCategory});
 
   @override
   ConsumerState<SearchScreen> createState() => _SearchScreenState();
 }
 
 class _SearchScreenState extends ConsumerState<SearchScreen> {
-  final TextEditingController _queryController = TextEditingController();
+  late final TextEditingController _queryController;
   String _activeFilter = 'all';
-  String _activeCategory = 'all';
+  late String _activeCategory;
   String _sortBy = 'match';
+
+  @override
+  void initState() {
+    super.initState();
+    _queryController = TextEditingController(text: widget.initialQuery ?? '');
+    _activeCategory = widget.initialCategory ?? 'all';
+  }
 
   @override
   void dispose() {

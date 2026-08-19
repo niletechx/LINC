@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:socket_io_client/socket_io_client.dart' as socket_io;
+import '../config/app_config.dart';
 import 'storage_service.dart';
 
 typedef MessageCallback = void Function(Map<String, dynamic> message);
@@ -14,13 +15,23 @@ class SocketService {
 
   bool get isConnected => _isConnected;
 
-  SocketService._internal();
+  SocketService._internal() {
+    AppConfig.addListener(_onConfigChanged);
+  }
+
+  void _onConfigChanged() {
+    if (_socket != null) {
+      debugPrint('🔄 Socket.IO base URL changed to ${AppConfig.socketUrl}, reconnecting...');
+      disconnect();
+      connect();
+    }
+  }
 
   Future<void> connect() async {
     if (_socket != null && _isConnected) return;
 
     final token = await StorageService.getToken();
-    final baseUrl = _resolveSocketUrl();
+    final baseUrl = AppConfig.socketUrl;
 
     _socket = socket_io.io(
       baseUrl,
@@ -85,14 +96,5 @@ class SocketService {
     _socket?.dispose();
     _socket = null;
     _isConnected = false;
-  }
-
-  static String _resolveSocketUrl() {
-    const customBase = String.fromEnvironment('BASE_URL');
-    if (customBase.isNotEmpty) {
-      final trimmed = customBase.endsWith('/') ? customBase.substring(0, customBase.length - 1) : customBase;
-      return trimmed.endsWith('/api') ? trimmed.substring(0, trimmed.length - 4) : trimmed;
-    }
-    return 'http://127.0.0.1:5000';
   }
 }

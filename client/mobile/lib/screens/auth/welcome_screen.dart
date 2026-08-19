@@ -3,9 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../config/colors.dart';
 import '../../config/text_styles.dart';
+import '../../providers/auth_provider.dart';
+import '../../widgets/server_config_dialog.dart';
 
 class WelcomeScreen extends ConsumerWidget {
   const WelcomeScreen({super.key});
+
+  void _showServerConfigDialog(BuildContext context) {
+    ServerConfigDialog.show(context);
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -13,6 +19,38 @@ class WelcomeScreen extends ConsumerWidget {
       backgroundColor: AppColors.headerBg,
       body: Stack(
         children: [
+          Positioned(
+            top: 40,
+            right: 16,
+            child: SafeArea(
+              child: GestureDetector(
+                onTap: () => _showServerConfigDialog(context),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.wifi_tethering, color: Colors.white, size: 15),
+                      SizedBox(width: 5),
+                      Text(
+                        'Server IP',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
           Positioned(
             top: -100,
             right: -50,
@@ -148,12 +186,12 @@ class WelcomeScreen extends ConsumerWidget {
                 ),
                 Padding(
                   padding: const EdgeInsets.only(
-                      left: 24, right: 24, bottom: 40, top: 24),
+                      left: 24, right: 24, bottom: 28, top: 16),
                   child: Column(
                     children: [
                       SizedBox(
                         width: double.infinity,
-                        height: 56,
+                        height: 54,
                         child: ElevatedButton(
                           onPressed: () => context.go('/signup'),
                           style: ElevatedButton.styleFrom(
@@ -174,10 +212,10 @@ class WelcomeScreen extends ConsumerWidget {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 12),
                       SizedBox(
                         width: double.infinity,
-                        height: 56,
+                        height: 54,
                         child: TextButton(
                           onPressed: () => context.go('/login'),
                           style: TextButton.styleFrom(
@@ -199,14 +237,37 @@ class WelcomeScreen extends ConsumerWidget {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 12),
+                      GestureDetector(
+                        onTap: () {
+                          ref.read(authProvider.notifier).signIn();
+                          context.go('/home');
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          child: const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                '✨ Explore in Demo Mode',
+                                style: TextStyle(
+                                  fontSize: 13.5,
+                                  fontWeight: FontWeight.w700,
+                                  color: Color(0xFF0F172A),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
                       Text(
                         'By continuing, you agree to our Terms of Service\nand Privacy Policy.',
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: 11.5,
                           color: AppColors.slateBlue.withValues(alpha: 0.8),
-                          height: 1.5,
+                          height: 1.4,
                         ),
                       ),
                     ],

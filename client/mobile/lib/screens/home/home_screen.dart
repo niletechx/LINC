@@ -16,7 +16,6 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   String _currentLocation = 'Bole, Addis Ababa';
-  final List<Map<String, dynamic>> _userPostedRequests = [];
 
   void _showLocationPicker(BuildContext context) {
     final locations = [
@@ -224,223 +223,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  void _showPostRequestModal(BuildContext context) {
-    final titleController = TextEditingController();
-    final budgetController = TextEditingController(text: '600');
-    String urgency = 'standard';
-    String selectedCat = '🔧 Plumbing & Repairs';
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (ctx) {
-        return StatefulBuilder(
-          builder: (context, setModalState) {
-            return Padding(
-              padding: EdgeInsets.fromLTRB(20, 16, 20, MediaQuery.of(ctx).viewInsets.bottom + 24),
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Center(
-                      child: Container(
-                        width: 40,
-                        height: 4,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFCBD5E1),
-                          borderRadius: BorderRadius.circular(2),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'Post a Service Request',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
-                    ),
-                    const SizedBox(height: 4),
-                    const Text(
-                      'Nearby verified providers will submit instant offers',
-                      style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
-                    ),
-                    const SizedBox(height: 16),
-                    const Text('What do you need help with?', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: Color(0xFF334155))),
-                    const SizedBox(height: 6),
-                    TextField(
-                      controller: titleController,
-                      decoration: InputDecoration(
-                        hintText: 'e.g. Need electrician to fix kitchen fuse box',
-                        hintStyle: const TextStyle(fontSize: 13, color: Color(0xFF94A3B8)),
-                        filled: true,
-                        fillColor: const Color(0xFFF8FAFC),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                      ),
-                    ),
-                    const SizedBox(height: 14),
-                    const Text('Category', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: Color(0xFF334155))),
-                    const SizedBox(height: 6),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF8FAFC),
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: const Color(0xFFE2E8F0)),
-                      ),
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButton<String>(
-                          isExpanded: true,
-                          value: selectedCat,
-                          items: const [
-                            DropdownMenuItem(value: '🔧 Plumbing & Repairs', child: Text('🔧 Plumbing & Repairs')),
-                            DropdownMenuItem(value: '🧹 Deep Cleaning', child: Text('🧹 Deep Cleaning')),
-                            DropdownMenuItem(value: '⚡ Electrical Work', child: Text('⚡ Electrical Work')),
-                            DropdownMenuItem(value: '💻 IT & Tech Support', child: Text('💻 IT & Tech Support')),
-                            DropdownMenuItem(value: '📚 Tutoring & Lessons', child: Text('📚 Tutoring & Lessons')),
-                            DropdownMenuItem(value: '🚗 Transport & Moving', child: Text('🚗 Transport & Moving')),
-                          ],
-                          onChanged: (val) {
-                            if (val != null) setModalState(() => selectedCat = val);
-                          },
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 14),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text('Estimated Budget (ETB)', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: Color(0xFF334155))),
-                              const SizedBox(height: 6),
-                              TextField(
-                                controller: budgetController,
-                                keyboardType: TextInputType.number,
-                                decoration: InputDecoration(
-                                  hintText: '500',
-                                  suffixText: 'ETB',
-                                  filled: true,
-                                  fillColor: const Color(0xFFF8FAFC),
-                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
-                                  contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text('Urgency', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: Color(0xFF334155))),
-                              const SizedBox(height: 6),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: GestureDetector(
-                                      onTap: () => setModalState(() => urgency = 'standard'),
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(vertical: 12),
-                                        decoration: BoxDecoration(
-                                          color: urgency == 'standard' ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
-                                          borderRadius: BorderRadius.circular(10),
-                                          border: Border.all(color: const Color(0xFFE2E8F0)),
-                                        ),
-                                        alignment: Alignment.center,
-                                        child: Text(
-                                          'Standard',
-                                          style: TextStyle(
-                                            fontSize: 11.5,
-                                            fontWeight: FontWeight.w700,
-                                            color: urgency == 'standard' ? Colors.white : const Color(0xFF64748B),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 6),
-                                  Expanded(
-                                    child: GestureDetector(
-                                      onTap: () => setModalState(() => urgency = 'urgent'),
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(vertical: 12),
-                                        decoration: BoxDecoration(
-                                          color: urgency == 'urgent' ? const Color(0xFFEF4444) : const Color(0xFFF8FAFC),
-                                          borderRadius: BorderRadius.circular(10),
-                                          border: Border.all(color: const Color(0xFFE2E8F0)),
-                                        ),
-                                        alignment: Alignment.center,
-                                        child: Text(
-                                          '⚡ Urgent',
-                                          style: TextStyle(
-                                            fontSize: 11.5,
-                                            fontWeight: FontWeight.w700,
-                                            color: urgency == 'urgent' ? Colors.white : const Color(0xFF64748B),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 48,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF0F172A),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        ),
-                        onPressed: () {
-                          final text = titleController.text.trim();
-                          if (text.isEmpty) return;
-                          setState(() {
-                            _userPostedRequests.insert(0, {
-                              'emoji': urgency == 'urgent' ? '⚡' : selectedCat.split(' ').first,
-                              'title': text,
-                              'budget': '${budgetController.text.trim()} ETB',
-                              'time': 'Just now',
-                              'offers': '0 offers',
-                              'isUrgent': urgency == 'urgent',
-                            });
-                          });
-                          Navigator.pop(ctx);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Your request is live! Providers have been notified.'),
-                              backgroundColor: Color(0xFF10B981),
-                              duration: Duration(seconds: 3),
-                            ),
-                          );
-                        },
-                        child: const Text(
-                          'Publish Request',
-                          style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w800),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final appMode = ref.watch(appModeProvider);
@@ -454,15 +236,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF1F5F9),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showPostRequestModal(context),
-        backgroundColor: const Color(0xFF0F172A),
-        icon: const Icon(Icons.add_rounded, color: Colors.white, size: 20),
-        label: const Text(
-          'Post Request',
-          style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w800),
-        ),
-      ),
+
       body: SafeArea(
         bottom: false,
         child: SingleChildScrollView(
@@ -748,36 +522,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 margin: const EdgeInsets.only(bottom: 80),
                 child: Column(
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
+                    const Padding(
+                      padding: EdgeInsets.fromLTRB(16, 14, 16, 12),
                       child: Row(
                         children: [
-                          const Text(
+                          Text(
                             'Open Requests',
                             style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
                           ),
-                          const Spacer(),
-                          GestureDetector(
-                            onTap: () => _showPostRequestModal(context),
-                            child: const Text(
-                              '+ Post',
-                              style: TextStyle(color: Color(0xFF7EC8E3), fontSize: 13, fontWeight: FontWeight.w700),
-                            ),
-                          ),
+                          Spacer(),
                         ],
                       ),
                     ),
-                    // User posted requests
-                    ..._userPostedRequests.map((r) {
-                      return _buildOpenRequestRow(
-                        r['emoji'] as String,
-                        r['title'] as String,
-                        r['budget'] as String,
-                        r['time'] as String,
-                        r['offers'] as String,
-                        r['isUrgent'] as bool,
-                      );
-                    }),
+
                     if (requestsAsync.value != null && requestsAsync.value!.isNotEmpty)
                       ...requestsAsync.value!.map((r) {
                         final isUrgent = r.urgency == 'urgent';
@@ -808,11 +565,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget _buildQuickChip(BuildContext context, String emoji, String label, {bool isUrgent = false}) {
     return GestureDetector(
       onTap: () {
-        if (isUrgent) {
-          _showPostRequestModal(context);
-        } else {
-          context.push('/search');
-        }
+        context.push('/search?query=${Uri.encodeComponent(label)}');
       },
       child: Container(
         margin: const EdgeInsets.only(right: 8),
@@ -843,7 +596,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget _buildCategoryCell(BuildContext context, String emoji, String label, Color color, {required bool showRightBorder, required bool showBottomBorder}) {
     return Expanded(
       child: GestureDetector(
-        onTap: () => context.push('/search'),
+        onTap: () => context.push('/search?query=${Uri.encodeComponent(label)}'),
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(

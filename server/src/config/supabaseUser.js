@@ -45,25 +45,18 @@
 require('dotenv').config({ path: require('path').resolve(__dirname, '../../.env') });
 
 const { createClient } = require('@supabase/supabase-js');
+const { mockSupabase } = require('./mockSupabase');
 
-const SUPABASE_URL     = process.env.SUPABASE_URL;
-const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
+const SUPABASE_URL     = process.env.SUPABASE_URL || '';
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || '';
 
-if (!SUPABASE_URL) {
-  throw new Error('SUPABASE_URL is required in environment variables');
-}
+const isPlaceholder = !SUPABASE_URL || SUPABASE_URL.includes('your-project-id');
 
-/**
- * getSupabaseUser(jwt)
- *
- * Creates a Supabase client authenticated as the current user.
- * RLS policies are enforced — the user can only see their own data.
- *
- * @param {string} jwt - The raw JWT string from req.token
- *                       (set by auth.middleware.js)
- * @returns {import('@supabase/supabase-js').SupabaseClient}
- */
 function getSupabaseUser(jwt) {
+  if (isPlaceholder) {
+    return mockSupabase;
+  }
+
   if (!jwt) {
     throw new Error('JWT token is required to create a user-scoped Supabase client');
   }
@@ -71,13 +64,10 @@ function getSupabaseUser(jwt) {
   return createClient(SUPABASE_URL, SUPABASE_ANON_KEY || 'anon', {
     global: {
       headers: {
-        // PostgREST reads this header and sets request.jwt.claims
-        // to the verified JWT payload, which our linc_uid() reads.
         Authorization: `Bearer ${jwt}`,
       },
     },
     auth: {
-      // Disable Supabase's auto-refresh — we manage our own JWTs
       autoRefreshToken: false,
       persistSession:   false,
       detectSessionInUrl: false,

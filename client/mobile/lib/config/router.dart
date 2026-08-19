@@ -66,12 +66,11 @@ class HomeModeWrapper extends ConsumerWidget {
 
 // ── Router ────────────────────────────────────────────────────────────────────
 final routerProvider = Provider<GoRouter>((ref) {
-  final authState = ref.watch(authProvider);
+  final isAuthed = ref.watch(authProvider.select((state) => state.isAuthed));
 
   return GoRouter(
     initialLocation: '/welcome',
     redirect: (context, state) {
-      final isAuthed = authState.isAuthed;
       final isAuthRoute = state.uri.path.startsWith('/welcome') ||
           state.uri.path.startsWith('/login') ||
           state.uri.path.startsWith('/signup') ||
@@ -117,7 +116,14 @@ final routerProvider = Provider<GoRouter>((ref) {
           return DmScreen(conversationId: id);
         },
       ),
-      GoRoute(path: '/search', builder: (_, __) => const SearchScreen()),
+      GoRoute(
+        path: '/search',
+        builder: (context, state) {
+          final query = state.uri.queryParameters['query'];
+          final category = state.uri.queryParameters['category'];
+          return SearchScreen(initialQuery: query, initialCategory: category);
+        },
+      ),
       GoRoute(
         path: '/booking/:id',
         builder: (context, state) {

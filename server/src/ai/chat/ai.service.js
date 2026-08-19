@@ -77,12 +77,25 @@ async function processMessage({ userId, message, conversationId, userLat, userLn
   // 5. Build grounded prompt
   const { systemInstruction } = buildPrompt(message, providers, history);
 
-  // 6. Call Gemini
+  // 6. Call Gemini with graceful fallback
   const messages = [
     ...history,
     { role: 'user', parts: [{ text: message }] },
   ];
-  const rawResponse = await chat(messages, systemInstruction);
+
+  let rawResponse;
+  try {
+    rawResponse = await chat(messages, systemInstruction);
+  } catch (err) {
+    logger.warn('Gemini chat failed, generating local rule-based response: ' + err.message);
+    if (providers && providers.length > 0) {
+      const topMatch = providers[0];
+      const otherMatches = providers.slice(1, 3).map(p => `• **${p.name}** (${p.headline}) - ${p.avg_rating}★`).join('\n');
+      rawResponse = `I found **${providers.length} verified specialist${providers.length > 1 ? 's' : ''}** for your request in Addis Ababa:\n\n• **${topMatch.name}** (${topMatch.headline}) - ${topMatch.avg_rating}★ (${topMatch.total_reviews} reviews), ${topMatch.hourly_rate ? `${topMatch.hourly_rate} ETB/hr` : 'Verified'}.\n${otherMatches ? `\nOther top matches:\n${otherMatches}\n` : ''}\nYou can message them directly or book through LINC Escrow protection for full payment security.`;
+    } else {
+      rawResponse = `I received your request: "${message}". We have verified professionals across Addis Ababa ready to assist. You can explore categories or describe your preferred location & budget!`;
+    }
+  }
 
   // 7. Parse structured response
   const parsed = parseResponse(rawResponse, providers);
@@ -151,7 +164,20 @@ async function processMessageStream({ userId, message, conversationId, userLat, 
   ];
 
   // Stream Gemini response
-  const fullText = await streamChat(messages, systemInstruction, onChunk);
+  let fullText;
+  try {
+    fullText = await streamChat(messages, systemInstruction, onChunk);
+  } catch (err) {
+    logger.warn('Gemini stream failed, streaming local rule-based response: ' + err.message);
+    if (providers && providers.length > 0) {
+      const topMatch = providers[0];
+      const otherMatches = providers.slice(1, 3).map((p) => `• **${p.name}** (${p.headline}) - ${p.avg_rating}★`).join('\n');
+      fullText = `I found **${providers.length} verified specialist${providers.length > 1 ? 's' : ''}** for your request in Addis Ababa:\n\n• **${topMatch.name}** (${topMatch.headline}) - ${topMatch.avg_rating}★ (${topMatch.total_reviews} reviews), ${topMatch.hourly_rate ? `${topMatch.hourly_rate} ETB/hr` : 'Verified'}.\n${otherMatches ? `\nOther top matches:\n${otherMatches}\n` : ''}\nYou can message them directly or book through LINC Escrow protection for full payment security.`;
+    } else {
+      fullText = `I received your request: "${message}". We have verified professionals across Addis Ababa ready to assist. You can explore categories or describe your preferred location & budget!`;
+    }
+    onChunk(fullText);
+  }
 
   const parsed = parseResponse(fullText, providers);
   await saveMessages(convId, message, parsed.message, { intent, providers });

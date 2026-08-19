@@ -1,7 +1,62 @@
 const messagingRepo = require('./messaging.repository');
+const supabase = require('../../config/supabase');
 
 async function listConversations(userId) {
-  return messagingRepo.listConversations(userId);
+  const convs = await messagingRepo.listConversations(userId);
+  const enriched = await Promise.all(
+    convs.map(async (conv) => {
+      const isParticipantA = String(conv.participant_a_id) === String(userId);
+      const otherId = isParticipantA ? conv.participant_b_id : conv.participant_a_id;
+      const otherType = isParticipantA ? conv.participant_b_type : conv.participant_a_type;
+
+      let otherUser = null;
+      if (otherType === 'provider') {
+        const { data: prov } = await supabase
+          .from('provider_profiles')
+          .select('id, user_id, headline, users!user_id(id, full_name, username, avatar_url)')
+          .eq('id', otherId)
+          .maybeSingle();
+        if (prov) {
+          otherUser = {
+            id: prov.id,
+            user_id: prov.user_id,
+            name: prov.users?.full_name || prov.headline || 'Provider',
+            username: prov.users?.username || '',
+            avatar_url: prov.users?.avatar_url || null,
+          };
+        }
+      }
+      if (!otherUser) {
+        const { data: usr } = await supabase
+          .from('users')
+          .select('id, full_name, username, avatar_url')
+          .eq('id', otherId)
+          .maybeSingle();
+        if (usr) {
+          otherUser = {
+            id: usr.id,
+            user_id: usr.id,
+            name: usr.full_name || usr.username || 'User',
+            username: usr.username || '',
+            avatar_url: usr.avatar_url || null,
+          };
+        }
+      }
+
+      const msgs = await messagingRepo.listMessages(conv.id);
+      const lastMessage = msgs.length > 0 ? msgs[msgs.length - 1] : null;
+      const unreadCount = msgs.filter((m) => !m.is_read && String(m.sender_id) !== String(userId)).length;
+
+      return {
+        ...conv,
+        other_participant: otherUser || { id: otherId, name: 'Provider', username: '' },
+        last_message: lastMessage ? lastMessage.content : '',
+        last_message_time: lastMessage ? lastMessage.created_at : conv.created_at,
+        unread_count: unreadCount,
+      };
+    })
+  );
+  return enriched;
 }
 
 async function getConversation(userId, conversationId) {
@@ -12,7 +67,7 @@ async function getConversation(userId, conversationId) {
     throw err;
   }
 
-  const isParticipant = [conversation.participant_a_id, conversation.participant_b_id].includes(userId);
+  const isParticipant = [String(conversation.participant_a_id), String(conversation.participant_b_id)].includes(String(userId));
   if (!isParticipant) {
     const err = new Error('Forbidden');
     err.statusCode = 403;
@@ -29,6 +84,11 @@ async function createConversation(payload = {}) {
     const err = new Error('participant_a_type, participant_a_id, participant_b_type, and participant_b_id are required');
     err.statusCode = 400;
     throw err;
+  }
+
+  const existing = await messagingRepo.findExistingConversation(participant_a_id, participant_b_id);
+  if (existing) {
+    return existing;
   }
 
   return messagingRepo.createConversation({

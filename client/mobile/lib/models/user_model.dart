@@ -5,6 +5,7 @@ class UserModel {
   final String fullName;
   final String? avatarUrl;
   final String? phone;
+  final String role;
   final bool isAdmin;
   final bool isActive;
 
@@ -15,6 +16,7 @@ class UserModel {
     required this.fullName,
     this.avatarUrl,
     this.phone,
+    this.role = 'client',
     this.isAdmin = false,
     this.isActive = true,
   });
@@ -27,6 +29,7 @@ class UserModel {
       fullName: json['full_name'] as String? ?? json['fullName'] as String? ?? '',
       avatarUrl: json['avatar_url'] as String? ?? json['avatarUrl'] as String?,
       phone: json['phone'] as String?,
+      role: json['role'] as String? ?? 'client',
       isAdmin: json['is_admin'] as bool? ?? json['isAdmin'] as bool? ?? false,
       isActive: json['is_active'] as bool? ?? json['isActive'] as bool? ?? true,
     );
@@ -40,6 +43,7 @@ class UserModel {
       'full_name': fullName,
       'avatar_url': avatarUrl,
       'phone': phone,
+      'role': role,
       'is_admin': isAdmin,
       'is_active': isActive,
     };

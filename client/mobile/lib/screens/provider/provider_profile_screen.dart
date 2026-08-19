@@ -5,6 +5,9 @@ import '../../data/mock_data.dart';
 import '../../models/provider_model.dart';
 import '../../providers/data_providers.dart';
 
+import '../../services/message_service.dart';
+import '../../providers/auth_provider.dart';
+
 class ProviderProfileScreen extends ConsumerStatefulWidget {
   final dynamic providerId;
   const ProviderProfileScreen({super.key, required this.providerId});
@@ -15,6 +18,24 @@ class ProviderProfileScreen extends ConsumerStatefulWidget {
 
 class _ProviderProfileScreenState extends ConsumerState<ProviderProfileScreen> {
   int? expandedService;
+
+  Future<void> _startChatWithProvider(ProviderModel p) async {
+    try {
+      final user = ref.read(authProvider).user;
+      final conv = await MessageService.instance.createOrGetConversation(
+        currentUserId: user?.id ?? '1',
+        participantType: 'provider',
+        participantId: p.id.toString(),
+      );
+      if (mounted) {
+        context.push('/dm/${conv.id}');
+      }
+    } catch (_) {
+      if (mounted) {
+        context.push('/dm/${p.id}');
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +61,7 @@ class _ProviderProfileScreenState extends ConsumerState<ProviderProfileScreen> {
               Expanded(
                 flex: 1,
                 child: InkWell(
-                  onTap: () => context.push('/dm/1'),
+                  onTap: () => _startChatWithProvider(p),
                   child: Container(
                     height: 50,
                     decoration: const BoxDecoration(
@@ -414,7 +435,7 @@ class _ProviderProfileScreenState extends ConsumerState<ProviderProfileScreen> {
                             children: [
                               Expanded(
                                 child: TextButton(
-                                  onPressed: () {},
+                                  onPressed: () => _startChatWithProvider(p),
                                   child: const Text('Ask a Question', style: TextStyle(color: Color(0xFF475569))),
                                 ),
                               ),

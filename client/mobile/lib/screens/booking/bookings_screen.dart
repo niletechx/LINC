@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../data/mock_data.dart';
 import '../../models/booking_model.dart';
 import '../../providers/app_provider.dart';
+import '../../providers/auth_provider.dart';
+import '../../providers/data_providers.dart';
+import '../../services/message_service.dart';
 
 class BookingsScreen extends ConsumerStatefulWidget {
   const BookingsScreen({super.key});
@@ -13,7 +15,26 @@ class BookingsScreen extends ConsumerStatefulWidget {
 }
 
 class _BookingsScreenState extends ConsumerState<BookingsScreen> {
-  final Map<int, bool> _releasedEscrows = {};
+  final Map<dynamic, bool> _releasedEscrows = {};
+
+  Future<void> _chatWithBookingProvider(BookingModel b) async {
+    try {
+      final user = ref.read(authProvider).user;
+      final conv = await MessageService.instance.createOrGetConversation(
+        currentUserId: user?.id ?? '1',
+        participantType: 'provider',
+        participantId: b.entityId ?? '1',
+        bookingId: b.id.toString(),
+      );
+      if (mounted) {
+        context.push('/dm/${conv.id}');
+      }
+    } catch (_) {
+      if (mounted) {
+        context.push('/dm/${b.id}');
+      }
+    }
+  }
 
   void _showReleaseEscrowModal(BuildContext context, BookingModel b) {
     showModalBottomSheet(
@@ -251,19 +272,7 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
   @override
   Widget build(BuildContext context) {
     final currentTab = ref.watch(bookingTabProvider);
-
-    List<BookingModel> filteredBookings;
-    switch (currentTab) {
-      case BookingTab.active:
-        filteredBookings = MockData.bookings.where((b) => b.status == BookingStatus.confirmed).toList();
-        break;
-      case BookingTab.upcoming:
-        filteredBookings = MockData.bookings.where((b) => b.status == BookingStatus.upcoming).toList();
-        break;
-      case BookingTab.completed:
-        filteredBookings = MockData.bookings.where((b) => b.status == BookingStatus.completed).toList();
-        break;
-    }
+    final bookingsAsync = ref.watch(bookingListProvider);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF1F5F9),
@@ -279,38 +288,146 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
               decoration: const BoxDecoration(
                 color: Color(0xFF7EC8E3),
               ),
-              child: const Text('Bookings', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: Color(0xFF0F172A))),
-            ),
-            Container(
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                border: Border(bottom: BorderSide(color: Color(0xFFE2E8F0))),
-              ),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _buildTab('Active (2)', BookingTab.active, currentTab),
-                  _buildTab('Upcoming (1)', BookingTab.upcoming, currentTab),
-                  _buildTab('Done (4)', BookingTab.completed, currentTab),
+                  const Text('Bookings', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: Color(0xFF0F172A))),
+                  GestureDetector(
+                    onTap: () => ref.refresh(bookingListProvider),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: const Color(0x26000000),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(Icons.refresh_rounded, color: Color(0xFF0F172A), size: 16),
+                    ),
+                  ),
                 ],
               ),
             ),
-            Expanded(
-              child: filteredBookings.isEmpty
-                  ? Center(
-                      child: Text(
-                        'No ${currentTab.name} bookings',
-                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Color(0xFF94A3B8)),
-                      ),
-                    )
-                  : ListView.separated(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-                      itemCount: filteredBookings.length,
-                      separatorBuilder: (context, index) => const SizedBox(height: 10),
-                      itemBuilder: (context, index) {
-                        final b = filteredBookings[index];
-                        return _buildBookingCard(context, b);
-                      },
+            bookingsAsync.when(
+              loading: () => const Expanded(
+                child: Center(
+                  child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF0284C7)),
+                ),
+              ),
+              error: (err, _) => Expanded(
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.error_outline_rounded, size: 48, color: Color(0xFF94A3B8)),
+                        const SizedBox(height: 12),
+                        const Text(
+                          'Unable to load bookings',
+                          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: Color(0xFF1E293B)),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          err.toString(),
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton.icon(
+                          onPressed: () => ref.refresh(bookingListProvider),
+                          icon: const Icon(Icons.refresh, size: 16),
+                          label: const Text('Try Again'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF0F172A),
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          ),
+                        ),
+                      ],
                     ),
+                  ),
+                ),
+              ),
+              data: (allBookings) {
+                final activeCount = allBookings.where((b) => b.status == BookingStatus.confirmed).length;
+                final upcomingCount = allBookings.where((b) => b.status == BookingStatus.upcoming).length;
+                final doneCount = allBookings.where((b) => b.status == BookingStatus.completed).length;
+
+                List<BookingModel> filteredBookings;
+                switch (currentTab) {
+                  case BookingTab.active:
+                    filteredBookings = allBookings.where((b) => b.status == BookingStatus.confirmed).toList();
+                    break;
+                  case BookingTab.upcoming:
+                    filteredBookings = allBookings.where((b) => b.status == BookingStatus.upcoming).toList();
+                    break;
+                  case BookingTab.completed:
+                    filteredBookings = allBookings.where((b) => b.status == BookingStatus.completed).toList();
+                    break;
+                }
+
+                return Expanded(
+                  child: Column(
+                    children: [
+                      Container(
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          border: Border(bottom: BorderSide(color: Color(0xFFE2E8F0))),
+                        ),
+                        child: Row(
+                          children: [
+                            _buildTab('Active ($activeCount)', BookingTab.active, currentTab),
+                            _buildTab('Upcoming ($upcomingCount)', BookingTab.upcoming, currentTab),
+                            _buildTab('Done ($doneCount)', BookingTab.completed, currentTab),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: filteredBookings.isEmpty
+                            ? RefreshIndicator(
+                                onRefresh: () async => ref.refresh(bookingListProvider),
+                                child: ListView(
+                                  physics: const AlwaysScrollableScrollPhysics(),
+                                  children: [
+                                    SizedBox(height: MediaQuery.of(context).size.height * 0.2),
+                                    const Center(
+                                      child: Icon(Icons.calendar_today_outlined, size: 48, color: Color(0xFFCBD5E1)),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    Center(
+                                      child: Text(
+                                        'No ${currentTab.name} bookings',
+                                        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Color(0xFF475569)),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    const Padding(
+                                      padding: EdgeInsets.symmetric(horizontal: 32),
+                                      child: Text(
+                                        'Book a service with any verified provider and manage your schedule here.',
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : RefreshIndicator(
+                                onRefresh: () async => ref.refresh(bookingListProvider),
+                                child: ListView.separated(
+                                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                                  itemCount: filteredBookings.length,
+                                  separatorBuilder: (context, index) => const SizedBox(height: 10),
+                                  itemBuilder: (context, index) {
+                                    final b = filteredBookings[index];
+                                    return _buildBookingCard(context, b);
+                                  },
+                                ),
+                              ),
+                      ),
+                    ],
+                  ),
+                );
+              },
             ),
           ],
         ),
@@ -355,15 +472,20 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
     switch (b.status) {
       case BookingStatus.confirmed:
         statusColor = const Color(0xFF059669);
-        statusLabel = isReleased ? 'Completed' : 'In Progress';
+        statusLabel = isReleased ? 'Completed' : (b.statusText.isNotEmpty ? b.statusText : 'In Progress');
         break;
       case BookingStatus.upcoming:
+      case BookingStatus.pending:
         statusColor = const Color(0xFFD97706);
-        statusLabel = 'Upcoming';
+        statusLabel = b.statusText.isNotEmpty ? b.statusText : 'Upcoming';
         break;
       case BookingStatus.completed:
         statusColor = const Color(0xFF64748B);
         statusLabel = 'Done';
+        break;
+      case BookingStatus.cancelled:
+        statusColor = const Color(0xFFEF4444);
+        statusLabel = 'Cancelled';
         break;
     }
 
@@ -468,7 +590,7 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
                             shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
                             padding: const EdgeInsets.symmetric(vertical: 12),
                           ),
-                          onPressed: () => context.push('/dm/1'),
+                          onPressed: () => _chatWithBookingProvider(b),
                           child: const Text('Chat', style: TextStyle(color: Color(0xFF0F172A), fontSize: 12.5, fontWeight: FontWeight.w700)),
                         ),
                       ),
@@ -486,7 +608,7 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
                       ),
                     ],
                   )
-                : b.status == BookingStatus.upcoming
+                : (b.status == BookingStatus.upcoming || b.status == BookingStatus.pending)
                     ? Row(
                         children: [
                           Expanded(
@@ -512,7 +634,7 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
                                 shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
                                 padding: const EdgeInsets.symmetric(vertical: 12),
                               ),
-                              onPressed: () => context.push('/dm/1'),
+                              onPressed: () => _chatWithBookingProvider(b),
                               child: const Text('Chat', style: TextStyle(color: Colors.white, fontSize: 12.5, fontWeight: FontWeight.w700)),
                             ),
                           ),

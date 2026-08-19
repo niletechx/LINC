@@ -84,6 +84,17 @@ async function createMessage(message) {
   return data;
 }
 
+async function findExistingConversation(idA, idB) {
+  const { data, error } = await supabase
+    .from('conversations')
+    .select(CONVERSATION_SELECT)
+    .or(`participant_a_id.eq.${idA}.and.participant_b_id.eq.${idB},participant_a_id.eq.${idB}.and.participant_b_id.eq.${idA}`)
+    .maybeSingle();
+
+  if (error && error.code !== 'PGRST116') return null;
+  return data;
+}
+
 async function markConversationRead(conversationId) {
   const { data, error } = await supabase
     .from('messages')
@@ -95,4 +106,4 @@ async function markConversationRead(conversationId) {
   return data || [];
 }
 
-module.exports = { listConversations, findById, createConversation, listMessages, createMessage, markConversationRead };
+module.exports = { listConversations, findById, findExistingConversation, createConversation, listMessages, createMessage, markConversationRead };

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../config/colors.dart';
 import '../../providers/auth_provider.dart';
+import '../../widgets/server_config_dialog.dart';
 
 class SignupScreen extends ConsumerStatefulWidget {
   const SignupScreen({super.key});
@@ -22,6 +23,12 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
   bool _loading = false;
   String _error = '';
   String _mode = 'client';
+
+  void _showServerConfigDialog(BuildContext context) {
+    ServerConfigDialog.show(context).then((_) {
+      if (mounted) setState(() {});
+    });
+  }
 
   void _handleNext() {
     setState(() {
@@ -145,9 +152,39 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                IconButton(
-                  onPressed: _handleBack,
-                  icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      onPressed: _handleBack,
+                      icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+                    ),
+                    GestureDetector(
+                      onTap: () => _showServerConfigDialog(context),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.35),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.wifi_tethering, color: Color(0xFF0F172A), size: 14),
+                            SizedBox(width: 4),
+                            Text(
+                              'Server IP',
+                              style: TextStyle(
+                                color: Color(0xFF0F172A),
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 16),
                 Padding(

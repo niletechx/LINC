@@ -16,7 +16,27 @@ function normalizeBookingInput(payload = {}) {
 }
 
 async function listBookings(userId) {
-  return bookingRepo.listBookings(userId);
+  const bookings = await bookingRepo.listBookings(userId);
+  const enriched = await Promise.all(
+    bookings.map(async (b) => {
+      let providerName = 'Provider';
+      if (b.entity_type === 'provider') {
+        const { data: prov } = await supabase
+          .from('provider_profiles')
+          .select('id, user_id, headline, users!user_id(id, full_name, username, avatar_url)')
+          .eq('id', b.entity_id)
+          .maybeSingle();
+        if (prov) {
+          providerName = prov.users?.full_name || prov.headline || 'Provider';
+        }
+      }
+      return {
+        ...b,
+        provider_name: providerName,
+      };
+    })
+  );
+  return enriched;
 }
 
 async function getBookingById(userId, id) {

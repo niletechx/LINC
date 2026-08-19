@@ -1,46 +1,14 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import '../config/app_config.dart';
+import 'api_client.dart';
 
-/// Central Dio HTTP client for all LINC API calls.
-/// Automatically attaches the JWT Bearer token from secure storage.
+/// Central helper for API calls delegating to [ApiClient].
 class ApiService {
   ApiService._();
   static final ApiService instance = ApiService._();
 
-  final _storage = const FlutterSecureStorage();
+  final ApiClient _client = ApiClient();
 
-  Dio get _dio {
-    final dio = Dio(
-      BaseOptions(
-        baseUrl: AppConfig.apiUrl,
-        connectTimeout: AppConfig.connectionTimeout,
-        receiveTimeout: AppConfig.receiveTimeout,
-        headers: {'Content-Type': 'application/json'},
-      ),
-    );
-
-    // ── Auth Interceptor ──────────────────────────────────────────────────
-    dio.interceptors.add(
-      InterceptorsWrapper(
-        onRequest: (options, handler) async {
-          final token = await _storage.read(key: 'access_token');
-          if (token != null) {
-            options.headers['Authorization'] = 'Bearer $token';
-          }
-          handler.next(options);
-        },
-        onError: (error, handler) async {
-          if (error.response?.statusCode == 401) {
-            // TODO: Trigger token refresh flow
-          }
-          handler.next(error);
-        },
-      ),
-    );
-
-    return dio;
-  }
+  Dio get _dio => _client.dio;
 
   // ── Convenience methods ───────────────────────────────────────────────────
   Future<Response> get(String path, {Map<String, dynamic>? params}) =>

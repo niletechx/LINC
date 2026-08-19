@@ -1,3 +1,4 @@
+import '../models/booking_model.dart';
 import 'api_client.dart';
 
 class BookingService {
@@ -33,10 +34,14 @@ class BookingService {
     }
   }
 
-  Future<List<dynamic>> listBookings() async {
+  Future<List<BookingModel>> listBookings() async {
     try {
       final response = await _client.dio.get('/bookings');
-      return response.data['data'] as List<dynamic>? ?? [];
+      final data = response.data['data'];
+      if (data is List) {
+        return data.map((json) => BookingModel.fromJson(json as Map<String, dynamic>)).toList();
+      }
+      return [];
     } catch (e) {
       throw _client.extractErrorMessage(e);
     }

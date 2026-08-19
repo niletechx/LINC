@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'config/app_config.dart';
 import 'config/router.dart';
 import 'config/theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await AppConfig.initialize();
 
   // Gracefully handle UI errors without displaying red exception screen
   ErrorWidget.builder = (FlutterErrorDetails details) {

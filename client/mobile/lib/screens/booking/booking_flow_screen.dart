@@ -119,18 +119,20 @@ class _BookingFlowScreenState extends ConsumerState<BookingFlowScreen> {
           child: InkWell(
             onTap: selectedTime != null
                 ? () async {
-                    setState(() => confirmed = true);
                     try {
+                      final priceNum = double.tryParse(p.services[selectedService].price.replaceAll(RegExp(r'[^0-9.]'), '')) ?? 350.0;
                       await BookingService().createBooking(
                         serviceId: p.services[selectedService].id,
                         entityId: p.id.toString(),
                         entityType: 'provider',
-                        scheduledAt: '2026-08-${16 + selectedDay}T$selectedTime',
-                        agreedPrice: 350.0,
+                        scheduledAt: '2026-08-${16 + selectedDay}T${selectedTime?.replaceAll(' ', '') ?? '10:00AM'}',
+                        agreedPrice: priceNum,
                         notes: note,
                         paymentMethod: paymentMethod,
                       );
+                      ref.invalidate(bookingListProvider);
                     } catch (_) {}
+                    if (mounted) setState(() => confirmed = true);
                   }
                 : null,
             child: Container(
@@ -384,8 +386,8 @@ class _BookingFlowScreenState extends ConsumerState<BookingFlowScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: const [
+          const Row(
+            children: [
               Text('Note', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: Color(0xFF0F172A))),
               Text(' (optional)', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Color(0xFF94A3B8))),
             ],
@@ -497,13 +499,13 @@ class _BookingFlowScreenState extends ConsumerState<BookingFlowScreen> {
               ],
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('LINC service fee (5%)', style: TextStyle(fontSize: 12.5, color: Color(0xFF64748B))),
-                const Text('~15 ETB', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Color(0xFF334155))),
+                Text('LINC service fee (5%)', style: TextStyle(fontSize: 12.5, color: Color(0xFF64748B))),
+                Text('~15 ETB', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Color(0xFF334155))),
               ],
             ),
           ),

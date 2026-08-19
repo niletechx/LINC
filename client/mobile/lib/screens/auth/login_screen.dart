@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../providers/auth_provider.dart';
+import '../../widgets/server_config_dialog.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -22,6 +23,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  void _showServerConfigDialog(BuildContext context) {
+    ServerConfigDialog.show(context).then((_) {
+      if (mounted) setState(() {});
+    });
   }
 
   void _handleSignIn() async {
@@ -100,26 +107,56 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  GestureDetector(
-                    onTap: () => context.go('/welcome'),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 4),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.chevron_left, color: Color(0xFF1E5F7A), size: 22),
-                          SizedBox(width: 2),
-                          Text(
-                            'Back',
-                            style: TextStyle(
-                              color: Color(0xFF1E5F7A),
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                            ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      GestureDetector(
+                        onTap: () => context.go('/welcome'),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 4),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.chevron_left, color: Color(0xFF1E5F7A), size: 22),
+                              SizedBox(width: 2),
+                              Text(
+                                'Back',
+                                style: TextStyle(
+                                  color: Color(0xFF1E5F7A),
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
-                    ),
+                      GestureDetector(
+                        onTap: () => _showServerConfigDialog(context),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.35),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.wifi_tethering, color: Color(0xFF0F172A), size: 14),
+                              SizedBox(width: 4),
+                              Text(
+                                'Server IP',
+                                style: TextStyle(
+                                  color: Color(0xFF0F172A),
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 14),
                   const Text(

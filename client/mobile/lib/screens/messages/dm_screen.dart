@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../config/colors.dart';
-import '../../data/mock_data.dart';
+import '../../models/conversation_model.dart';
+import '../../providers/data_providers.dart';
 import '../../providers/dm_provider.dart';
 
 class DmScreen extends ConsumerStatefulWidget {
@@ -17,8 +18,27 @@ class _DmScreenState extends ConsumerState<DmScreen> {
   final TextEditingController _textController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(dmProvider.notifier).loadConversation(widget.conversationId);
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    _textController.dispose();
+    super.dispose();
+  }
+
+  @override
   void didUpdateWidget(covariant DmScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
+    _scrollToBottom();
+  }
+
+  void _scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
         _scrollController.animateTo(
@@ -31,20 +51,39 @@ class _DmScreenState extends ConsumerState<DmScreen> {
   }
 
   void _sendMessage() {
-    if (_textController.text.trim().isEmpty) return;
+    final text = _textController.text.trim();
+    if (text.isEmpty) return;
+    ref.read(dmProvider.notifier).setInput(text);
     ref.read(dmProvider.notifier).send(widget.conversationId);
     _textController.clear();
+    _scrollToBottom();
   }
 
   @override
   Widget build(BuildContext context) {
-    final conv = MockData.conversations.firstWhere(
-      (c) => c.id.toString() == widget.conversationId.toString(),
-      orElse: () => MockData.conversations.first,
-    );
+    final convIdStr = widget.conversationId.toString();
+    final conversationsAsync = ref.watch(conversationListProvider);
+    final convList = conversationsAsync.value ?? [];
+    final conv = convList.cast<ConversationModel?>().firstWhere(
+          (c) => c?.id.toString() == convIdStr,
+          orElse: () => null,
+        ) ??
+        ConversationModel(
+          id: convIdStr,
+          providerId: '1',
+          name: 'Provider',
+          initials: 'P',
+          color: const Color(0xFF0284C7),
+          lastMsg: '',
+          time: 'now',
+          unread: 0,
+          online: true,
+        );
+
     final dmState = ref.watch(dmProvider);
-    final messages = dmState.messages[widget.conversationId] ?? [];
-    final showTrust = dmState.showAITrust[widget.conversationId] == true;
+    final messages = dmState.messages[convIdStr] ?? [];
+    final showTrust = dmState.showAITrust[convIdStr] == true;
+    final isLoading = dmState.isLoading[convIdStr] == true && messages.isEmpty;
 
     return Scaffold(
       backgroundColor: AppColors.appBackground,
@@ -146,29 +185,55 @@ class _DmScreenState extends ConsumerState<DmScreen> {
         child: Column(
           children: [
           Expanded(
-            child: ListView(
-              controller: _scrollController,
-              padding: const EdgeInsets.fromLTRB(14, 14, 14, 0),
-              children: [
-                Row(
-                  children: [
-                    const Expanded(child: Divider(color: Color(0xFFE2E8F0))),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      child: Text(
-                        'Today',
-                        style: const TextStyle(
-                          fontSize: 10.5,
-                          color: Color(0xFF94A3B8),
-                          fontWeight: FontWeight.w600,
-                        ),
+            child: isLoading
+                ? const Center(
+                    child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF0284C7)),
+                  )
+                : ListView(
+                    controller: _scrollController,
+                    padding: const EdgeInsets.fromLTRB(14, 14, 14, 0),
+                    children: [
+                      const Row(
+                        children: [
+                          Expanded(child: Divider(color: Color(0xFFE2E8F0))),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 8),
+                            child: Text(
+                              'Today',
+                              style: TextStyle(
+                                fontSize: 10.5,
+                                color: Color(0xFF94A3B8),
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          Expanded(child: Divider(color: Color(0xFFE2E8F0))),
+                        ],
                       ),
-                    ),
-                    const Expanded(child: Divider(color: Color(0xFFE2E8F0))),
-                  ],
-                ),
-                const SizedBox(height: 14),
-                ...messages.map((msg) {
+                      const SizedBox(height: 14),
+                      if (messages.isEmpty)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 40),
+                          child: Center(
+                            child: Column(
+                              children: [
+                                const Icon(Icons.waving_hand_rounded, size: 36, color: Color(0xFF7EC8E3)),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'Say hello to ${conv.name}!',
+                                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF64748B)),
+                                ),
+                                const SizedBox(height: 4),
+                                const Text(
+                                  'Start discussing your project requirements, schedule, or pricing.',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(fontSize: 11, color: Color(0xFF94A3B8)),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ...messages.map((msg) {
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 6),
                     child: Row(
@@ -238,7 +303,7 @@ class _DmScreenState extends ConsumerState<DmScreen> {
                       ],
                     ),
                   );
-                }).toList(),
+                }),
                 if (showTrust)
                   Padding(
                     padding: const EdgeInsets.only(top: 12, bottom: 16),
@@ -264,10 +329,10 @@ class _DmScreenState extends ConsumerState<DmScreen> {
                                 ),
                               ),
                               const SizedBox(width: 8),
-                              Expanded(
+                              const Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: const [
+                                  children: [
                                     Text(
                                       'AI Trust Advisor',
                                       style: TextStyle(
@@ -300,13 +365,13 @@ class _DmScreenState extends ConsumerState<DmScreen> {
                               border: Border.all(color: const Color(0x3310B981)), // 20% opacity
                             ),
                             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                            child: Row(
+                            child: const Row(
                               children: [
-                                const Text('🛡️', style: TextStyle(fontSize: 20)),
-                                const SizedBox(width: 8),
+                                Text('🛡️', style: TextStyle(fontSize: 20)),
+                                SizedBox(width: 8),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: const [
+                                  children: [
                                     Text(
                                       'Strong Trust Score',
                                       style: TextStyle(
