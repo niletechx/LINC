@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../data/mock_data.dart';
 import '../../models/provider_model.dart';
 import '../../providers/data_providers.dart';
 
@@ -39,84 +38,139 @@ class _ProviderProfileScreenState extends ConsumerState<ProviderProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final providersAsync = ref.watch(providerListProvider);
-    final sourceList = (providersAsync.value != null && providersAsync.value!.isNotEmpty)
-        ? providersAsync.value!
-        : MockData.providers;
-    final p = sourceList.firstWhere(
-      (prov) => prov.id.toString() == widget.providerId.toString(),
-      orElse: () => sourceList.first,
-    );
+    final providerAsync = ref.watch(providerDetailProvider(widget.providerId.toString()));
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFF1F5F9),
-      bottomNavigationBar: Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          border: Border(top: BorderSide(color: Color(0xFFE2E8F0))),
-        ),
-        child: SafeArea(
-          child: Row(
-            children: [
-              Expanded(
-                flex: 1,
-                child: InkWell(
-                  onTap: () => _startChatWithProvider(p),
-                  child: Container(
-                    height: 50,
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      border: Border(right: BorderSide(color: Color(0xFFF1F5F9))),
-                    ),
-                    alignment: Alignment.center,
-                    child: const Text(
-                      'Message',
-                      style: TextStyle(
-                        color: Color(0xFF334155),
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Expanded(
-                flex: 2,
-                child: InkWell(
-                  onTap: () => context.push('/booking/${p.id}'),
-                  child: Container(
-                    height: 50,
-                    color: const Color(0xFF0F172A),
-                    alignment: Alignment.center,
-                    child: Text(
-                      'Book Now · ${p.price}',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
+    return providerAsync.when(
+      loading: () => Scaffold(
+        backgroundColor: const Color(0xFFF1F5F9),
+        appBar: AppBar(
+          backgroundColor: const Color(0xFF7EC8E3),
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF0F172A)),
+            onPressed: () {
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                context.go('/home');
+              }
+            },
           ),
+          title: const Text('Provider Profile', style: TextStyle(color: Color(0xFF0F172A), fontSize: 16, fontWeight: FontWeight.w800)),
+        ),
+        body: const Center(
+          child: CircularProgressIndicator(color: Color(0xFF7EC8E3)),
         ),
       ),
-      body: CustomScrollView(
-        slivers: [
-          SliverToBoxAdapter(
+      error: (err, _) => Scaffold(
+        backgroundColor: const Color(0xFFF1F5F9),
+        appBar: AppBar(
+          backgroundColor: const Color(0xFF7EC8E3),
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF0F172A)),
+            onPressed: () {
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                context.go('/home');
+              }
+            },
+          ),
+          title: const Text('Provider Profile', style: TextStyle(color: Color(0xFF0F172A), fontSize: 16, fontWeight: FontWeight.w800)),
+        ),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _buildHero(p),
-                _buildStats(p),
-                _buildAbout(p),
-                _buildServices(p),
-                _buildReviews(p),
+                const Icon(Icons.person_off_outlined, size: 48, color: Color(0xFF94A3B8)),
+                const SizedBox(height: 12),
+                const Text('Unable to load provider profile', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Color(0xFF0F172A))),
+                const SizedBox(height: 6),
+                Text(err.toString(), textAlign: TextAlign.center, style: const TextStyle(fontSize: 12, color: Color(0xFF64748B))),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0F172A), foregroundColor: Colors.white),
+                  onPressed: () => ref.refresh(providerDetailProvider(widget.providerId.toString())),
+                  child: const Text('Retry'),
+                ),
               ],
             ),
           ),
-        ],
+        ),
+      ),
+      data: (p) => Scaffold(
+        backgroundColor: const Color(0xFFF1F5F9),
+        bottomNavigationBar: Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            border: Border(top: BorderSide(color: Color(0xFFE2E8F0))),
+          ),
+          child: SafeArea(
+            child: Row(
+              children: [
+                Expanded(
+                  flex: 1,
+                  child: InkWell(
+                    onTap: () => _startChatWithProvider(p),
+                    child: Container(
+                      height: 50,
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        border: Border(right: BorderSide(color: Color(0xFFF1F5F9))),
+                      ),
+                      alignment: Alignment.center,
+                      child: const Text(
+                        'Message',
+                        style: TextStyle(
+                          color: Color(0xFF334155),
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  flex: 2,
+                  child: InkWell(
+                    onTap: () => context.push('/booking/${p.id}'),
+                    child: Container(
+                      height: 50,
+                      color: const Color(0xFF0F172A),
+                      alignment: Alignment.center,
+                      child: Text(
+                        'Book Now · ${p.price}',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        body: CustomScrollView(
+          slivers: [
+            SliverToBoxAdapter(
+              child: Column(
+                children: [
+                  _buildHero(p),
+                  _buildStats(p),
+                  _buildAbout(p),
+                  _buildServices(p),
+                  _buildReviews(p),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

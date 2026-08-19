@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../data/mock_data.dart';
 import '../../models/provider_model.dart';
 import '../../services/booking_service.dart';
 import '../../providers/data_providers.dart';
@@ -24,17 +23,10 @@ class _BookingFlowScreenState extends ConsumerState<BookingFlowScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final providersAsync = ref.watch(providerListProvider);
-    final sourceList = (providersAsync.value != null && providersAsync.value!.isNotEmpty)
-        ? providersAsync.value!
-        : MockData.providers;
-    final p = sourceList.firstWhere(
-      (prov) => prov.id.toString() == widget.providerId.toString(),
-      orElse: () => sourceList.first,
-    );
+    final providerAsync = ref.watch(providerDetailProvider(widget.providerId.toString()));
 
-    if (confirmed) {
-      return Scaffold(
+    return providerAsync.when(
+      loading: () => Scaffold(
         backgroundColor: const Color(0xFFF1F5F9),
         appBar: AppBar(
           backgroundColor: const Color(0xFF7EC8E3),
@@ -45,126 +37,176 @@ class _BookingFlowScreenState extends ConsumerState<BookingFlowScreen> {
           ),
           title: const Text('Book Service', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w800)),
         ),
-        body: Column(
-          children: [
-            Container(
-              color: const Color(0xFF7EC8E3),
-              width: double.infinity,
-              padding: const EdgeInsets.fromLTRB(28, 20, 28, 20),
-              child: Column(
-                children: [
-                  Container(
-                    width: 60,
-                    height: 60,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFF10B981),
-                      shape: BoxShape.circle,
-                    ),
-                    alignment: Alignment.center,
-                    child: const Icon(Icons.check, color: Colors.white, size: 30),
-                  ),
-                  const SizedBox(height: 12),
-                  const Text('Booking Confirmed!', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: Colors.white)),
-                  const SizedBox(height: 8),
-                  const Text('Your provider has been notified.', style: TextStyle(fontSize: 13, color: Color(0xFF1E5F7A))),
-                ],
-              ),
-            ),
-            Container(
-              color: Colors.white,
-              margin: const EdgeInsets.only(bottom: 8),
-              child: Column(
-                children: [
-                  _buildSummaryRow('Service', p.services[selectedService].name),
-                  _buildSummaryRow('Date', 'Aug ${16 + selectedDay}'),
-                  _buildSummaryRow('Time', selectedTime ?? ''),
-                  _buildSummaryRow('Payment', paymentMethod == 'cash' ? 'Cash on Delivery' : 'Escrow (Safe Pay)'),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF0F172A),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                  minimumSize: const Size(double.infinity, 50),
-                ),
-                onPressed: () => context.go('/bookings'),
-                child: const Text('View My Bookings', style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w800)),
-              ),
-            ),
-          ],
+        body: const Center(
+          child: CircularProgressIndicator(color: Color(0xFF7EC8E3)),
         ),
-      );
-    }
-
-    return Scaffold(
-      backgroundColor: const Color(0xFFF1F5F9),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF7EC8E3),
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: const Text('Book Service', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w800)),
       ),
-      bottomNavigationBar: Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          border: Border(top: BorderSide(color: Color(0xFFE2E8F0))),
+      error: (err, _) => Scaffold(
+        backgroundColor: const Color(0xFFF1F5F9),
+        appBar: AppBar(
+          backgroundColor: const Color(0xFF7EC8E3),
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () => Navigator.pop(context),
+          ),
+          title: const Text('Book Service', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w800)),
         ),
-        child: SafeArea(
-          child: InkWell(
-            onTap: selectedTime != null
-                ? () async {
-                    try {
-                      final priceNum = double.tryParse(p.services[selectedService].price.replaceAll(RegExp(r'[^0-9.]'), '')) ?? 350.0;
-                      await BookingService().createBooking(
-                        serviceId: p.services[selectedService].id,
-                        entityId: p.id.toString(),
-                        entityType: 'provider',
-                        scheduledAt: '2026-08-${16 + selectedDay}T${selectedTime?.replaceAll(' ', '') ?? '10:00AM'}',
-                        agreedPrice: priceNum,
-                        notes: note,
-                        paymentMethod: paymentMethod,
-                      );
-                      ref.invalidate(bookingListProvider);
-                    } catch (_) {}
-                    if (mounted) setState(() => confirmed = true);
-                  }
-                : null,
-            child: Container(
-              height: 50,
-              color: selectedTime != null ? const Color(0xFF7EC8E3) : const Color(0xFFE2E8F0),
-              alignment: Alignment.center,
-              child: Text(
-                selectedTime != null ? 'Confirm Booking · ${p.services[selectedService].price}' : 'Select a time to continue',
-                style: TextStyle(
-                  color: selectedTime != null ? Colors.white : const Color(0xFF94A3B8),
-                  fontSize: 14,
-                  fontWeight: selectedTime != null ? FontWeight.w800 : FontWeight.w600,
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.error_outline, size: 48, color: Colors.redAccent),
+                const SizedBox(height: 12),
+                const Text('Unable to load provider details', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                const SizedBox(height: 12),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0F172A), foregroundColor: Colors.white),
+                  onPressed: () => ref.refresh(providerDetailProvider(widget.providerId.toString())),
+                  child: const Text('Retry'),
                 ),
-              ),
+              ],
             ),
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.only(bottom: 88),
-        child: Column(
-          children: [
-            _buildProviderMiniCard(p),
-            _buildServiceSelection(p),
-            _buildDatePicker(),
-            _buildTimeSlots(),
-            _buildNote(),
-            _buildPaymentMethod(),
-            _buildPriceSummary(p),
-          ],
-        ),
-      ),
+      data: (p) {
+        if (confirmed) {
+          return Scaffold(
+            backgroundColor: const Color(0xFFF1F5F9),
+            appBar: AppBar(
+              backgroundColor: const Color(0xFF7EC8E3),
+              elevation: 0,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.white),
+                onPressed: () => Navigator.pop(context),
+              ),
+              title: const Text('Book Service', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w800)),
+            ),
+            body: Column(
+              children: [
+                Container(
+                  color: const Color(0xFF7EC8E3),
+                  width: double.infinity,
+                  padding: const EdgeInsets.fromLTRB(28, 20, 28, 20),
+                  child: Column(
+                    children: [
+                      Container(
+                        width: 60,
+                        height: 60,
+                        decoration: const BoxDecoration(
+                          color: Color(0xFF10B981),
+                          shape: BoxShape.circle,
+                        ),
+                        alignment: Alignment.center,
+                        child: const Icon(Icons.check, color: Colors.white, size: 30),
+                      ),
+                      const SizedBox(height: 12),
+                      const Text('Booking Confirmed!', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: Colors.white)),
+                      const SizedBox(height: 8),
+                      const Text('Your provider has been notified.', style: TextStyle(fontSize: 13, color: Color(0xFF1E5F7A))),
+                    ],
+                  ),
+                ),
+                Container(
+                  color: Colors.white,
+                  margin: const EdgeInsets.only(bottom: 8),
+                  child: Column(
+                    children: [
+                      _buildSummaryRow('Service', p.services.isNotEmpty ? p.services[selectedService.clamp(0, p.services.length - 1)].name : p.headline),
+                      _buildSummaryRow('Date', 'Aug ${16 + selectedDay}'),
+                      _buildSummaryRow('Time', selectedTime ?? ''),
+                      _buildSummaryRow('Payment', paymentMethod == 'cash' ? 'Cash on Delivery' : 'Escrow (Safe Pay)'),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF0F172A),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      minimumSize: const Size(double.infinity, 50),
+                    ),
+                    onPressed: () => context.go('/bookings'),
+                    child: const Text('View My Bookings', style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w800)),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+
+        return Scaffold(
+          backgroundColor: const Color(0xFFF1F5F9),
+          appBar: AppBar(
+            backgroundColor: const Color(0xFF7EC8E3),
+            elevation: 0,
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.white),
+              onPressed: () => Navigator.pop(context),
+            ),
+            title: const Text('Book Service', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w800)),
+          ),
+          bottomNavigationBar: Container(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              border: Border(top: BorderSide(color: Color(0xFFE2E8F0))),
+            ),
+            child: SafeArea(
+              child: InkWell(
+                onTap: selectedTime != null
+                    ? () async {
+                        try {
+                          final priceNum = double.tryParse(p.services.isNotEmpty ? p.services[selectedService.clamp(0, p.services.length - 1)].price.replaceAll(RegExp(r'[^0-9.]'), '') : '350') ?? 350.0;
+                          await BookingService().createBooking(
+                            serviceId: p.services.isNotEmpty ? p.services[selectedService.clamp(0, p.services.length - 1)].id : '1',
+                            entityId: p.id.toString(),
+                            entityType: 'provider',
+                            scheduledAt: '2026-08-${16 + selectedDay}T${selectedTime?.replaceAll(' ', '') ?? '10:00AM'}',
+                            agreedPrice: priceNum,
+                            notes: note,
+                            paymentMethod: paymentMethod,
+                          );
+                          ref.invalidate(bookingListProvider);
+                        } catch (_) {}
+                        if (mounted) setState(() => confirmed = true);
+                      }
+                    : null,
+                child: Container(
+                  height: 50,
+                  color: selectedTime != null ? const Color(0xFF7EC8E3) : const Color(0xFFE2E8F0),
+                  alignment: Alignment.center,
+                  child: Text(
+                    selectedTime != null ? 'Confirm Booking · ${p.services.isNotEmpty ? p.services[selectedService.clamp(0, p.services.length - 1)].price : p.price}' : 'Select a time to continue',
+                    style: TextStyle(
+                      color: selectedTime != null ? Colors.white : const Color(0xFF94A3B8),
+                      fontSize: 14,
+                      fontWeight: selectedTime != null ? FontWeight.w800 : FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.only(bottom: 88),
+            child: Column(
+              children: [
+                _buildProviderMiniCard(p),
+                if (p.services.isNotEmpty) _buildServiceSelection(p),
+                _buildDatePicker(),
+                _buildTimeSlots(),
+                _buildNote(),
+                _buildPaymentMethod(),
+                if (p.services.isNotEmpty) _buildPriceSummary(p),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 

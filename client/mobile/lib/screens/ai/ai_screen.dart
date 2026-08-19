@@ -850,10 +850,10 @@ class _AiScreenState extends ConsumerState<AiScreen> with SingleTickerProviderSt
               borderRadius: BorderRadius.circular(14),
               border: Border.all(color: const Color(0xFFE2E8F0)),
             ),
-            child: Row(
+            child: const Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const SizedBox(
+                SizedBox(
                   width: 14,
                   height: 14,
                   child: CircularProgressIndicator(
@@ -861,8 +861,8 @@ class _AiScreenState extends ConsumerState<AiScreen> with SingleTickerProviderSt
                     valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF0284C7)),
                   ),
                 ),
-                const SizedBox(width: 10),
-                const Text(
+                SizedBox(width: 10),
+                Text(
                   'LINC AI Advisor is analyzing database & reviews...',
                   style: TextStyle(
                     fontSize: 13,

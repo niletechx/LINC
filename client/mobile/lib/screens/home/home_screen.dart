@@ -797,7 +797,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     const Text(' · ', style: TextStyle(color: Color(0xFF94A3B8))),
                     Text(time, style: const TextStyle(fontSize: 11.5, color: Color(0xFF64748B))),
                     const Text(' · ', style: TextStyle(color: Color(0xFF94A3B8))),
-                    Text(location, style: const TextStyle(fontSize: 11.5, color: Color(0xFF64748B))),
+                    Expanded(
+                      child: Text(
+                        location,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontSize: 11.5, color: Color(0xFF64748B)),
+                      ),
+                    ),
                   ],
                 ),
               ],

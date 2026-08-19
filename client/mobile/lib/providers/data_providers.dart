@@ -31,3 +31,8 @@ final bookingListProvider = FutureProvider.autoDispose<List<BookingModel>>((ref)
   final service = BookingService();
   return service.listBookings();
 });
+
+final providerDetailProvider = FutureProvider.family<ProviderModel, String>((ref, id) async {
+  final service = ProviderService();
+  return service.getProviderById(id);
+});
