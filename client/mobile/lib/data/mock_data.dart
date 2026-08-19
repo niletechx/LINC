@@ -69,15 +69,15 @@ class MockData {
 
   // ── Conversations ──────────────────────────────────────────────────────────
   static final List<ConversationModel> conversations = [
-    ConversationModel(id: 1, providerId: 1, name: 'Abebe Girma', initials: 'AG', color: AppColors.avatarTeal, lastMsg: 'I can be there by 3pm, does that work?', time: '2m', unread: 2, online: true),
-    ConversationModel(id: 2, providerId: 2, name: 'Sara Mekonnen', initials: 'SM', color: AppColors.avatarCyan, lastMsg: 'Thank you for the booking! See you tomorrow.', time: '1h', unread: 0, online: false),
-    ConversationModel(id: 3, providerId: 3, name: 'Dawit Tadesse', initials: 'DT', color: AppColors.avatarGreen, lastMsg: 'The laptop repair is complete. You can pick it up.', time: '3h', unread: 0, online: true),
-    ConversationModel(id: 4, providerId: 4, name: 'Helen Bekele', initials: 'HB', color: AppColors.avatarViolet, lastMsg: 'Our next session is Thursday at 4pm.', time: '1d', unread: 0, online: false),
+    ConversationModel(id: '1', providerId: '1', name: 'Abebe Girma', initials: 'AG', color: AppColors.avatarTeal, lastMsg: 'I can be there by 3pm, does that work?', time: '2m', unread: 2, online: true),
+    ConversationModel(id: '2', providerId: '2', name: 'Sara Mekonnen', initials: 'SM', color: AppColors.avatarCyan, lastMsg: 'Thank you for the booking! See you tomorrow.', time: '1h', unread: 0, online: false),
+    ConversationModel(id: '3', providerId: '3', name: 'Dawit Tadesse', initials: 'DT', color: AppColors.avatarGreen, lastMsg: 'The laptop repair is complete. You can pick it up.', time: '3h', unread: 0, online: true),
+    ConversationModel(id: '4', providerId: '4', name: 'Helen Bekele', initials: 'HB', color: AppColors.avatarViolet, lastMsg: 'Our next session is Thursday at 4pm.', time: '1d', unread: 0, online: false),
   ];
 
   // ── DM Seed ────────────────────────────────────────────────────────────────
-  static final Map<int, List<DMMessage>> dmSeed = {
-    1: [
+  static final Map<dynamic, List<DMMessage>> dmSeed = {
+    '1': [
       DMMessage(fromMe: false, text: 'Hello! I saw your request for plumbing help in Bole. I\'m available today.', time: '10:12'),
       DMMessage(fromMe: true, text: 'Great! Can you come at around 3pm? It\'s a pipe leak in the kitchen.', time: '10:14'),
       DMMessage(fromMe: false, text: 'Yes, 3pm works perfectly. My rate is 300 ETB/hr, and most kitchen leaks take 1–2 hours.', time: '10:15'),
