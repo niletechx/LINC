@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../data/mock_data.dart';
 import '../../widgets/provider_card.dart';
 import '../../providers/app_provider.dart';
 import '../../providers/auth_provider.dart';
@@ -491,26 +490,64 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Row(
-                        children: (providersAsync.value != null && providersAsync.value!.isNotEmpty
-                                ? providersAsync.value!
-                                : MockData.providers)
-                            .map((p) {
-                          return Padding(
-                            padding: const EdgeInsets.only(right: 12),
-                            child: GestureDetector(
-                              onTap: () => context.push('/provider/${p.id}'),
-                              child: ProviderCard(
-                                provider: p,
-                                onTap: () => context.push('/provider/${p.id}'),
+                    providersAsync.when(
+                      loading: () => const Center(
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 24),
+                          child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF7EC8E3)),
+                        ),
+                      ),
+                      error: (err, _) => Center(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+                          child: Text(
+                            'Unable to load nearby providers',
+                            style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                          ),
+                        ),
+                      ),
+                      data: (providers) {
+                        if (providers.isEmpty) {
+                          return Center(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+                              child: Column(
+                                children: [
+                                  const Icon(Icons.person_search_outlined, size: 36, color: Color(0xFF94A3B8)),
+                                  const SizedBox(height: 6),
+                                  const Text(
+                                    'No registered providers yet',
+                                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Color(0xFF475569)),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'Create a provider account to be featured here!',
+                                    style: TextStyle(fontSize: 11.5, color: Colors.grey.shade500),
+                                  ),
+                                ],
                               ),
                             ),
                           );
-                        }).toList(),
-                      ),
+                        }
+                        return SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Row(
+                            children: providers.map((p) {
+                              return Padding(
+                                padding: const EdgeInsets.only(right: 12),
+                                child: GestureDetector(
+                                  onTap: () => context.push('/provider/${p.id}'),
+                                  child: ProviderCard(
+                                    provider: p,
+                                    onTap: () => context.push('/provider/${p.id}'),
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -521,37 +558,82 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 color: Colors.white,
                 margin: const EdgeInsets.only(bottom: 80),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Padding(
-                      padding: EdgeInsets.fromLTRB(16, 14, 16, 12),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
                       child: Row(
                         children: [
-                          Text(
+                          const Text(
                             'Open Requests',
                             style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
                           ),
-                          Spacer(),
+                          const Spacer(),
+                          GestureDetector(
+                            onTap: () => context.push('/search'),
+                            child: const Text(
+                              'Post Request',
+                              style: TextStyle(color: Color(0xFF0284C7), fontSize: 12, fontWeight: FontWeight.w700),
+                            ),
+                          ),
                         ],
                       ),
                     ),
-
-                    if (requestsAsync.value != null && requestsAsync.value!.isNotEmpty)
-                      ...requestsAsync.value!.map((r) {
-                        final isUrgent = r.urgency == 'urgent';
-                        return _buildOpenRequestRow(
-                          isUrgent ? '⚡' : '🔧',
-                          r.title,
-                          '${r.budgetMin.toInt()}–${r.budgetMax.toInt()} ${r.currency}',
-                          r.time,
-                          '2 offers',
-                          isUrgent,
+                    requestsAsync.when(
+                      loading: () => const Center(
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 20),
+                          child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF7EC8E3)),
+                        ),
+                      ),
+                      error: (err, _) => Center(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                          child: Text(
+                            'Unable to load open requests',
+                            style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                          ),
+                        ),
+                      ),
+                      data: (requests) {
+                        if (requests.isEmpty) {
+                          return Center(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+                              child: Column(
+                                children: [
+                                  const Icon(Icons.assignment_outlined, size: 32, color: Color(0xFF94A3B8)),
+                                  const SizedBox(height: 6),
+                                  const Text(
+                                    'No open requests in database',
+                                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Color(0xFF475569)),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'Ask AI to post your first service request!',
+                                    style: TextStyle(fontSize: 11.5, color: Colors.grey.shade500),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }
+                        return Column(
+                          children: requests.map((r) {
+                            final isUrgent = r.urgency == 'urgent' || r.urgency == 'high';
+                            final emoji = _getEmojiForCategory(r.title);
+                            return _buildOpenRequestRow(
+                              emoji,
+                              r.title,
+                              '${r.budgetMin.toInt()}–${r.budgetMax.toInt()} ${r.currency}',
+                              r.time,
+                              r.city,
+                              isUrgent,
+                            );
+                          }).toList(),
                         );
-                      })
-                    else ...[
-                      _buildOpenRequestRow('⚡', 'Emergency Electrical Repair', '500–800 ETB', '12m ago', '3 offers', true),
-                      _buildOpenRequestRow('🧹', 'Deep Apartment Cleaning (2BHK)', '600–1,000 ETB', '35m ago', '5 offers', false),
-                      _buildOpenRequestRow('🔧', 'Plumbing & Water Tank Fix', '400–700 ETB', '1h ago', '2 offers', false),
-                    ],
+                      },
+                    ),
                   ],
                 ),
               ),
@@ -630,7 +712,30 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _buildOpenRequestRow(String emoji, String title, String budget, String time, String offers, bool isUrgent) {
+  String _getEmojiForCategory(String title) {
+    final lower = title.toLowerCase();
+    if (lower.contains('pipe') || lower.contains('water') || lower.contains('leak') || lower.contains('plumb')) {
+      return '🔧';
+    }
+    if (lower.contains('electr') || lower.contains('wire') || lower.contains('light') || lower.contains('power')) {
+      return '⚡';
+    }
+    if (lower.contains('clean') || lower.contains('maid') || lower.contains('house')) {
+      return '🧹';
+    }
+    if (lower.contains('laptop') || lower.contains('comput') || lower.contains('tech') || lower.contains('it')) {
+      return '💻';
+    }
+    if (lower.contains('tutor') || lower.contains('teach') || lower.contains('lesson') || lower.contains('math')) {
+      return '📚';
+    }
+    if (lower.contains('car') || lower.contains('driv') || lower.contains('transport') || lower.contains('cargo')) {
+      return '🚗';
+    }
+    return '📋';
+  }
+
+  Widget _buildOpenRequestRow(String emoji, String title, String budget, String time, String location, bool isUrgent) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 16),
       decoration: const BoxDecoration(
@@ -692,7 +797,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     const Text(' · ', style: TextStyle(color: Color(0xFF94A3B8))),
                     Text(time, style: const TextStyle(fontSize: 11.5, color: Color(0xFF64748B))),
                     const Text(' · ', style: TextStyle(color: Color(0xFF94A3B8))),
-                    Text(offers, style: const TextStyle(fontSize: 11.5, color: Color(0xFF64748B))),
+                    Text(location, style: const TextStyle(fontSize: 11.5, color: Color(0xFF64748B))),
                   ],
                 ),
               ],

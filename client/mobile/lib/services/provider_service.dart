@@ -25,11 +25,10 @@ class ProviderService {
       );
 
       final data = response.data['data'] as List<dynamic>? ?? [];
-      final list = data.map((json) => _mapJsonToProvider(json as Map<String, dynamic>)).toList();
-      return list.isNotEmpty ? list : MockData.providers;
+      return data.map((json) => _mapJsonToProvider(json as Map<String, dynamic>)).toList();
     } catch (e) {
-      debugPrint('ProviderService: using offline mock providers ($e)');
-      return MockData.providers;
+      debugPrint('ProviderService.getProviders error: $e');
+      return [];
     }
   }
 

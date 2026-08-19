@@ -26,6 +26,24 @@ class ServiceRequestModel {
   });
 
   factory ServiceRequestModel.fromJson(Map<String, dynamic> json) {
+    final createdAtStr = json['created_at'] as String?;
+    String timeAgo = 'Recently';
+    if (createdAtStr != null) {
+      try {
+        final dt = DateTime.parse(createdAtStr);
+        final diff = DateTime.now().difference(dt);
+        if (diff.inMinutes < 1) {
+          timeAgo = 'Just now';
+        } else if (diff.inMinutes < 60) {
+          timeAgo = '${diff.inMinutes}m ago';
+        } else if (diff.inHours < 24) {
+          timeAgo = '${diff.inHours}h ago';
+        } else {
+          timeAgo = '${diff.inDays}d ago';
+        }
+      } catch (_) {}
+    }
+
     return ServiceRequestModel(
       id: json['id']?.toString() ?? '',
       title: json['title'] as String? ?? 'Service Request',
@@ -36,7 +54,7 @@ class ServiceRequestModel {
       city: json['location_city'] as String? ?? 'Addis Ababa',
       urgency: json['urgency'] as String? ?? 'medium',
       status: json['status'] as String? ?? 'open',
-      time: '12m ago',
+      time: timeAgo,
     );
   }
 }

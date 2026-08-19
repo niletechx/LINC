@@ -670,6 +670,47 @@ class MockQueryBuilder {
       return true;
     });
 
+    if (this.table === 'provider_profiles') {
+      result = result.map((p) => {
+        if (p.user_id && (!p.users || !p.users.full_name)) {
+          const u = (db.users || []).find((x) => String(x.id) === String(p.user_id));
+          if (u) {
+            return {
+              ...p,
+              users: {
+                id: u.id,
+                full_name: u.full_name,
+                username: u.username,
+                avatar_url: u.avatar_url,
+                location_city: u.location_city,
+              },
+            };
+          }
+        }
+        return p;
+      });
+    }
+
+    if (this.table === 'requests') {
+      result = result.map((r) => {
+        if (r.user_id && (!r.users || !r.users.full_name)) {
+          const u = (db.users || []).find((x) => String(x.id) === String(r.user_id));
+          if (u) {
+            return {
+              ...r,
+              users: {
+                id: u.id,
+                full_name: u.full_name,
+                username: u.username,
+                avatar_url: u.avatar_url,
+              },
+            };
+          }
+        }
+        return r;
+      });
+    }
+
     // 3. Update
     if (this._updateData) {
       for (const item of result) {
