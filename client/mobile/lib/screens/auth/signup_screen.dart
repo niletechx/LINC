@@ -113,7 +113,11 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
       );
 
       if (mounted) {
-        context.go('/home');
+        if (_mode == 'provider') {
+          context.go('/provider-setup');
+        } else {
+          context.go('/home');
+        }
       }
     } catch (e) {
       if (mounted) {

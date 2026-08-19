@@ -17,6 +17,7 @@ import '../screens/messages/messages_screen.dart';
 import '../screens/messages/dm_screen.dart';
 import '../screens/profile/profile_screen.dart';
 import '../screens/profile/verification_screen.dart';
+import '../screens/provider/provider_setup_screen.dart';
 import '../providers/app_provider.dart';
 import '../widgets/bottom_nav.dart';
 
@@ -132,6 +133,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(path: '/verification', builder: (_, __) => const VerificationScreen()),
+      GoRoute(path: '/provider-setup', builder: (_, __) => const ProviderSetupScreen()),
     ],
   );
 });

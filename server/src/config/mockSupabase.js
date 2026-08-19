@@ -641,6 +641,18 @@ class MockQueryBuilder {
           is_active: true,
           ...item,
         };
+        if (this.table === 'provider_profiles' && item.user_id && !row.users) {
+          const u = (db.users || []).find((x) => String(x.id) === String(item.user_id));
+          if (u) {
+            row.users = {
+              id: u.id,
+              full_name: u.full_name,
+              username: u.username,
+              avatar_url: u.avatar_url,
+              location_city: u.location_city,
+            };
+          }
+        }
         if (!db[this.table].some((r) => r.id === row.id)) {
           db[this.table].push(row);
         }

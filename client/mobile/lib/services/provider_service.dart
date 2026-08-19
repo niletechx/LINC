@@ -47,6 +47,43 @@ class ProviderService {
     }
   }
 
+  Future<Map<String, dynamic>> createMyProfile({
+    required String headline,
+    required String bio,
+    required double hourlyRate,
+    String currency = 'ETB',
+    String locationCity = 'Addis Ababa',
+    List<String> categoryIds = const [],
+    String availabilityStatus = 'available',
+  }) async {
+    try {
+      final response = await _client.dio.post(
+        '/providers/me',
+        data: {
+          'headline': headline,
+          'bio': bio,
+          'hourly_rate': hourlyRate,
+          'currency': currency,
+          'location_city': locationCity,
+          'category_ids': categoryIds,
+          'availability_status': availabilityStatus,
+        },
+      );
+      return response.data['data'] as Map<String, dynamic>? ?? {};
+    } catch (e) {
+      throw _client.extractErrorMessage(e);
+    }
+  }
+
+  Future<Map<String, dynamic>?> getMyProfile() async {
+    try {
+      final response = await _client.dio.get('/providers/me');
+      return response.data['data'] as Map<String, dynamic>?;
+    } catch (_) {
+      return null;
+    }
+  }
+
   ProviderModel _mapJsonToProvider(Map<String, dynamic> json) {
     final user = json['users'] as Map<String, dynamic>? ?? {};
     final id = json['id']?.toString() ?? '1';
