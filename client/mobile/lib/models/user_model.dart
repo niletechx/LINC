@@ -8,6 +8,7 @@ class UserModel {
   final String role;
   final bool isAdmin;
   final bool isActive;
+  final String? locationCity;
 
   const UserModel({
     required this.id,
@@ -19,6 +20,7 @@ class UserModel {
     this.role = 'client',
     this.isAdmin = false,
     this.isActive = true,
+    this.locationCity,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -32,6 +34,7 @@ class UserModel {
       role: json['role'] as String? ?? 'client',
       isAdmin: json['is_admin'] as bool? ?? json['isAdmin'] as bool? ?? false,
       isActive: json['is_active'] as bool? ?? json['isActive'] as bool? ?? true,
+      locationCity: json['location_city'] as String? ?? json['locationCity'] as String?,
     );
   }
 

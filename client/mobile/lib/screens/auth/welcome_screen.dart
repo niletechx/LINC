@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../config/colors.dart';
 import '../../config/text_styles.dart';
-import '../../providers/auth_provider.dart';
 import '../../widgets/server_config_dialog.dart';
 
 class WelcomeScreen extends ConsumerWidget {
@@ -237,30 +236,7 @@ class WelcomeScreen extends ConsumerWidget {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 12),
-                      GestureDetector(
-                        onTap: () {
-                          ref.read(authProvider.notifier).signIn();
-                          context.go('/home');
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          child: const Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                '✨ Explore in Demo Mode',
-                                style: TextStyle(
-                                  fontSize: 13.5,
-                                  fontWeight: FontWeight.w700,
-                                  color: Color(0xFF0F172A),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 4),
                       Text(
                         'By continuing, you agree to our Terms of Service\nand Privacy Policy.',
                         textAlign: TextAlign.center,

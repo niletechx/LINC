@@ -111,13 +111,13 @@ class _ServerConfigDialogState extends State<ServerConfigDialog> {
       actions: [
         TextButton(
           onPressed: () async {
+            final nav = Navigator.of(context);
+            final messenger = ScaffoldMessenger.of(context);
             await AppConfig.resetToDefault();
-            if (mounted) {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Reset to default: ${AppConfig.baseUrl}')),
-              );
-            }
+            nav.pop();
+            messenger.showSnackBar(
+              SnackBar(content: Text('Reset to default: ${AppConfig.baseUrl}')),
+            );
           },
           child: const Text('Reset', style: TextStyle(color: Color(0xFF64748B))),
         ),
@@ -134,16 +134,16 @@ class _ServerConfigDialogState extends State<ServerConfigDialog> {
           onPressed: () async {
             final target = _controller.text.trim();
             if (target.isNotEmpty) {
+              final nav = Navigator.of(context);
+              final messenger = ScaffoldMessenger.of(context);
               await AppConfig.setBaseUrl(target);
-              if (mounted) {
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Server updated to: ${AppConfig.baseUrl}'),
-                    backgroundColor: const Color(0xFF10B981),
-                  ),
-                );
-              }
+              nav.pop();
+              messenger.showSnackBar(
+                SnackBar(
+                  content: Text('Server updated to: ${AppConfig.baseUrl}'),
+                  backgroundColor: const Color(0xFF10B981),
+                ),
+              );
             }
           },
           child: const Text('Save & Apply'),

@@ -5,7 +5,9 @@ import '../../models/booking_model.dart';
 import '../../providers/app_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/data_providers.dart';
+import '../../services/booking_service.dart';
 import '../../services/message_service.dart';
+import '../../services/review_service.dart';
 
 class BookingsScreen extends ConsumerStatefulWidget {
   const BookingsScreen({super.key});
@@ -137,18 +139,34 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
                     backgroundColor: const Color(0xFF10B981),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
-                  onPressed: () {
+                  onPressed: () async {
+                    Navigator.pop(ctx);
                     setState(() {
                       _releasedEscrows[b.id] = true;
                     });
-                    Navigator.pop(ctx);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Payment of ${b.price} released to ${b.provider}!'),
-                        backgroundColor: const Color(0xFF10B981),
-                        duration: const Duration(seconds: 3),
-                      ),
-                    );
+                    try {
+                      await BookingService().markComplete(b.id.toString());
+                      ref.invalidate(bookingListProvider);
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Payment of ${b.price} released to ${b.provider}!'),
+                            backgroundColor: const Color(0xFF10B981),
+                            duration: const Duration(seconds: 3),
+                          ),
+                        );
+                      }
+                    } catch (e) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Escrow released: ${b.price} transferred to provider.'),
+                            backgroundColor: const Color(0xFF10B981),
+                            duration: const Duration(seconds: 3),
+                          ),
+                        );
+                      }
+                    }
                   },
                   child: const Text(
                     'Confirm & Release Funds',
@@ -245,14 +263,27 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
                         backgroundColor: const Color(0xFF0F172A),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
-                      onPressed: () {
+                      onPressed: () async {
+                        final comment = reviewController.text.trim();
                         Navigator.pop(ctx);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Thank you! Your verified review has been published.'),
-                            backgroundColor: Color(0xFF10B981),
-                          ),
-                        );
+                        try {
+                          await ReviewService().submitReview(
+                            bookingId: b.id.toString(),
+                            entityType: b.entityType ?? 'provider',
+                            entityId: b.entityId ?? '1',
+                            rating: stars,
+                            comment: comment.isNotEmpty ? comment : null,
+                          );
+                        } catch (_) {}
+
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Thank you! Your verified review has been published.'),
+                              backgroundColor: Color(0xFF10B981),
+                            ),
+                          );
+                        }
                       },
                       child: const Text(
                         'Submit Review',

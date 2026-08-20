@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../data/mock_data.dart';
 import '../../widgets/provider_card.dart';
 import '../../providers/data_providers.dart';
 
@@ -36,53 +35,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     final providersAsync = ref.watch(providerListProvider);
-    final sourceProviders = (providersAsync.value != null && providersAsync.value!.isNotEmpty)
-        ? providersAsync.value!
-        : MockData.allProviders;
-
-    var filteredProviders = sourceProviders.where((p) {
-      if (_activeFilter == 'verified' && !p.verified) return false;
-      if (_activeFilter == 'nearby') {
-        double dist = double.tryParse(p.distance.split(' ')[0]) ?? 0;
-        if (dist >= 2.0) return false;
-      }
-      if (_activeFilter == 'toprated' && p.rating < 4.8) return false;
-
-      if (_activeCategory != 'all') {
-        final headline = p.headline.toLowerCase();
-        final about = p.about.toLowerCase();
-        if (!headline.contains(_activeCategory.toLowerCase()) && !about.contains(_activeCategory.toLowerCase())) {
-          return false;
-        }
-      }
-
-      if (_queryController.text.isNotEmpty) {
-        final query = _queryController.text.toLowerCase();
-        if (!p.name.toLowerCase().contains(query) &&
-            !p.headline.toLowerCase().contains(query) &&
-            !p.about.toLowerCase().contains(query)) {
-          return false;
-        }
-      }
-      return true;
-    }).toList();
-
-    // Sorting
-    if (_sortBy == 'rated') {
-      filteredProviders.sort((a, b) => b.rating.compareTo(a.rating));
-    } else if (_sortBy == 'near') {
-      filteredProviders.sort((a, b) {
-        double distA = double.tryParse(a.distance.split(' ')[0]) ?? 0;
-        double distB = double.tryParse(b.distance.split(' ')[0]) ?? 0;
-        return distA.compareTo(distB);
-      });
-    } else if (_sortBy == 'price') {
-      filteredProviders.sort((a, b) {
-        final priceA = int.tryParse(a.price.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
-        final priceB = int.tryParse(b.price.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
-        return priceA.compareTo(priceB);
-      });
-    }
 
     return Scaffold(
       backgroundColor: const Color(0xFFF1F5F9),
@@ -192,104 +144,195 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               ),
             ),
 
-            // 3. Results Count & Sorting bar
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-              color: Colors.white,
-              child: Row(
-                children: [
-                  RichText(
-                    text: TextSpan(
+            // 3. Body with loading/error/results
+            Expanded(
+              child: providersAsync.when(
+                loading: () => const Center(
+                  child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF0284C7)),
+                ),
+                error: (err, _) => Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        TextSpan(
-                          text: '${filteredProviders.length}',
-                          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
+                        const Icon(Icons.wifi_off_rounded, size: 48, color: Color(0xFF94A3B8)),
+                        const SizedBox(height: 12),
+                        const Text(
+                          'Cannot load providers',
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Color(0xFF1E293B)),
                         ),
-                        const TextSpan(
-                          text: ' verified specialists',
-                          style: TextStyle(fontSize: 12, color: Color(0xFF64748B), fontWeight: FontWeight.w500),
+                        const SizedBox(height: 6),
+                        Text(
+                          err.toString(),
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton.icon(
+                          onPressed: () => ref.refresh(providerListProvider),
+                          icon: const Icon(Icons.refresh, size: 16),
+                          label: const Text('Try Again'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF0F172A),
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          ),
                         ),
                       ],
                     ),
                   ),
-                  const Spacer(),
-                  _buildSortBtn('Match', 'match'),
-                  const SizedBox(width: 6),
-                  _buildSortBtn('Distance', 'near'),
-                  const SizedBox(width: 6),
-                  _buildSortBtn('Rating', 'rated'),
-                  const SizedBox(width: 6),
-                  _buildSortBtn('Price', 'price'),
-                ],
-              ),
-            ),
+                ),
+                data: (sourceProviders) {
+                  var filteredProviders = sourceProviders.where((p) {
+                    if (_activeFilter == 'verified' && !p.verified) return false;
+                    if (_activeFilter == 'nearby') {
+                      double dist = double.tryParse(p.distance.split(' ')[0]) ?? 0;
+                      if (dist >= 2.0) return false;
+                    }
+                    if (_activeFilter == 'toprated' && p.rating < 4.8) return false;
 
-            const Divider(height: 1, color: Color(0xFFE2E8F0)),
+                    if (_activeCategory != 'all') {
+                      final headline = p.headline.toLowerCase();
+                      final about = p.about.toLowerCase();
+                      if (!headline.contains(_activeCategory.toLowerCase()) &&
+                          !about.contains(_activeCategory.toLowerCase())) {
+                        return false;
+                      }
+                    }
 
-            // 4. Expanded Results List or Empty State
-            Expanded(
-              child: filteredProviders.isEmpty
-                  ? Container(
-                      color: Colors.white,
-                      padding: const EdgeInsets.all(32),
-                      child: Center(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
+                    if (_queryController.text.isNotEmpty) {
+                      final query = _queryController.text.toLowerCase();
+                      if (!p.name.toLowerCase().contains(query) &&
+                          !p.headline.toLowerCase().contains(query) &&
+                          !p.about.toLowerCase().contains(query)) {
+                        return false;
+                      }
+                    }
+                    return true;
+                  }).toList();
+
+                  // Sorting
+                  if (_sortBy == 'rated') {
+                    filteredProviders.sort((a, b) => b.rating.compareTo(a.rating));
+                  } else if (_sortBy == 'near') {
+                    filteredProviders.sort((a, b) {
+                      double distA = double.tryParse(a.distance.split(' ')[0]) ?? 0;
+                      double distB = double.tryParse(b.distance.split(' ')[0]) ?? 0;
+                      return distA.compareTo(distB);
+                    });
+                  } else if (_sortBy == 'price') {
+                    filteredProviders.sort((a, b) {
+                      final priceA = int.tryParse(a.price.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
+                      final priceB = int.tryParse(b.price.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
+                      return priceA.compareTo(priceB);
+                    });
+                  }
+
+                  return Column(
+                    children: [
+                      // Results count & sort bar
+                      Container(
+                        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                        color: Colors.white,
+                        child: Row(
                           children: [
-                            Container(
-                              width: 64,
-                              height: 64,
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFF1F5F9),
-                                borderRadius: BorderRadius.circular(20),
+                            RichText(
+                              text: TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text: '${filteredProviders.length}',
+                                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
+                                  ),
+                                  const TextSpan(
+                                    text: ' verified specialists',
+                                    style: TextStyle(fontSize: 12, color: Color(0xFF64748B), fontWeight: FontWeight.w500),
+                                  ),
+                                ],
                               ),
-                              alignment: Alignment.center,
-                              child: const Text('🔍', style: TextStyle(fontSize: 28)),
                             ),
-                            const SizedBox(height: 16),
-                            const Text(
-                              'No matching providers found',
-                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
-                            ),
-                            const SizedBox(height: 6),
-                            const Text(
-                              'Try searching for another service, keyword, or clear your filters.',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(fontSize: 12.5, color: Color(0xFF64748B), height: 1.4),
-                            ),
-                            const SizedBox(height: 18),
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF0F172A),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  _queryController.clear();
-                                  _activeFilter = 'all';
-                                  _activeCategory = 'all';
-                                });
-                              },
-                              child: const Text('Clear Filters', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
-                            ),
+                            const Spacer(),
+                            _buildSortBtn('Match', 'match'),
+                            const SizedBox(width: 6),
+                            _buildSortBtn('Distance', 'near'),
+                            const SizedBox(width: 6),
+                            _buildSortBtn('Rating', 'rated'),
+                            const SizedBox(width: 6),
+                            _buildSortBtn('Price', 'price'),
                           ],
                         ),
                       ),
-                    )
-                  : Container(
-                      color: Colors.white,
-                      child: ListView.builder(
-                        padding: const EdgeInsets.symmetric(vertical: 4),
-                        itemCount: filteredProviders.length,
-                        itemBuilder: (context, index) {
-                          final p = filteredProviders[index];
-                          return ProviderListTile(
-                            provider: p,
-                            onTap: () => context.push('/provider/${p.id}'),
-                          );
-                        },
+                      const Divider(height: 1, color: Color(0xFFE2E8F0)),
+
+                      // Results list or empty state
+                      Expanded(
+                        child: filteredProviders.isEmpty
+                            ? Container(
+                                color: Colors.white,
+                                padding: const EdgeInsets.all(32),
+                                child: Center(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Container(
+                                        width: 64,
+                                        height: 64,
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFF1F5F9),
+                                          borderRadius: BorderRadius.circular(20),
+                                        ),
+                                        alignment: Alignment.center,
+                                        child: const Text('🔍', style: TextStyle(fontSize: 28)),
+                                      ),
+                                      const SizedBox(height: 16),
+                                      const Text(
+                                        'No matching providers found',
+                                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
+                                      ),
+                                      const SizedBox(height: 6),
+                                      const Text(
+                                        'Try searching for another service, keyword, or clear your filters.',
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(fontSize: 12.5, color: Color(0xFF64748B), height: 1.4),
+                                      ),
+                                      const SizedBox(height: 18),
+                                      ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: const Color(0xFF0F172A),
+                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                        ),
+                                        onPressed: () {
+                                          setState(() {
+                                            _queryController.clear();
+                                            _activeFilter = 'all';
+                                            _activeCategory = 'all';
+                                          });
+                                        },
+                                        child: const Text('Clear Filters', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              )
+                            : Container(
+                                color: Colors.white,
+                                child: ListView.builder(
+                                  padding: const EdgeInsets.symmetric(vertical: 4),
+                                  itemCount: filteredProviders.length,
+                                  itemBuilder: (context, index) {
+                                    final p = filteredProviders[index];
+                                    return ProviderListTile(
+                                      provider: p,
+                                      onTap: () => context.push('/provider/${p.id}'),
+                                    );
+                                  },
+                                ),
+                              ),
                       ),
-                    ),
+                    ],
+                  );
+                },
+              ),
             ),
           ],
         ),

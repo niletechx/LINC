@@ -10,9 +10,11 @@ class BookingModel {
   final Color color;
   final String date;
   final String price;
+  final double? agreedPrice;
   final BookingStatus status;
   final String statusText;
   final String? entityId;
+  final String? entityType;
 
   const BookingModel({
     required this.id,
@@ -22,9 +24,11 @@ class BookingModel {
     required this.color,
     required this.date,
     required this.price,
+    this.agreedPrice,
     required this.status,
     this.statusText = 'Confirmed',
     this.entityId,
+    this.entityType,
   });
 
   static const List<Color> _avatarColors = [
@@ -87,7 +91,8 @@ class BookingModel {
     final serviceObj = json['services'] as Map<String, dynamic>?;
     final title = serviceObj?['title']?.toString() ?? json['title']?.toString() ?? 'Service Booking';
     final providerName = json['provider_name']?.toString() ?? 'Verified Provider';
-    final priceAmount = json['agreed_price'] ?? serviceObj?['price_amount'] ?? 350;
+    final num? rawAgreedPrice = json['agreed_price'] as num? ?? serviceObj?['price_amount'] as num?;
+    final priceAmount = rawAgreedPrice ?? 350;
     final currency = json['currency']?.toString() ?? 'ETB';
 
     return BookingModel(
@@ -98,9 +103,11 @@ class BookingModel {
       color: _hashColor(providerName),
       date: _formatDate(json['scheduled_at'] ?? json['created_at']),
       price: '$priceAmount $currency',
+      agreedPrice: rawAgreedPrice?.toDouble() ?? 350.0,
       status: bStatus,
       statusText: statusLabel,
       entityId: json['entity_id']?.toString(),
+      entityType: json['entity_type']?.toString() ?? 'provider',
     );
   }
 }

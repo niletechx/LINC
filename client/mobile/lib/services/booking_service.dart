@@ -46,4 +46,23 @@ class BookingService {
       throw _client.extractErrorMessage(e);
     }
   }
+
+  Future<Map<String, dynamic>> markComplete(String bookingId) async {
+    try {
+      final response = await _client.dio.post('/bookings/$bookingId/complete');
+      return response.data['data'] as Map<String, dynamic>? ?? {};
+    } catch (e) {
+      throw _client.extractErrorMessage(e);
+    }
+  }
+
+  Future<Map<String, dynamic>> updateBooking(String bookingId, Map<String, dynamic> payload) async {
+    try {
+      final response = await _client.dio.put('/bookings/$bookingId', data: payload);
+      return response.data['data'] as Map<String, dynamic>? ?? {};
+    } catch (e) {
+      throw _client.extractErrorMessage(e);
+    }
+  }
 }
+

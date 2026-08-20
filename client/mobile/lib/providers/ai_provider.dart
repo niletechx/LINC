@@ -1,7 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/chat_message_model.dart';
-import '../data/mock_data.dart';
 import '../services/ai_service.dart';
+
+const _kWelcomeMessage = ChatMessage(
+  role: MessageRole.ai,
+  text: "Hi! I'm LINC AI. Describe what you need in plain language — location, budget, urgency — and I'll match you with the best verified providers nearby.",
+);
 
 class AIChatState {
   final List<ChatMessage> messages;
@@ -50,8 +54,8 @@ class AIChatNotifier extends StateNotifier<AIChatState> {
   final AiService _aiService = AiService();
 
   AIChatNotifier()
-      : super(AIChatState(
-          messages: List.from(MockData.initialAiMessages),
+      : super(const AIChatState(
+          messages: [_kWelcomeMessage],
           activeTitle: 'New Chat',
         )) {
     loadSessions();
@@ -71,7 +75,7 @@ class AIChatNotifier extends StateNotifier<AIChatState> {
 
   Future<void> startNewSession() async {
     state = AIChatState(
-      messages: List.from(MockData.initialAiMessages),
+      messages: [_kWelcomeMessage],
       activeTitle: 'New Chat',
       conversations: state.conversations,
       conversationId: null,
@@ -110,7 +114,7 @@ class AIChatNotifier extends StateNotifier<AIChatState> {
 
       state = state.copyWith(
         loading: false,
-        messages: loaded.isNotEmpty ? loaded : List.from(MockData.initialAiMessages),
+        messages: loaded.isNotEmpty ? loaded : [_kWelcomeMessage],
       );
     } catch (_) {
       state = state.copyWith(loading: false);

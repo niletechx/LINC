@@ -5,6 +5,7 @@ import '../../widgets/provider_card.dart';
 import '../../providers/app_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/data_providers.dart';
+import '../../services/notification_service.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -113,27 +114,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   void _showNotificationsModal(BuildContext context) {
-    final notifications = [
-      {
-        'title': 'Booking Confirmed!',
-        'body': 'Abebe Kebede confirmed your plumbing repair for tomorrow at 2:00 PM.',
-        'time': '5m ago',
-        'icon': '✅',
-      },
-      {
-        'title': 'New Message',
-        'body': 'Sara Tesfaye: "I am on my way to your location."',
-        'time': '25m ago',
-        'icon': '💬',
-      },
-      {
-        'title': 'Escrow Protected',
-        'body': 'Your 500 ETB deposit is safely held in LINC Escrow until job completion.',
-        'time': '2h ago',
-        'icon': '🛡️',
-      },
-    ];
-
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.white,
@@ -141,82 +121,130 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (ctx) {
-        return Padding(
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFCBD5E1),
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        return Consumer(
+          builder: (context, ref, _) {
+            final notifsAsync = ref.watch(notificationListProvider);
+
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Notifications',
-                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFCBD5E1),
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
                   ),
-                  Text(
-                    'Mark all as read',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF0284C7)),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 14),
-              ...notifications.map((n) {
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 10),
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF8FAFC),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xFFE2E8F0)),
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(n['icon']!, style: const TextStyle(fontSize: 20)),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  n['title']!,
-                                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Color(0xFF0F172A)),
-                                ),
-                                Text(
-                                  n['time']!,
-                                  style: const TextStyle(fontSize: 11, color: Color(0xFF94A3B8)),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              n['body']!,
-                              style: const TextStyle(fontSize: 12, color: Color(0xFF475569)),
-                            ),
-                          ],
+                      const Text(
+                        'Notifications',
+                        style: TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
+                      ),
+                      GestureDetector(
+                        onTap: () async {
+                          await NotificationService().markAllAsRead();
+                          ref.invalidate(notificationListProvider);
+                        },
+                        child: const Text(
+                          'Mark all as read',
+                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF0284C7)),
                         ),
                       ),
                     ],
                   ),
-                );
-              }),
-            ],
-          ),
+                  const SizedBox(height: 14),
+                  notifsAsync.when(
+                    loading: () => const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(20),
+                        child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF0284C7)),
+                      ),
+                    ),
+                    error: (_, __) => const Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Center(
+                        child: Text(
+                          'No new notifications',
+                          style: TextStyle(fontSize: 13, color: Color(0xFF94A3B8)),
+                        ),
+                      ),
+                    ),
+                    data: (notifs) {
+                      if (notifs.isEmpty) {
+                        return Container(
+                          padding: const EdgeInsets.all(24),
+                          alignment: Alignment.center,
+                          child: const Column(
+                            children: [
+                              Text('🔔', style: TextStyle(fontSize: 28)),
+                              SizedBox(height: 8),
+                              Text(
+                                'You\'re all caught up!',
+                                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Color(0xFF334155)),
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                'New updates for bookings and messages will appear here.',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+
+                      return Column(
+                        children: notifs.map((n) {
+                          final icon = n.type == 'booking' ? '✅' : (n.type == 'message' ? '💬' : '🛡️');
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 10),
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: n.isRead ? const Color(0xFFF8FAFC) : const Color(0xFFF0F9FF),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: n.isRead ? const Color(0xFFE2E8F0) : const Color(0xFFBAE6FD)),
+                            ),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(icon, style: const TextStyle(fontSize: 20)),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        n.title,
+                                        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Color(0xFF0F172A)),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        n.body,
+                                        style: const TextStyle(fontSize: 12, color: Color(0xFF475569)),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            );
+          },
         );
       },
     );

@@ -5,6 +5,7 @@ import '../models/provider_model.dart';
 import '../services/booking_service.dart';
 import '../services/category_service.dart';
 import '../services/message_service.dart';
+import '../services/notification_service.dart';
 import '../services/provider_service.dart';
 import '../services/request_service.dart';
 
@@ -32,7 +33,13 @@ final bookingListProvider = FutureProvider.autoDispose<List<BookingModel>>((ref)
   return service.listBookings();
 });
 
+final notificationListProvider = FutureProvider.autoDispose<List<NotificationModel>>((ref) async {
+  final service = NotificationService();
+  return service.getNotifications();
+});
+
 final providerDetailProvider = FutureProvider.family<ProviderModel, String>((ref, id) async {
   final service = ProviderService();
   return service.getProviderById(id);
 });
+

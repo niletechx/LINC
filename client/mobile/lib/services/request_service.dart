@@ -11,6 +11,7 @@ class ServiceRequestModel {
   final String urgency;
   final String status;
   final String time;
+  final String? userName;
 
   const ServiceRequestModel({
     required this.id,
@@ -23,6 +24,7 @@ class ServiceRequestModel {
     required this.urgency,
     required this.status,
     required this.time,
+    this.userName,
   });
 
   factory ServiceRequestModel.fromJson(Map<String, dynamic> json) {
@@ -44,6 +46,9 @@ class ServiceRequestModel {
       } catch (_) {}
     }
 
+    final userObj = json['users'] as Map<String, dynamic>?;
+    final userName = json['user_name'] as String? ?? userObj?['full_name'] as String? ?? userObj?['username'] as String? ?? 'Client';
+
     return ServiceRequestModel(
       id: json['id']?.toString() ?? '',
       title: json['title'] as String? ?? 'Service Request',
@@ -55,6 +60,7 @@ class ServiceRequestModel {
       urgency: json['urgency'] as String? ?? 'medium',
       status: json['status'] as String? ?? 'open',
       time: timeAgo,
+      userName: userName,
     );
   }
 }
