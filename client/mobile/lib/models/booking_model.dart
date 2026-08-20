@@ -15,6 +15,11 @@ class BookingModel {
   final String statusText;
   final String? entityId;
   final String? entityType;
+  final String clientName;
+  final String? clientAvatar;
+  final String? notes;
+  final bool isProviderView;
+  final String? requesterId;
 
   const BookingModel({
     required this.id,
@@ -29,6 +34,11 @@ class BookingModel {
     this.statusText = 'Confirmed',
     this.entityId,
     this.entityType,
+    this.clientName = 'Client',
+    this.clientAvatar,
+    this.notes,
+    this.isProviderView = false,
+    this.requesterId,
   });
 
   static const List<Color> _avatarColors = [
@@ -94,6 +104,10 @@ class BookingModel {
     final num? rawAgreedPrice = json['agreed_price'] as num? ?? serviceObj?['price_amount'] as num?;
     final priceAmount = rawAgreedPrice ?? 350;
     final currency = json['currency']?.toString() ?? 'ETB';
+    final clientName = json['client_name']?.toString() ?? (json['users'] is Map ? json['users']['full_name']?.toString() : null) ?? 'Client';
+    final notes = json['notes']?.toString();
+    final isProviderView = json['is_provider_view'] == true;
+    final requesterId = json['requester_id']?.toString();
 
     return BookingModel(
       id: json['id'] ?? 1,
@@ -108,6 +122,11 @@ class BookingModel {
       statusText: statusLabel,
       entityId: json['entity_id']?.toString(),
       entityType: json['entity_type']?.toString() ?? 'provider',
+      clientName: clientName,
+      clientAvatar: json['client_avatar']?.toString() ?? (json['users'] is Map ? json['users']['avatar_url']?.toString() : null),
+      notes: notes,
+      isProviderView: isProviderView,
+      requesterId: requesterId,
     );
   }
 }

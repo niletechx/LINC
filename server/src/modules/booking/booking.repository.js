@@ -20,15 +20,18 @@ const BOOKING_SELECT = `
   services!service_id (id, title, price_type, price_amount, provider_id, business_id, organization_id)
 `;
 
-async function listBookings(userId) {
+async function listBookings(userIdOrEntityIds) {
+  const ids = Array.isArray(userIdOrEntityIds) ? userIdOrEntityIds : [userIdOrEntityIds];
+  const orConds = ids.map((id) => `requester_id.eq.${id},entity_id.eq.${id}`).join(',');
+
   const { data, error } = await supabase
     .from('bookings')
     .select(BOOKING_SELECT)
-    .eq('requester_id', userId)
+    .or(orConds)
     .order('created_at', { ascending: false });
 
   if (error) throw error;
-  return data;
+  return data || [];
 }
 
 async function findById(id) {
