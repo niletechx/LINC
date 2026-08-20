@@ -120,8 +120,7 @@ class DMMessage {
 
   factory DMMessage.fromJson(Map<String, dynamic> json, String currentUserId) {
     final sId = json['sender_id']?.toString() ?? '';
-    final sType = json['sender_type']?.toString() ?? '';
-    final isFromMe = (currentUserId.isNotEmpty && sId == currentUserId) || sType == 'user';
+    final isFromMe = currentUserId.isNotEmpty && (sId == currentUserId);
 
     return DMMessage(
       id: json['id']?.toString(),

@@ -3,6 +3,7 @@ import '../models/conversation_model.dart';
 import '../services/message_service.dart';
 import '../services/socket_service.dart';
 import 'auth_provider.dart';
+import 'data_providers.dart';
 
 class DMState {
   final Map<String, List<DMMessage>> messages;
@@ -69,18 +70,18 @@ class DMNotifier extends StateNotifier<DMState> {
     final key = convId.toString();
     _socketService.joinConversation(key);
 
-    if (state.messages[key] != null && state.messages[key]!.isNotEmpty) {
-      return;
+    final hasExisting = state.messages[key] != null && state.messages[key]!.isNotEmpty;
+    if (!hasExisting) {
+      final loading = {...state.isLoading, key: true};
+      state = state.copyWith(isLoading: loading);
     }
-
-    final loading = {...state.isLoading, key: true};
-    state = state.copyWith(isLoading: loading);
 
     try {
       final currentUserId = _ref.read(authProvider).user?.id ?? '';
       final msgs = await _messageService.getMessages(key, currentUserId);
       final current = {...state.messages, key: msgs};
       state = state.copyWith(messages: current);
+      _ref.invalidate(conversationListProvider);
     } catch (_) {
       // Fallback gracefully
     } finally {

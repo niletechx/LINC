@@ -21,7 +21,7 @@ const sendMessage = asyncHandler(async (req, res) => {
   const message = await messagingService.sendMessage(req.user.id, req.params.id, {
     ...req.body,
     sender_id: req.user.id,
-    sender_type: 'user',
+    sender_type: req.body.sender_type || (req.user.role === 'provider' ? 'provider' : 'user'),
   });
   return success(res, message, 'Message sent successfully', 201);
 });

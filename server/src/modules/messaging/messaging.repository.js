@@ -23,11 +23,14 @@ const MESSAGE_SELECT = `
   created_at
 `;
 
-async function listConversations(userId) {
+async function listConversations(userIdOrEntityIds) {
+  const ids = Array.isArray(userIdOrEntityIds) ? userIdOrEntityIds : [userIdOrEntityIds];
+  const orConds = ids.map((id) => `participant_a_id.eq.${id},participant_b_id.eq.${id}`).join(',');
+
   const { data, error } = await supabase
     .from('conversations')
     .select(CONVERSATION_SELECT)
-    .or(`participant_a_id.eq.${userId},participant_b_id.eq.${userId}`)
+    .or(orConds)
     .order('last_message_at', { ascending: false, nullsFirst: false });
 
   if (error) throw error;
@@ -85,10 +88,21 @@ async function createMessage(message) {
 }
 
 async function findExistingConversation(idA, idB) {
+  const idsA = Array.isArray(idA) ? idA : [idA];
+  const idsB = Array.isArray(idB) ? idB : [idB];
+
+  const conds = [];
+  idsA.forEach((a) => {
+    idsB.forEach((b) => {
+      conds.push(`participant_a_id.eq.${a}.and.participant_b_id.eq.${b}`);
+      conds.push(`participant_a_id.eq.${b}.and.participant_b_id.eq.${a}`);
+    });
+  });
+
   const { data, error } = await supabase
     .from('conversations')
     .select(CONVERSATION_SELECT)
-    .or(`participant_a_id.eq.${idA}.and.participant_b_id.eq.${idB},participant_a_id.eq.${idB}.and.participant_b_id.eq.${idA}`)
+    .or(conds.join(','))
     .maybeSingle();
 
   if (error && error.code !== 'PGRST116') return null;

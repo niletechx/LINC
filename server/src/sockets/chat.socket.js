@@ -29,6 +29,46 @@ function registerChatSocket(io, socket) {
 
       if (error) throw error;
 
+      // Update conversation last_message_at
+      await supabase
+        .from('conversations')
+        .update({ last_message_at: new Date().toISOString() })
+        .eq('id', conversationId);
+
+      // Create notification for the other participant
+      try {
+        const { data: conv } = await supabase
+          .from('conversations')
+          .select('participant_a_id, participant_b_id, participant_a_type, participant_b_type')
+          .eq('id', conversationId)
+          .maybeSingle();
+
+        if (conv) {
+          const isA = String(conv.participant_a_id) === String(senderId);
+          let recipientId = isA ? conv.participant_b_id : conv.participant_a_id;
+          let recipientType = isA ? conv.participant_b_type : conv.participant_a_type;
+
+          if (recipientType === 'provider') {
+            const { data: p } = await supabase
+              .from('provider_profiles')
+              .select('user_id')
+              .eq('id', recipientId)
+              .maybeSingle();
+            if (p && p.user_id) recipientId = p.user_id;
+          }
+
+          if (recipientId) {
+            await supabase.from('notifications').insert({
+              user_id: recipientId,
+              title: 'New Message',
+              body: content.length > 60 ? content.substring(0, 60) + '...' : content,
+              type: 'message',
+              data: { conversation_id: conversationId },
+            });
+          }
+        }
+      } catch (_) {}
+
       // Emit message to the conversation room
       io.to(`conversation:${conversationId}`).emit('new_message', message);
 

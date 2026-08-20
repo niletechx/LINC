@@ -1,11 +1,30 @@
 const messagingRepo = require('./messaging.repository');
 const supabase = require('../../config/supabase');
 
+async function getUserEntityIds(userId) {
+  if (!userId) return [];
+  const ids = new Set([String(userId)]);
+  try {
+    const { data: provs } = await supabase
+      .from('provider_profiles')
+      .select('id, user_id')
+      .or(`user_id.eq.${userId},id.eq.${userId}`);
+    if (provs && provs.length > 0) {
+      provs.forEach((p) => {
+        if (p.id) ids.add(String(p.id));
+        if (p.user_id) ids.add(String(p.user_id));
+      });
+    }
+  } catch (_) {}
+  return Array.from(ids);
+}
+
 async function listConversations(userId) {
-  const convs = await messagingRepo.listConversations(userId);
+  const userEntityIds = await getUserEntityIds(userId);
+  const convs = await messagingRepo.listConversations(userEntityIds);
   const enriched = await Promise.all(
     convs.map(async (conv) => {
-      const isParticipantA = String(conv.participant_a_id) === String(userId);
+      const isParticipantA = userEntityIds.includes(String(conv.participant_a_id));
       const otherId = isParticipantA ? conv.participant_b_id : conv.participant_a_id;
       const otherType = isParticipantA ? conv.participant_b_type : conv.participant_a_type;
 
@@ -45,11 +64,11 @@ async function listConversations(userId) {
 
       const msgs = await messagingRepo.listMessages(conv.id);
       const lastMessage = msgs.length > 0 ? msgs[msgs.length - 1] : null;
-      const unreadCount = msgs.filter((m) => !m.is_read && String(m.sender_id) !== String(userId)).length;
+      const unreadCount = msgs.filter((m) => !m.is_read && !userEntityIds.includes(String(m.sender_id))).length;
 
       return {
         ...conv,
-        other_participant: otherUser || { id: otherId, name: 'Provider', username: '' },
+        other_participant: otherUser || { id: otherId, name: 'Participant', username: '' },
         last_message: lastMessage ? lastMessage.content : '',
         last_message_time: lastMessage ? lastMessage.created_at : conv.created_at,
         unread_count: unreadCount,
@@ -67,7 +86,11 @@ async function getConversation(userId, conversationId) {
     throw err;
   }
 
-  const isParticipant = [String(conversation.participant_a_id), String(conversation.participant_b_id)].includes(String(userId));
+  const userEntityIds = await getUserEntityIds(userId);
+  const isParticipant = [String(conversation.participant_a_id), String(conversation.participant_b_id)].some((id) =>
+    userEntityIds.includes(String(id))
+  );
+
   if (!isParticipant) {
     const err = new Error('Forbidden');
     err.statusCode = 403;
@@ -86,7 +109,10 @@ async function createConversation(payload = {}) {
     throw err;
   }
 
-  const existing = await messagingRepo.findExistingConversation(participant_a_id, participant_b_id);
+  const userAIds = await getUserEntityIds(participant_a_id);
+  const userBIds = await getUserEntityIds(participant_b_id);
+
+  const existing = await messagingRepo.findExistingConversation(userAIds, userBIds);
   if (existing) {
     return existing;
   }
@@ -108,30 +134,54 @@ async function listMessages(userId, conversationId) {
 
 async function sendMessage(userId, conversationId, payload = {}) {
   const conversation = await getConversation(userId, conversationId);
-  const { content, sender_type, sender_id } = payload;
+  const { content, sender_type } = payload;
 
-  if (!content || !sender_type || !sender_id) {
-    const err = new Error('content, sender_type, and sender_id are required');
+  if (!content) {
+    const err = new Error('content is required');
     err.statusCode = 400;
     throw err;
   }
 
-  const effectiveSenderId = sender_id || userId;
-  const validSenders = [conversation.participant_a_id, conversation.participant_b_id];
-  if (!validSenders.includes(effectiveSenderId)) {
-    const err = new Error('You can only send messages from a conversation participant');
-    err.statusCode = 403;
-    throw err;
-  }
+  const userEntityIds = await getUserEntityIds(userId);
+  const effectiveSenderId = String(userId);
+  const isParticipantB = userEntityIds.includes(String(conversation.participant_b_id));
+  const effectiveSenderType = sender_type || (isParticipantB && conversation.participant_b_type === 'provider' ? 'provider' : 'user');
 
-  return messagingRepo.createMessage({
+  const msg = await messagingRepo.createMessage({
     conversation_id: conversationId,
-    sender_type,
+    sender_type: effectiveSenderType,
     sender_id: effectiveSenderId,
     content,
     has_ai_mention: Boolean(payload.has_ai_mention),
     ai_response: payload.ai_response || null,
   });
+
+  try {
+    const isA = userEntityIds.includes(String(conversation.participant_a_id));
+    let recipientId = isA ? conversation.participant_b_id : conversation.participant_a_id;
+    let recipientType = isA ? conversation.participant_b_type : conversation.participant_a_type;
+
+    if (recipientType === 'provider') {
+      const { data: p } = await supabase
+        .from('provider_profiles')
+        .select('user_id')
+        .eq('id', recipientId)
+        .maybeSingle();
+      if (p && p.user_id) recipientId = p.user_id;
+    }
+
+    if (recipientId) {
+      await supabase.from('notifications').insert({
+        user_id: recipientId,
+        title: 'New Message',
+        body: content.length > 60 ? content.substring(0, 60) + '...' : content,
+        type: 'message',
+        data: { conversation_id: conversationId },
+      });
+    }
+  } catch (_) {}
+
+  return msg;
 }
 
 async function markConversationRead(userId, conversationId) {
@@ -140,3 +190,4 @@ async function markConversationRead(userId, conversationId) {
 }
 
 module.exports = { listConversations, getConversation, createConversation, listMessages, sendMessage, markConversationRead };
+
