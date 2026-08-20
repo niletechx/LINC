@@ -1,122 +1,94 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import AuthPage from './pages/AuthPage';
+import LandingPage from './pages/LandingPage';
+import HomePage from './pages/HomePage';
+import SearchPage from './pages/SearchPage';
+import AIPage from './pages/AIPage';
+import BookingsPage from './pages/BookingsPage';
+import MessagesPage from './pages/MessagesPage';
+import ProfilePage from './pages/ProfilePage';
+import ProviderProfilePage from './pages/ProviderProfilePage';
+import BookingFlowPage from './pages/BookingFlowPage';
+import VerificationPage from './pages/VerificationPage';
+import ProviderSetupPage from './pages/ProviderSetupPage';
+import DmPage from './pages/DmPage';
+import Navbar from './components/layout/Navbar';
+import AuthPromptModal from './components/auth/AuthPromptModal';
+import { useAuthStore } from './stores/authStore';
+import { useAppStore } from './stores/appStore';
+import './App.css';
 
-function App() {
-  const [count, setCount] = useState(0)
+// Toast Banner Component
+function GlobalToast() {
+  const { toast, hideToast } = useAppStore();
+  if (!toast) return null;
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+    <div className={`global-toast-banner toast-${toast.type} animate-fade-in`}>
+      <span>{toast.message}</span>
+      <button type="button" onClick={hideToast} className="toast-close-btn">
+        ×
+      </button>
+    </div>
+  );
 }
 
-export default App
+// Unified Layout Shell: Navbar on top + Floating Content Card
+function AppLayout() {
+  return (
+    <div className="app-main-layout">
+      <Navbar />
+
+      <main className="app-content-card">
+        <Outlet />
+      </main>
+    </div>
+  );
+}
+
+export default function App() {
+  const { isAuthenticated } = useAuthStore();
+
+  return (
+    <BrowserRouter>
+      {/* High-Resolution Wallpaper Layer */}
+      <div className="fixed-background-wallpaper" aria-hidden="true">
+        <img
+          src="/assets/bg-city.jpg"
+          alt="LINC Addis Skyline"
+          className="wallpaper-img"
+        />
+      </div>
+
+      <GlobalToast />
+      <AuthPromptModal />
+      <Routes>
+        {/* Fullscreen Dedicated Auth Pages (Matches Exact User Prototype) */}
+        <Route path="/login" element={<AuthPage initialMode="login" />} />
+        <Route path="/signup" element={<AuthPage initialMode="signup" />} />
+
+        {/* Regular Layout Routes with Navbar + Content Card */}
+        <Route element={<AppLayout />}>
+          {/* Public Routes: Search & View Specialists Only */}
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/search" element={<SearchPage />} />
+          <Route path="/provider/:id" element={<ProviderProfilePage />} />
+
+          {/* Authenticated-Only Routes */}
+          <Route path="/ai" element={isAuthenticated ? <AIPage /> : <Navigate to="/login" replace />} />
+          <Route path="/home" element={isAuthenticated ? <HomePage /> : <Navigate to="/login" replace />} />
+          <Route path="/bookings" element={isAuthenticated ? <BookingsPage /> : <Navigate to="/login" replace />} />
+          <Route path="/messages" element={isAuthenticated ? <MessagesPage /> : <Navigate to="/login" replace />} />
+          <Route path="/profile" element={isAuthenticated ? <ProfilePage /> : <Navigate to="/login" replace />} />
+          <Route path="/booking/:id" element={isAuthenticated ? <BookingFlowPage /> : <Navigate to="/login" replace />} />
+          <Route path="/dm/:id" element={isAuthenticated ? <DmPage /> : <Navigate to="/login" replace />} />
+          <Route path="/verification" element={isAuthenticated ? <VerificationPage /> : <Navigate to="/login" replace />} />
+          <Route path="/provider-setup" element={isAuthenticated ? <ProviderSetupPage /> : <Navigate to="/login" replace />} />
+
+          {/* Fallback */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  );
+}

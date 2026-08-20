@@ -3,8 +3,8 @@ const { success, error } = require('../../utils/apiResponse');
 const asyncHandler = require('../../utils/asyncHandler');
 
 const register = asyncHandler(async (req, res) => {
-  const { email, password, full_name, username } = req.body;
-  const result = await authService.register({ email, password, full_name, username });
+  const { email, password, full_name, username, phone, location_city, role, headline } = req.body;
+  const result = await authService.register({ email, password, full_name, username, phone, location_city, role, headline });
   return success(res, result, 'Account created successfully', 201);
 });
 
