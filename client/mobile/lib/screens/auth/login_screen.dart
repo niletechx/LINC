@@ -505,23 +505,48 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           children: [
                             const Text(
                               "Don't have an account? ",
-                              style: TextStyle(
-                                color: Color(0xFF64748B),
-                                fontSize: 13.5,
-                              ),
+                              style: TextStyle(color: Color(0xFF64748B), fontSize: 13.5),
                             ),
                             GestureDetector(
                               onTap: () => context.go('/signup'),
                               child: const Text(
                                 'Sign Up',
-                                style: TextStyle(
-                                  color: Color(0xFF38BDF8),
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 13.5,
-                                ),
+                                style: TextStyle(color: Color(0xFF38BDF8), fontWeight: FontWeight.w700, fontSize: 13.5),
                               ),
                             ),
                           ],
+                        ),
+                        const SizedBox(height: 16),
+                        // Explore without account
+                        GestureDetector(
+                          onTap: () {
+                            ref.read(authProvider.notifier).enterGuestMode();
+                            context.go('/home');
+                          },
+                          child: Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF1F5F9),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: const Color(0xFFE2E8F0)),
+                            ),
+                            child: const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.explore_outlined, size: 16, color: Color(0xFF64748B)),
+                                SizedBox(width: 8),
+                                Text(
+                                  'Explore Without Account',
+                                  style: TextStyle(
+                                    color: Color(0xFF64748B),
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                       ],
                     ),

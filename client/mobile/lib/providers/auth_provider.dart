@@ -5,6 +5,7 @@ import '../services/storage_service.dart';
 
 class AuthState {
   final bool isAuthed;
+  final bool isGuest; // browsing without an account
   final UserModel? user;
   final String? token;
   final bool isLoading;
@@ -13,6 +14,7 @@ class AuthState {
 
   const AuthState({
     this.isAuthed = false,
+    this.isGuest = false,
     this.user,
     this.token,
     this.isLoading = false,
@@ -20,8 +22,12 @@ class AuthState {
     this.isInitialized = false,
   });
 
+  /// True when the user can see the explore/home UI (either signed-in or guest).
+  bool get canExplore => isAuthed || isGuest;
+
   AuthState copyWith({
     bool? isAuthed,
+    bool? isGuest,
     UserModel? user,
     String? token,
     bool? isLoading,
@@ -30,6 +36,7 @@ class AuthState {
   }) {
     return AuthState(
       isAuthed: isAuthed ?? this.isAuthed,
+      isGuest: isGuest ?? this.isGuest,
       user: user ?? this.user,
       token: token ?? this.token,
       isLoading: isLoading ?? this.isLoading,
@@ -50,7 +57,17 @@ class AuthNotifier extends StateNotifier<AuthState> {
     try {
       await StorageService.clear();
     } catch (_) {}
-    state = const AuthState(isInitialized: true, isAuthed: false, user: null, token: null);
+    state = const AuthState(isInitialized: true, isAuthed: false, isGuest: false, user: null, token: null);
+  }
+
+  /// Let an unauthenticated user explore the app without an account.
+  void enterGuestMode() {
+    state = state.copyWith(isGuest: true, isAuthed: false);
+  }
+
+  /// Clear guest mode (e.g. when navigating to login/signup from welcome).
+  void exitGuestMode() {
+    state = state.copyWith(isGuest: false);
   }
 
   Future<void> login({
@@ -62,6 +79,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       final result = await _authService.login(email: email, password: password);
       state = state.copyWith(
         isAuthed: true,
+        isGuest: false,
         user: result.user,
         token: result.token,
         isLoading: false,
@@ -100,6 +118,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       );
       state = state.copyWith(
         isAuthed: true,
+        isGuest: false,
         user: result.user,
         token: result.token,
         isLoading: false,
@@ -118,14 +137,20 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(isLoading: true);
     await _authService.logout();
     await StorageService.clear();
-    state = const AuthState(isInitialized: true, isAuthed: false, user: null, token: null);
+    state = const AuthState(isInitialized: true, isAuthed: false, isGuest: false, user: null, token: null);
   }
 
   void signIn() {
-    state = state.copyWith(isAuthed: true);
+    state = state.copyWith(isAuthed: true, isGuest: false);
   }
 }
 
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>(
   (ref) => AuthNotifier(),
 );
+
+/// Derived provider — true if the user is browsing as a guest (no account).
+final isGuestProvider = Provider<bool>((ref) {
+  final auth = ref.watch(authProvider);
+  return auth.isGuest && !auth.isAuthed;
+});

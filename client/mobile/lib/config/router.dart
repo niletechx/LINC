@@ -30,6 +30,63 @@ class AppShell extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final mode = ref.watch(appModeProvider);
     final isProvider = mode == AppMode.provider;
+    final authState = ref.watch(authProvider);
+    final isGuest = authState.isGuest && !authState.isAuthed;
+
+    void gotoOrGate(String route, {bool requiresAuth = false}) {
+      if (requiresAuth && isGuest) {
+        // Show sign-in sheet
+        showModalBottomSheet(
+          context: context,
+          backgroundColor: Colors.white,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          builder: (ctx) => Padding(
+            padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(width: 40, height: 4, decoration: BoxDecoration(color: const Color(0xFFCBD5E1), borderRadius: BorderRadius.circular(2))),
+                const SizedBox(height: 20),
+                Container(
+                  width: 60, height: 60,
+                  decoration: BoxDecoration(color: const Color(0xFFEFF6FF), borderRadius: BorderRadius.circular(18)),
+                  alignment: Alignment.center,
+                  child: const Icon(Icons.lock_outline_rounded, size: 28, color: Color(0xFF3B82F6)),
+                ),
+                const SizedBox(height: 14),
+                const Text('Sign in to continue', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)), textAlign: TextAlign.center),
+                const SizedBox(height: 6),
+                const Text('Create a free account to access messaging, bookings, and more.', textAlign: TextAlign.center, style: TextStyle(fontSize: 13, color: Color(0xFF64748B), height: 1.4)),
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity, height: 50,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0F172A), foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
+                    onPressed: () { Navigator.pop(ctx); context.go('/signup'); },
+                    child: const Text('Create Account — Free', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity, height: 50,
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(side: const BorderSide(color: Color(0xFFE2E8F0), width: 1.5), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
+                    onPressed: () { Navigator.pop(ctx); context.go('/login'); },
+                    child: const Text('Sign In', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Color(0xFF0F172A))),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                GestureDetector(onTap: () => Navigator.pop(ctx), child: const Text('Continue exploring as guest', style: TextStyle(fontSize: 12.5, color: Color(0xFF94A3B8)))),
+              ],
+            ),
+          ),
+        );
+      } else {
+        context.go(route);
+      }
+    }
 
     return Scaffold(
       body: child,
@@ -38,18 +95,18 @@ class AppShell extends ConsumerWidget {
         onTap: (index) {
           if (isProvider) {
             switch (index) {
-              case 0: context.go('/home'); break;
-              case 1: context.go('/messages'); break;
-              case 2: context.go('/bookings'); break;
-              case 3: context.go('/profile'); break;
+              case 0: gotoOrGate('/home'); break;
+              case 1: gotoOrGate('/messages', requiresAuth: true); break;
+              case 2: gotoOrGate('/bookings', requiresAuth: true); break;
+              case 3: gotoOrGate('/profile', requiresAuth: true); break;
             }
           } else {
             switch (index) {
-              case 0: context.go('/home'); break;
-              case 1: context.go('/messages'); break;
-              case 2: context.go('/ai'); break;
-              case 3: context.go('/bookings'); break;
-              case 4: context.go('/profile'); break;
+              case 0: gotoOrGate('/home'); break;
+              case 1: gotoOrGate('/messages', requiresAuth: true); break;
+              case 2: gotoOrGate('/ai', requiresAuth: true); break;
+              case 3: gotoOrGate('/bookings', requiresAuth: true); break;
+              case 4: gotoOrGate('/profile', requiresAuth: true); break;
             }
           }
         },
@@ -87,23 +144,49 @@ class HomeModeWrapper extends ConsumerWidget {
 
 // ── Router ────────────────────────────────────────────────────────────────────
 final routerProvider = Provider<GoRouter>((ref) {
-  final isAuthed = ref.watch(authProvider.select((state) => state.isAuthed));
+  final authState = ref.watch(authProvider);
+  final isAuthed = authState.isAuthed;
+  final isGuest = authState.isGuest;
   final needsProviderSetup = ref.watch(needsProviderSetupProvider);
 
   return GoRouter(
     initialLocation: '/welcome',
     redirect: (context, state) {
-      final isAuthRoute = state.uri.path.startsWith('/welcome') ||
-          state.uri.path.startsWith('/login') ||
-          state.uri.path.startsWith('/signup') ||
-          state.uri.path.startsWith('/forgot');
-      if (!isAuthed && !isAuthRoute) return '/welcome';
+      final path = state.uri.path;
+
+      // Auth routes — always accessible
+      final isAuthRoute = path.startsWith('/welcome') ||
+          path.startsWith('/login') ||
+          path.startsWith('/signup') ||
+          path.startsWith('/forgot');
+
+      // Routes accessible without signing in (explore/browse mode)
+      final isPublicRoute = path.startsWith('/explore') ||
+          path.startsWith('/search') ||
+          path.startsWith('/provider/');
+
+      // Guest can access public + home view; redirect anything else to welcome
+      if (!isAuthed && isGuest) {
+        // Guest trying to access auth screens → stay or go to explore
+        if (isAuthRoute) return null;
+        // Guest accessing public routes → allowed
+        if (isPublicRoute || path.startsWith('/home')) return null;
+        // Guest accessing protected routes (booking, messages, ai, profile) → welcome
+        return '/welcome';
+      }
+
+      // Fully unauthenticated (no guest) → gate everything except auth + public
+      if (!isAuthed && !isGuest) {
+        if (isAuthRoute || isPublicRoute) return null;
+        return '/welcome';
+      }
+
+      // Authenticated user landing on auth screen → go home (or provider setup)
       if (isAuthed && isAuthRoute) {
-        if (needsProviderSetup) {
-          return '/provider-setup';
-        }
+        if (needsProviderSetup) return '/provider-setup';
         return '/home';
       }
+
       return null;
     },
     routes: [
