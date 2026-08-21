@@ -60,7 +60,7 @@ async function retrieveMatches(intent, userLat, userLng) {
     categoryIds = (cats || []).map((c) => c.id);
   }
 
-  // ── 2. Resolve entity IDs via services table ──────────────────────────────
+  // ── 2. Resolve entity IDs via services table & provider_categories table ──
   let providerIds = [], businessIds = [], orgIds = [];
 
   if (categoryIds.length > 0) {
@@ -76,6 +76,18 @@ async function retrieveMatches(intent, userLat, userLng) {
       if (s.business_id)     businessIds.push(s.business_id);
       if (s.organization_id) orgIds.push(s.organization_id);
     });
+
+    // Also look up provider_categories table
+    try {
+      const { data: provCats } = await supabase
+        .from('provider_categories')
+        .select('provider_id')
+        .in('category_id', categoryIds);
+
+      (provCats || []).forEach((pc) => {
+        if (pc.provider_id) providerIds.push(pc.provider_id);
+      });
+    } catch (_) {}
 
     providerIds = [...new Set(providerIds)];
     businessIds = [...new Set(businessIds)];

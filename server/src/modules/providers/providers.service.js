@@ -25,10 +25,58 @@ function normalizeProfileInput(payload = {}) {
   return { ...filtered, category_ids: categoryIds };
 }
 
+const supabase = require('../../config/supabase');
+
 async function getValidCategoryIds(categoryIds = []) {
   if (!Array.isArray(categoryIds) || categoryIds.length === 0) return [];
+  
+  // First try findByIds
   const rows = await categoriesRepo.findByIds(categoryIds);
-  return rows.map((row) => row.id);
+  if (rows && rows.length > 0) {
+    return rows.map((row) => row.id);
+  }
+
+  // Fallback: match by slug or name
+  const allCats = await categoriesRepo.findAll();
+  const matched = (allCats || []).filter((c) =>
+    categoryIds.includes(c.id) ||
+    categoryIds.includes(c.slug) ||
+    categoryIds.some((cid) => c.slug.toLowerCase().includes(String(cid).toLowerCase()))
+  );
+  return matched.map((c) => c.id);
+}
+
+async function syncPrimaryService(providerId, profileData, categoryId) {
+  if (!categoryId) return;
+  try {
+    const { data: existingServices } = await supabase
+      .from('services')
+      .select('id')
+      .eq('provider_id', providerId);
+
+    if (!existingServices || existingServices.length === 0) {
+      await supabase.from('services').insert({
+        provider_id: providerId,
+        title: profileData.headline || 'Standard Service',
+        description: profileData.bio || 'Verified professional service across Addis Ababa.',
+        price_type: 'hourly',
+        price_amount: Number(profileData.hourly_rate) || 350,
+        currency: profileData.currency || 'ETB',
+        category_id: categoryId,
+        is_active: true,
+        is_available: true,
+        created_at: new Date().toISOString(),
+      });
+    } else {
+      await supabase.from('services').update({
+        title: profileData.headline,
+        description: profileData.bio,
+        price_amount: Number(profileData.hourly_rate) || 350,
+        category_id: categoryId,
+        updated_at: new Date().toISOString(),
+      }).eq('id', existingServices[0].id);
+    }
+  } catch (_) {}
 }
 
 async function getMyProfile(userId) {
@@ -75,6 +123,7 @@ async function createProviderProfile(userId, payload = {}) {
 
   if (validCategoryIds.length > 0) {
     await providersRepo.syncProviderCategories(created.id, validCategoryIds);
+    await syncPrimaryService(created.id, profileData, validCategoryIds[0]);
   }
 
   return created;
@@ -102,6 +151,9 @@ async function updateProviderProfile(userId, payload = {}) {
 
   if (validCategoryIds.length > 0 || Array.isArray(category_ids)) {
     await providersRepo.syncProviderCategories(existing.id, validCategoryIds);
+    if (validCategoryIds.length > 0) {
+      await syncPrimaryService(existing.id, { ...existing, ...profileData }, validCategoryIds[0]);
+    }
   }
 
   return updated;

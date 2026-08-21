@@ -418,7 +418,7 @@ class _AiScreenState extends ConsumerState<AiScreen> with SingleTickerProviderSt
                 ),
 
                 // Multi-Candidate Interactive Cards (Up to 10)
-                if (msg.hasProviders) ...[
+                if (msg.hasProviders && msg.providers != null && msg.providers!.isNotEmpty) ...[
                   const SizedBox(height: 14),
                   Padding(
                     padding: const EdgeInsets.only(left: 4, bottom: 8),
@@ -427,7 +427,7 @@ class _AiScreenState extends ConsumerState<AiScreen> with SingleTickerProviderSt
                         const Icon(Icons.tune_rounded, size: 15, color: Color(0xFF0284C7)),
                         const SizedBox(width: 6),
                         Text(
-                          'Fitted Service Providers (${(msg.providers ?? []).length.clamp(1, 10)})',
+                          'Matching Service Providers (${msg.providers!.length.clamp(1, 10)})',
                           style: const TextStyle(
                             fontSize: 12.5,
                             fontWeight: FontWeight.w800,
@@ -438,10 +438,7 @@ class _AiScreenState extends ConsumerState<AiScreen> with SingleTickerProviderSt
                       ],
                     ),
                   ),
-                  if (msg.providers != null && msg.providers!.isNotEmpty)
-                    ...msg.providers!.take(10).map((p) => _buildProviderCard(p))
-                  else
-                    ..._buildDefaultProviderCards(),
+                  ...msg.providers!.take(10).map((p) => _buildProviderCard(p)),
                 ],
               ],
             ),
@@ -794,33 +791,6 @@ class _AiScreenState extends ConsumerState<AiScreen> with SingleTickerProviderSt
         ],
       ),
     );
-  }
-
-  List<Widget> _buildDefaultProviderCards() {
-    return [
-      _buildProviderCard({
-        'name': 'Samuel Girma',
-        'username': 'samuel_plumbing',
-        'headline': 'Master Plumber & Pipe Specialist',
-        'avg_rating': 4.9,
-        'total_reviews': 38,
-        'location_city': 'Bole, Addis Ababa',
-        'hourly_rate': 350,
-        'currency': 'ETB',
-        'id': '1',
-      }),
-      _buildProviderCard({
-        'name': 'Helen Tadesse',
-        'username': 'helen_clean',
-        'headline': 'Professional Home & Office Cleaner',
-        'avg_rating': 5.0,
-        'total_reviews': 52,
-        'location_city': 'Kazanchis, Addis Ababa',
-        'hourly_rate': 280,
-        'currency': 'ETB',
-        'id': '2',
-      }),
-    ];
   }
 
   // ── TYPING / THINKING INDICATOR ───────────────────────────────────────────

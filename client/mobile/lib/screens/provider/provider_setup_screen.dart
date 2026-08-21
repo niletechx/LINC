@@ -50,6 +50,39 @@ class _ProviderSetupScreenState extends ConsumerState<ProviderSetupScreen> {
   void initState() {
     super.initState();
     _headlineController.text = _categories[0]['suggestedHeadline'];
+    _loadExistingProfile();
+  }
+
+  Future<void> _loadExistingProfile() async {
+    try {
+      final profile = await ProviderService().getMyProfile();
+      if (profile != null && mounted) {
+        setState(() {
+          if (profile['headline'] != null) {
+            _headlineController.text = profile['headline'].toString();
+          }
+          if (profile['bio'] != null) {
+            _bioController.text = profile['bio'].toString();
+          }
+          if (profile['hourly_rate'] != null) {
+            _rateController.text = profile['hourly_rate'].toString();
+          }
+          if (profile['location_city'] != null) {
+            _cityController.text = profile['location_city'].toString();
+          }
+          if (profile['availability_status'] != null) {
+            _selectedAvailability = profile['availability_status'].toString();
+          }
+          // Match category from categories or headline
+          final headline = (profile['headline'] ?? '').toString().toLowerCase();
+          final matchingCat = _categories.firstWhere(
+            (c) => headline.contains(c['slug']) || headline.contains(c['name'].toString().toLowerCase()),
+            orElse: () => _categories[0],
+          );
+          _selectedCategory = matchingCat['slug'];
+        });
+      }
+    } catch (_) {}
   }
 
   @override

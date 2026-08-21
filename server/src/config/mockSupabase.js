@@ -107,12 +107,19 @@ const db = {
     },
   ],
   categories: [
-    { id: '1', name: 'Plumbing & Repairs', slug: 'plumbing', description: 'Pipe fix, leaks, drainage', icon: '🔧', parent_id: null, is_active: true },
-    { id: '2', name: 'Cleaning & Housekeeping', slug: 'cleaning', description: 'Deep clean, maid services', icon: '🧹', parent_id: null, is_active: true },
-    { id: '3', name: 'Electrical Work', slug: 'electric', description: 'Wiring, fixtures, appliances', icon: '⚡', parent_id: null, is_active: true },
-    { id: '4', name: 'IT & Tech Support', slug: 'it-tech', description: 'Hardware, software, networking', icon: '💻', parent_id: null, is_active: true },
-    { id: '5', name: 'Tutoring & Lessons', slug: 'tutoring', description: 'Academic and skills tutoring', icon: '📚', parent_id: null, is_active: true },
-    { id: '6', name: 'Transport & Moving', slug: 'transport', description: 'Driver, freight, relocation', icon: '🚗', parent_id: null, is_active: true },
+    { id: '1', name: 'Plumbing & Water', slug: 'plumbing', description: 'Pipe fix, leaks, drainage, pumps', icon: '🔧', parent_id: null, is_active: true },
+    { id: '2', name: 'Cleaning & Maid', slug: 'cleaning', description: 'Deep clean, maid, housekeeping', icon: '🧹', parent_id: null, is_active: true },
+    { id: '3', name: 'Electrical Work', slug: 'electric', description: 'Wiring, circuits, fixtures, solar', icon: '⚡', parent_id: null, is_active: true },
+    { id: '4', name: 'IT & Computer', slug: 'it-tech', description: 'Hardware, laptops, software, tech', icon: '💻', parent_id: null, is_active: true },
+    { id: '5', name: 'Tutoring & Skills', slug: 'tutoring', description: 'Academic lessons, language, skills', icon: '📚', parent_id: null, is_active: true },
+    { id: '6', name: 'Transport & Cargo', slug: 'transport', description: 'Driver, freight, moving logistics', icon: '🚗', parent_id: null, is_active: true },
+    { id: '7', name: 'Health & Wellness', slug: 'wellness', description: 'Fitness, physiotherapy, massage', icon: '💆', parent_id: null, is_active: true },
+    { id: '8', name: 'Painting & Design', slug: 'creative', description: 'Interior painting, decor, carpentry', icon: '🎨', parent_id: null, is_active: true },
+  ],
+  provider_categories: [
+    { provider_id: '1', category_id: '1' },
+    { provider_id: '2', category_id: '3' },
+    { provider_id: '2', category_id: '4' },
   ],
   services: [
     {

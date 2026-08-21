@@ -90,10 +90,10 @@ async function processMessage({ userId, message, conversationId, userLat, userLn
     logger.warn('Gemini chat failed, generating local rule-based response: ' + err.message);
     if (providers && providers.length > 0) {
       const topMatch = providers[0];
-      const otherMatches = providers.slice(1, 3).map(p => `• **${p.name}** (${p.headline}) - ${p.avg_rating}★`).join('\n');
-      rawResponse = `I found **${providers.length} verified specialist${providers.length > 1 ? 's' : ''}** for your request in Addis Ababa:\n\n• **${topMatch.name}** (${topMatch.headline}) - ${topMatch.avg_rating}★ (${topMatch.total_reviews} reviews), ${topMatch.hourly_rate ? `${topMatch.hourly_rate} ETB/hr` : 'Verified'}.\n${otherMatches ? `\nOther top matches:\n${otherMatches}\n` : ''}\nYou can message them directly or book through LINC Escrow protection for full payment security.`;
+      const otherMatches = providers.slice(1, 3).map((p) => `• **${p.name}** (@${p.username || 'provider'}) — *${p.headline}* · ★${p.avg_rating || 5.0} (${p.total_reviews || 0} reviews) · ${p.hourly_rate ? `${p.hourly_rate} ETB/hr` : 'Verified'}`).join('\n');
+      rawResponse = `I found **${providers.length} verified specialist${providers.length > 1 ? 's' : ''}** for your request in Addis Ababa:\n\n• **${topMatch.name}** (@${topMatch.username || 'provider'}) — *${topMatch.headline}* · ★${topMatch.avg_rating || 5.0} (${topMatch.total_reviews || 0} reviews) · ${topMatch.hourly_rate ? `${topMatch.hourly_rate} ETB/hr` : 'Verified'}\n${otherMatches ? `\nOther top matches:\n${otherMatches}\n` : ''}\nYou can message them directly or book through LINC Escrow protection for full payment security.`;
     } else {
-      rawResponse = `I received your request: "${message}". We have verified professionals across Addis Ababa ready to assist. You can explore categories or describe your preferred location & budget!`;
+      rawResponse = `I couldn't find any verified service providers matching "${message}" in our database right now.\n\nWe currently support verified professionals in:\n• 🔧 **Plumbing & Water**\n• ⚡ **Electrical Work**\n• 🧹 **Cleaning & Maid Services**\n• 💻 **IT & Computer Repair**\n• 📚 **Tutoring & Skills**\n• 🚗 **Transport & Cargo**\n• 💆 **Health & Wellness**\n• 🎨 **Painting & Design**\n\nPlease try searching for one of these categories or adjust your search keywords!`;
     }
   }
 
@@ -171,10 +171,10 @@ async function processMessageStream({ userId, message, conversationId, userLat, 
     logger.warn('Gemini stream failed, streaming local rule-based response: ' + err.message);
     if (providers && providers.length > 0) {
       const topMatch = providers[0];
-      const otherMatches = providers.slice(1, 3).map((p) => `• **${p.name}** (${p.headline}) - ${p.avg_rating}★`).join('\n');
-      fullText = `I found **${providers.length} verified specialist${providers.length > 1 ? 's' : ''}** for your request in Addis Ababa:\n\n• **${topMatch.name}** (${topMatch.headline}) - ${topMatch.avg_rating}★ (${topMatch.total_reviews} reviews), ${topMatch.hourly_rate ? `${topMatch.hourly_rate} ETB/hr` : 'Verified'}.\n${otherMatches ? `\nOther top matches:\n${otherMatches}\n` : ''}\nYou can message them directly or book through LINC Escrow protection for full payment security.`;
+      const otherMatches = providers.slice(1, 3).map((p) => `• **${p.name}** (@${p.username || 'provider'}) — *${p.headline}* · ★${p.avg_rating || 5.0} (${p.total_reviews || 0} reviews) · ${p.hourly_rate ? `${p.hourly_rate} ETB/hr` : 'Verified'}`).join('\n');
+      fullText = `I found **${providers.length} verified specialist${providers.length > 1 ? 's' : ''}** for your request in Addis Ababa:\n\n• **${topMatch.name}** (@${topMatch.username || 'provider'}) — *${topMatch.headline}* · ★${topMatch.avg_rating || 5.0} (${topMatch.total_reviews || 0} reviews) · ${topMatch.hourly_rate ? `${topMatch.hourly_rate} ETB/hr` : 'Verified'}\n${otherMatches ? `\nOther top matches:\n${otherMatches}\n` : ''}\nYou can message them directly or book through LINC Escrow protection for full payment security.`;
     } else {
-      fullText = `I received your request: "${message}". We have verified professionals across Addis Ababa ready to assist. You can explore categories or describe your preferred location & budget!`;
+      fullText = `I couldn't find any verified service providers matching "${message}" in our database right now.\n\nWe currently support verified professionals in:\n• 🔧 **Plumbing & Water**\n• ⚡ **Electrical Work**\n• 🧹 **Cleaning & Maid Services**\n• 💻 **IT & Computer Repair**\n• 📚 **Tutoring & Skills**\n• 🚗 **Transport & Cargo**\n• 💆 **Health & Wellness**\n• 🎨 **Painting & Design**\n\nPlease try searching for one of these categories or adjust your search keywords!`;
     }
     onChunk(fullText);
   }

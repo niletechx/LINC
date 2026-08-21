@@ -342,6 +342,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     ];
 
     final group2 = [
+      if (isProvider)
+        {'icon': '🛠️', 'label': 'Edit Provider Profile & Trade', 'badge': null, 'highlight': false, 'action': () => context.push('/provider-setup')},
       {'icon': '🛡️', 'label': 'Trust & Verification', 'badge': 'Recommended', 'highlight': true, 'action': () => context.push('/verification')},
       {'icon': isProvider ? '👤' : '💼', 'label': isProvider ? 'Switch to Client View' : 'Switch to Provider Dashboard', 'badge': null, 'highlight': false, 'action': () {
         ref.read(appModeProvider.notifier).state = isProvider ? AppMode.client : AppMode.provider;

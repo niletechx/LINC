@@ -41,19 +41,34 @@ async function extractIntent(userMessage, previousIntent = null) {
     };
   }
 
-  // Fast-path 2: Common service keywords
+  // Fast-path 2: Common service keywords matching database category slugs
   let fastCat = null;
-  if (/plumb|pipe|leak|drain|toilet|faucet|sink/i.test(lower)) fastCat = 'plumbing';
-  else if (/clean|housekeep|maid|janitor|sanitize|wash/i.test(lower)) fastCat = 'cleaning';
-  else if (/laptop|computer|macbook|pc|screen|hardware|repair/i.test(lower)) fastCat = 'laptop repair';
-  else if (/tutor|teach|math|english|calculus|lesson|study/i.test(lower)) fastCat = 'tutoring';
-  else if (/electr|wire|circuit|breaker|light|socket/i.test(lower)) fastCat = 'electrical';
+  if (/plumb|pipe|leak|drain|toilet|faucet|sink|water pump|sanitary|clog/i.test(lower)) {
+    fastCat = 'plumbing';
+  } else if (/clean|housekeep|maid|janitor|sanitize|scrub|laundry|carpet/i.test(lower)) {
+    fastCat = 'cleaning';
+  } else if (/electr|wire|circuit|breaker|light|socket|generator|solar|appliance|power/i.test(lower)) {
+    fastCat = 'electric';
+  } else if (/laptop|computer|macbook|pc|screen|hardware|software|tech|network|windows|iphone|phone repair/i.test(lower)) {
+    fastCat = 'it-tech';
+  } else if (/tutor|teach|math|english|calculus|lesson|study|school|exam|physics|chemistry|academic/i.test(lower)) {
+    fastCat = 'tutoring';
+  } else if (/transport|move|moving|driver|cargo|freight|relocation|truck|van|taxi|delivery/i.test(lower)) {
+    fastCat = 'transport';
+  } else if (/wellness|massage|fitness|trainer|gym|physio|therapy|health|workout/i.test(lower)) {
+    fastCat = 'wellness';
+  } else if (/paint|decor|interior|carpenter|wood|renovation|furniture|design/i.test(lower)) {
+    fastCat = 'creative';
+  }
 
   let fastLoc = null;
   if (/bole/i.test(lower)) fastLoc = 'Bole';
   else if (/kazanchis|casanchis/i.test(lower)) fastLoc = 'Kazanchis';
+  else if (/sarbet|sar bet/i.test(lower)) fastLoc = 'Sarbet';
+  else if (/cmc|ayat/i.test(lower)) fastLoc = 'CMC / Ayat';
   else if (/piassa|arada/i.test(lower)) fastLoc = 'Piassa';
   else if (/mexico/i.test(lower)) fastLoc = 'Mexico';
+  else if (/megenagna/i.test(lower)) fastLoc = 'Megenagna';
   else if (/addis/i.test(lower)) fastLoc = 'Addis Ababa';
 
   if (fastCat) {

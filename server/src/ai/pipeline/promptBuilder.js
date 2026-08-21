@@ -1,53 +1,71 @@
 /**
  * Assembles the full grounded system prompt for the AI chat mode.
- * Injects retrieved provider data as context, with special handling
- * for new providers so the AI presents them fairly.
+ * Injects retrieved provider data as context.
+ * Enforces strict zero-hallucination rules when no matching providers exist.
  */
-function buildPrompt(userMessage, retrievedProviders, conversationHistory) {
+function buildPrompt(userMessage, retrievedProviders = [], conversationHistory = []) {
   let context;
+  let modeInstructions;
 
-  if (retrievedProviders.length === 0) {
-    context = 'No providers were found matching this specific need right now.';
+  if (!retrievedProviders || retrievedProviders.length === 0) {
+    context = `DATABASE SEARCH RESULT: NO MATCHING PROVIDERS FOUND.
+There are currently ZERO service providers in the LINC database matching this specific category or request.`;
+
+    modeInstructions = `CRITICAL NO-MATCH RULE (ZERO HALLUCINATION):
+- There are NO matching providers in our database for this request.
+- You MUST NOT make up, invent, or hallucinate any provider names, usernames (@...), phone numbers, ratings, or prices.
+- Directly, politely, and clearly tell the user that there are currently no verified service providers available in this specific category on LINC yet.
+- Suggest supported platform categories:
+  • 🔧 Plumbing & Water
+  • ⚡ Electrical Work
+  • 🧹 Cleaning & Maid
+  • 💻 IT & Computer
+  • 📚 Tutoring & Skills
+  • 🚗 Transport & Cargo
+  • 💆 Health & Wellness
+  • 🎨 Painting & Design
+- Offer to help them search for another service or answer questions about how LINC escrow works.`;
   } else {
-    // Build a plain-language note for each provider so Gemini understands new vs established
-    const providerNotes = retrievedProviders.map((p) => {
-      const base = { ...p };
-      if (p.is_new) {
-        base._note = 'NEW PROVIDER — joined recently, few or no reviews yet. Present them honestly as new but promising.';
-      } else if (p.total_reviews >= 20) {
-        base._note = 'ESTABLISHED — many reviews, reliable track record.';
-      }
-      return base;
-    });
+    // Build clean profile objects
+    const providerNotes = retrievedProviders.map((p) => ({
+      id: p.id,
+      name: p.name,
+      username: p.username || (p.name ? p.name.toLowerCase().replace(/\s+/g, '_') : 'provider'),
+      headline: p.headline,
+      bio: p.bio,
+      hourly_rate: p.hourly_rate,
+      currency: p.currency || 'ETB',
+      location: p.location_city,
+      rating: p.avg_rating || 5.0,
+      total_reviews: p.total_reviews || 0,
+      completed_jobs: p.completed_jobs || 0,
+      is_verified: p.is_verified,
+      is_new: p.is_new,
+      reviews: p.customer_reviews || [],
+    }));
 
-    context = `Here are the top matching providers/businesses/organizations from our database:\n${JSON.stringify(providerNotes, null, 2)}`;
+    context = `DATABASE MATCHES (${retrievedProviders.length} verified providers found in database):
+${JSON.stringify(providerNotes, null, 2)}`;
+
+    modeInstructions = `CRITICAL MATCH RULES:
+- ONLY present and reference the exact providers listed in the DATABASE MATCHES above. Do NOT invent other providers.
+- For each matched provider, present:
+  • **@\${username}** (\${name}) — *\${headline}*
+  • **Rating & Track Record**: ★ \${rating} (\${total_reviews} reviews) · \${completed_jobs} completed jobs · Verified
+  • **Location & Rate**: \${location} · \${hourly_rate} \${currency}/hr
+  • **Why they fit**: Highlight their relevant experience and tools for the user's specific request.
+- Remind the user they can message the provider directly or book with 100% LINC Escrow payment protection.`;
   }
 
-  const systemInstruction = `You are LINC AI, the intelligent, unbiased service concierge and trust advisor on the LINC platform in Ethiopia.
+  const systemInstruction = `You are LINC AI, the intelligent service concierge and trust advisor on the LINC platform in Addis Ababa, Ethiopia.
 
-Your Operating Principles:
-1. **Unbiased Multi-Provider Insights (Default Search Mode)**:
-   - When a user asks for a service, do NOT just pick or push a single provider.
-   - Present the top fitted candidates from the database (up to 10 candidates are provided below).
-   - For EACH fitted provider, provide clear structured bullet insights:
-     • **@username** (Full Name) — *Headline/Specialty*
-     • **Rating & Jobs**: ★ rating, total verified reviews, completed job count, verified status badge.
-     • **Client Sentiment**: Highlight specific praise or feedback from past client reviews (e.g. speed, attention to detail, warranty, equipment).
-     • **Pricing & Value**: Hourly rate (ETB) and location.
-     • **Why they fit**: Key qualification for the user's specific request.
+${modeInstructions}
 
-2. **@Username Deep-Dive & Trust Advisor Mode**:
-   - If the user mentions a specific provider by **@username** or name (e.g., "@samuel_plumbing" or "Tell me more about Helen"), enter your deep-dive Trust Advisor mode for that individual:
-     - **Profile & Background**: Years of experience, specialties, certification status.
-     - **Authentic Client Reviews**: Quote or summarize specific past reviews and overall customer satisfaction.
-     - **Pros & Value Verdict**: Transparent evaluation of their hourly rate vs market average in Addis Ababa.
-     - **Advisor Tip**: Practical guidance for booking or messaging them in LINC.
-
-3. **Context Awareness**:
-   - Maintain multi-turn memory from previous user queries in this session (e.g., remembered location like Bole, budget caps, urgency).
-
-4. **Call to Action**:
-   - Remind the user they can ask: "Type @username to ask me for an in-depth trust and review breakdown on any specific provider."
+General Guidelines:
+1. Always understand the user's intent directly from their request.
+2. Be polite, concise, and professional.
+3. If the user asks about a specific @username, provide an in-depth trust evaluation using only their real profile and reviews.
+4. Keep the tone helpful, authentic, and Ethiopian market-aware.
 
 ${context}`;
 
