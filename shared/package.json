@@ -1,0 +1,5 @@
+{
+  "name": "linc-shared",
+  "version": "1.0.0",
+  "description": "Shared constants, enums, and utilities for LINC client and server"
+}
