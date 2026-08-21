@@ -50,7 +50,12 @@ class BookingService {
   Future<Map<String, dynamic>> markComplete(String bookingId) async {
     try {
       final response = await _client.dio.post('/bookings/$bookingId/complete');
-      return response.data['data'] as Map<String, dynamic>? ?? {};
+      final raw = response.data['data'];
+      if (raw is Map<String, dynamic>) return raw;
+      if (raw is List && raw.isNotEmpty && raw.first is Map<String, dynamic>) {
+        return raw.first as Map<String, dynamic>;
+      }
+      return {};
     } catch (e) {
       throw _client.extractErrorMessage(e);
     }
@@ -59,7 +64,12 @@ class BookingService {
   Future<Map<String, dynamic>> updateBooking(String bookingId, Map<String, dynamic> payload) async {
     try {
       final response = await _client.dio.put('/bookings/$bookingId', data: payload);
-      return response.data['data'] as Map<String, dynamic>? ?? {};
+      final raw = response.data['data'];
+      if (raw is Map<String, dynamic>) return raw;
+      if (raw is List && raw.isNotEmpty && raw.first is Map<String, dynamic>) {
+        return raw.first as Map<String, dynamic>;
+      }
+      return {};
     } catch (e) {
       throw _client.extractErrorMessage(e);
     }

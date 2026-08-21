@@ -49,10 +49,23 @@ class DMNotifier extends StateNotifier<DMState> {
       final newMsg = DMMessage.fromJson(data, currentUserId);
 
       final current = {...state.messages};
-      final list = current[convId] ?? [];
+      final list = List<DMMessage>.from(current[convId] ?? []);
 
+      // Deduplicate by real id
       if (newMsg.id != null && list.any((m) => m.id == newMsg.id)) {
         return;
+      }
+
+      // If this is my own message coming back from the socket,
+      // replace the optimistic placeholder (id==null, same text) instead of adding a duplicate
+      if (newMsg.fromMe) {
+        final optIdx = list.lastIndexWhere((m) => m.id == null && m.text == newMsg.text);
+        if (optIdx != -1) {
+          list[optIdx] = newMsg;
+          current[convId] = list;
+          state = state.copyWith(messages: current);
+          return;
+        }
       }
 
       current[convId] = [...list, newMsg];

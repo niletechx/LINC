@@ -28,29 +28,49 @@ class AppShell extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final mode = ref.watch(appModeProvider);
+    final isProvider = mode == AppMode.provider;
+
     return Scaffold(
       body: child,
       bottomNavigationBar: LincBottomNav(
+        isProvider: isProvider,
         onTap: (index) {
-          switch (index) {
-            case 0: context.go('/home'); break;
-            case 1: context.go('/messages'); break;
-            case 2: context.go('/ai'); break;
-            case 3: context.go('/bookings'); break;
-            case 4: context.go('/profile'); break;
+          if (isProvider) {
+            switch (index) {
+              case 0: context.go('/home'); break;
+              case 1: context.go('/messages'); break;
+              case 2: context.go('/bookings'); break;
+              case 3: context.go('/profile'); break;
+            }
+          } else {
+            switch (index) {
+              case 0: context.go('/home'); break;
+              case 1: context.go('/messages'); break;
+              case 2: context.go('/ai'); break;
+              case 3: context.go('/bookings'); break;
+              case 4: context.go('/profile'); break;
+            }
           }
         },
-        currentIndex: _indexFromLocation(GoRouterState.of(context).uri.path),
+        currentIndex: _indexFromLocation(GoRouterState.of(context).uri.path, isProvider),
       ),
     );
   }
 
-  int _indexFromLocation(String path) {
+  int _indexFromLocation(String path, bool isProvider) {
     if (path.startsWith('/home') || path == '/') return 0;
     if (path.startsWith('/messages')) return 1;
-    if (path.startsWith('/ai')) return 2;
-    if (path.startsWith('/bookings')) return 3;
-    if (path.startsWith('/profile')) return 4;
+    if (isProvider) {
+      // Provider: Home | Chat | Bookings | Me  (no AI)
+      if (path.startsWith('/bookings')) return 2;
+      if (path.startsWith('/profile')) return 3;
+    } else {
+      // Client: Home | Chat | AI | Bookings | Me
+      if (path.startsWith('/ai')) return 2;
+      if (path.startsWith('/bookings')) return 3;
+      if (path.startsWith('/profile')) return 4;
+    }
     return 0;
   }
 }

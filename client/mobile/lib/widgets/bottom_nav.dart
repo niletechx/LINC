@@ -3,13 +3,19 @@ import '../config/colors.dart';
 import '../config/text_styles.dart';
 
 /// LINC Bottom Navigation Bar
-/// 5 items: Home | Chat | AI (center elevated) | Bookings | Me
-/// Source: BottomNav component from LINC-REEACT/src/App.tsx lines 1785–1830
+/// Client mode (5 items): Home | Chat | AI (center elevated) | Bookings | Me
+/// Provider mode (4 items): Home | Chat | Bookings | Me  — no AI tab
 class LincBottomNav extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
+  final bool isProvider;
 
-  const LincBottomNav({required this.currentIndex, required this.onTap, super.key});
+  const LincBottomNav({
+    required this.currentIndex,
+    required this.onTap,
+    this.isProvider = false,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -24,13 +30,22 @@ class LincBottomNav extends StatelessWidget {
           height: 68,
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              _NavItem(icon: _homeIcon, label: 'Home', active: currentIndex == 0, onTap: () => onTap(0)),
-              _NavItem(icon: _chatIcon, label: 'Chat', active: currentIndex == 1, onTap: () => onTap(1)),
-              _AiNavItem(active: currentIndex == 2, onTap: () => onTap(2)),
-              _NavItem(icon: _bookingsIcon, label: 'Bookings', active: currentIndex == 3, onTap: () => onTap(3)),
-              _NavItem(icon: _profileIcon, label: 'Me', active: currentIndex == 4, onTap: () => onTap(4)),
-            ],
+            children: isProvider
+                ? [
+                    // Provider: 4 tabs — Home | Chat | Bookings | Me
+                    _NavItem(icon: _homeIcon, label: 'Home', active: currentIndex == 0, onTap: () => onTap(0)),
+                    _NavItem(icon: _chatIcon, label: 'Chat', active: currentIndex == 1, onTap: () => onTap(1)),
+                    _NavItem(icon: _bookingsIcon, label: 'Bookings', active: currentIndex == 2, onTap: () => onTap(2)),
+                    _NavItem(icon: _profileIcon, label: 'Me', active: currentIndex == 3, onTap: () => onTap(3)),
+                  ]
+                : [
+                    // Client: 5 tabs — Home | Chat | AI | Bookings | Me
+                    _NavItem(icon: _homeIcon, label: 'Home', active: currentIndex == 0, onTap: () => onTap(0)),
+                    _NavItem(icon: _chatIcon, label: 'Chat', active: currentIndex == 1, onTap: () => onTap(1)),
+                    _AiNavItem(active: currentIndex == 2, onTap: () => onTap(2)),
+                    _NavItem(icon: _bookingsIcon, label: 'Bookings', active: currentIndex == 3, onTap: () => onTap(3)),
+                    _NavItem(icon: _profileIcon, label: 'Me', active: currentIndex == 4, onTap: () => onTap(4)),
+                  ],
           ),
         ),
       ),
