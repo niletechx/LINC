@@ -12,6 +12,7 @@ class AppConfig {
   AppConfig._();
 
   static const String defaultDevHost = '10.2.64.251:5000';
+  static const String defaultRenderHost = 'https://linc-backend.onrender.com';
   static const String _envBaseUrl = String.fromEnvironment('BASE_URL');
 
   static String? _overrideBaseUrl;
@@ -47,13 +48,16 @@ class AppConfig {
     } catch (_) {}
   }
 
-  /// The root base URL (e.g. `http://10.186.1.187:5000`) without trailing slash or `/api`.
+  /// The root base URL (e.g. `https://linc-backend.onrender.com` or `http://10.2.64.251:5000`) without trailing slash or `/api`.
   static String get baseUrl {
     if (_overrideBaseUrl != null && _overrideBaseUrl!.isNotEmpty) {
       return _overrideBaseUrl!;
     }
     if (_envBaseUrl.isNotEmpty) {
       return _normalizeUrl(_envBaseUrl);
+    }
+    if (kReleaseMode) {
+      return defaultRenderHost;
     }
     if (kIsWeb) {
       return 'http://127.0.0.1:5000';

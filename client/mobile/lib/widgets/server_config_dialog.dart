@@ -76,6 +76,11 @@ class _ServerConfigDialogState extends State<ServerConfigDialog> {
               runSpacing: 6,
               children: [
                 _buildPresetChip(
+                  label: 'Render Cloud',
+                  url: 'https://linc-backend.onrender.com',
+                  icon: Icons.cloud_done_rounded,
+                ),
+                _buildPresetChip(
                   label: 'Wi-Fi PC (10.2.64.251)',
                   url: 'http://10.2.64.251:5000',
                   icon: Icons.wifi,
