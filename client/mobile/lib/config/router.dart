@@ -150,7 +150,7 @@ final routerProvider = Provider<GoRouter>((ref) {
   final needsProviderSetup = ref.watch(needsProviderSetupProvider);
 
   return GoRouter(
-    initialLocation: '/welcome',
+    initialLocation: '/home',
     redirect: (context, state) {
       final path = state.uri.path;
 
