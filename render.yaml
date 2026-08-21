@@ -44,8 +44,6 @@ services:
   - type: web
     name: linc-web
     runtime: static
-    plan: free
-    region: oregon
     rootDir: client/web
     buildCommand: npm install && npm run build
     staticPublishPath: dist
