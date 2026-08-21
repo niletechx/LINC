@@ -1,16 +1,35 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, Info, ArrowLeft, ArrowRight } from 'lucide-react';
+import { 
+  ChevronLeft, 
+  Info, 
+  ArrowLeft, 
+  ArrowRight, 
+  Briefcase, 
+  MapPin, 
+  DollarSign, 
+  FileText, 
+  Sparkles, 
+  Check, 
+  ShieldCheck, 
+  Clock 
+} from 'lucide-react';
+import { useAppStore } from '../stores/appStore';
+import { useProviderStore } from '../stores/providerStore';
+import { providerService } from '../services/providerService';
 
 export default function ProviderSetupPage() {
   const navigate = useNavigate();
+  const { setAppMode, showToast } = useAppStore();
+  const { updateProfile } = useProviderStore();
 
   const [selectedCategory, setSelectedCategory] = useState('plumbing');
   const [headline, setHeadline] = useState('Master Plumber & Pipe Specialist');
   const [rate, setRate] = useState('350');
-  const [city, setCity] = useState('Addis Ababa, Bole');
-  const [bio, setBio] = useState('');
+  const [city, setCity] = useState('Bole, Addis Ababa');
+  const [bio, setBio] = useState('Certified technician with 6+ years experience in Addis Ababa. I carry modern diagnostic tools, offer quick same-day emergency repairs, and guarantee all my work with escrow safety.');
   const [availability, setAvailability] = useState('available');
+  const [isSaving, setIsSaving] = useState(false);
 
   const categories = [
     { id: '1', slug: 'plumbing', name: 'Plumbing & Water', emoji: '🔧', headline: 'Master Plumber & Pipe Specialist' },
@@ -39,162 +58,215 @@ export default function ProviderSetupPage() {
     }
   };
 
-  const handleSave = () => {
-    navigate('/home');
+  const handleSave = async () => {
+    setIsSaving(true);
+    const profilePayload = {
+      tradeCategory: selectedCategory,
+      headline,
+      hourlyRate: Number(rate) || 350,
+      location: city,
+      bio,
+      isAvailable: availability === 'available',
+    };
+
+    updateProfile(profilePayload);
+
+    try {
+      await providerService.updateMyProfile({
+        headline,
+        bio,
+        hourly_rate: Number(rate) || 350,
+        is_available: availability === 'available',
+      });
+    } catch (_) {
+      // Local state is already updated
+    } finally {
+      setIsSaving(false);
+      setAppMode('provider');
+      showToast('🎉 Provider profile launched! You are now live on the LINC marketplace.', 'success');
+      navigate('/home');
+    }
   };
 
   return (
-    <div className="bg-[#F8FAFC] min-h-screen">
-      {/* Cyan Header */}
-      <div className="bg-[#7EC8E3] px-4 pt-6 pb-5 w-full">
-        <div className="flex justify-between items-center mb-2">
-          <button onClick={() => navigate(-1)} className="w-[30px] h-[30px] flex justify-center items-center">
-            <ChevronLeft size={24} className="text-[#0F172A] -ml-2" />
-          </button>
-          <button onClick={() => navigate('/home')} className="text-[#1E5F7A] font-bold text-[13px]">
-            Skip for now
-          </button>
-        </div>
-        <h1 className="text-[22px] font-extrabold text-[#0F172A] tracking-tight">Welcome, Provider! 💼</h1>
-        <p className="text-[13px] text-[#1E5F7A] font-medium mt-1">
-          Set up your professional profile to start getting service bookings.
-        </p>
+    <div className="provider-setup-container">
+      {/* ── Top Navigation Bar ── */}
+      <div className="setup-top-nav">
+        <button 
+          type="button" 
+          onClick={() => navigate(-1)} 
+          className="back-icon-btn"
+        >
+          <ChevronLeft size={20} />
+          <span>Back</span>
+        </button>
+        <button 
+          type="button" 
+          onClick={() => navigate('/home')} 
+          className="skip-btn"
+        >
+          Skip for now
+        </button>
       </div>
 
-      <div className="p-4 flex flex-col gap-4 pb-12">
-        {/* 1. SELECT TRADE / CATEGORY */}
-        <SectionCard title="1. Primary Trade / Specialty" subtitle="Select the main type of service you provide">
-          <div className="flex flex-wrap gap-2">
-            {categories.map(cat => {
+      {/* ── 1. Frosted Glass Hero Banner ── */}
+      <section className="setup-hero-card">
+        <div className="setup-hero-identity">
+          <div className="setup-icon-box">
+            <Briefcase size={28} />
+          </div>
+          <div>
+            <h1 className="setup-title">Become a Verified Specialist 💼</h1>
+            <p className="setup-subtitle">
+              Set up your public profile, rates, and coverage area to start receiving client bookings in Addis Ababa.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ── 2. Step Cards Stack ── */}
+      <div className="setup-form-stack">
+        {/* Step 1: Specialty */}
+        <div className="setup-step-glass-card">
+          <div className="step-card-header">
+            <h3 className="step-title">1. Primary Trade / Specialty</h3>
+            <p className="step-sub">Select the main category of services you provide</p>
+          </div>
+
+          <div className="category-chips-grid">
+            {categories.map((cat) => {
               const isSelected = selectedCategory === cat.slug;
               return (
-                <div 
+                <div
                   key={cat.id}
                   onClick={() => handleCategorySelect(cat)}
-                  className={`px-3 py-2 rounded-[12px] border cursor-pointer flex items-center ${isSelected ? 'bg-[#7EC8E3] border-[#0284C7] border-[1.5px]' : 'bg-[#F1F5F9] border-[#E2E8F0]'}`}
+                  className={`trade-category-chip ${isSelected ? 'selected' : ''}`}
                 >
-                  <span className="text-[15px]">{cat.emoji}</span>
-                  <span className={`ml-1.5 text-[12.5px] ${isSelected ? 'font-extrabold text-white' : 'font-semibold text-[#334155]'}`}>
-                    {cat.name}
-                  </span>
+                  <span className="trade-emoji">{cat.emoji}</span>
+                  <span className="trade-name">{cat.name}</span>
                 </div>
               );
             })}
           </div>
-        </SectionCard>
+        </div>
 
-        {/* 2. PROFESSIONAL HEADLINE */}
-        <SectionCard title="2. Professional Headline" subtitle="This will appear at the top of your profile card">
-          <input 
-            type="text" 
+        {/* Step 2: Headline */}
+        <div className="setup-step-glass-card">
+          <div className="step-card-header">
+            <h3 className="step-title">2. Professional Headline</h3>
+            <p className="step-sub">This appears prominently on your search card and profile</p>
+          </div>
+
+          <input
+            type="text"
             value={headline}
             onChange={(e) => setHeadline(e.target.value)}
-            className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-[12px] px-3.5 py-3 text-[14px] font-semibold text-[#0F172A] focus:border-[#7EC8E3] focus:outline-none"
             placeholder="e.g. Certified Electrician & Home Wiring Pro"
+            className="setup-text-input"
           />
-        </SectionCard>
+        </div>
 
-        {/* 3. HOURLY RATE & OPERATING LOCATION */}
-        <SectionCard title="3. Rates & Operating Location" subtitle="Set your standard starting rate and location">
-          <div className="flex gap-3">
-            <div className="flex-5 flex flex-col">
-              <label className="text-[12px] font-bold text-[#475569] mb-1.5">Hourly Rate (ETB)</label>
-              <div className="relative">
-                <span className="absolute left-3 top-3 text-[13px] font-extrabold text-[#059669]">ETB</span>
-                <input 
+        {/* Step 3: Hourly Rate & Location */}
+        <div className="setup-step-glass-card">
+          <div className="step-card-header">
+            <h3 className="step-title">3. Rates & Operating Location</h3>
+            <p className="step-sub">Set your baseline hourly rate in ETB and your Addis sub-city base</p>
+          </div>
+
+          <div className="rate-location-grid">
+            <div className="input-group">
+              <label className="input-label">Hourly Rate (ETB / hr)</label>
+              <div className="rate-input-wrap">
+                <span className="rate-prefix">ETB</span>
+                <input
                   type="number"
                   value={rate}
                   onChange={(e) => setRate(e.target.value)}
-                  className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-[12px] pl-10 pr-8 py-3 text-[14px] font-bold text-[#0F172A] focus:border-[#7EC8E3] focus:outline-none"
+                  className="rate-field"
                 />
-                <span className="absolute right-3 top-3.5 text-[12px] text-[#94A3B8]">/hr</span>
+                <span className="rate-suffix">/hr</span>
               </div>
             </div>
-            <div className="flex-6 flex flex-col w-full">
-              <label className="text-[12px] font-bold text-[#475569] mb-1.5">City / Sub-city</label>
-              <input 
+
+            <div className="input-group">
+              <label className="input-label">City / Sub-City</label>
+              <input
                 type="text"
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
-                className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-[12px] px-3 py-3 text-[13px] font-semibold text-[#0F172A] focus:border-[#7EC8E3] focus:outline-none"
+                className="setup-text-input"
               />
             </div>
           </div>
-          <div className="flex overflow-x-auto gap-1.5 mt-2.5 hide-scrollbar">
+
+          <div className="location-chips-row">
             {locationSuggestions.map((loc, i) => (
-              <div 
-                key={i} 
+              <button
+                key={i}
+                type="button"
                 onClick={() => setCity(loc)}
-                className="whitespace-nowrap px-2 py-1 bg-[#F1F5F9] rounded-[6px] text-[10.5px] font-semibold text-[#64748B] cursor-pointer"
+                className="location-suggest-chip"
               >
-                {loc.split(',')[0]}
-              </div>
+                <MapPin size={11} />
+                <span>{loc.split(',')[0]}</span>
+              </button>
             ))}
           </div>
-        </SectionCard>
+        </div>
 
-        {/* 4. BIO & EXPERIENCE */}
-        <SectionCard title="4. About Your Services & Experience" subtitle="Highlight your skills, background, tools, and response time">
-          <textarea 
+        {/* Step 4: Bio & Experience */}
+        <div className="setup-step-glass-card">
+          <div className="step-card-header">
+            <h3 className="step-title">4. About Your Services & Experience</h3>
+            <p className="step-sub">Highlight your experience, tools, certifications, and response time</p>
+          </div>
+
+          <textarea
             value={bio}
             onChange={(e) => setBio(e.target.value)}
-            className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-[12px] p-3 text-[13.5px] text-[#0F172A] leading-relaxed resize-none focus:border-[#7EC8E3] focus:outline-none"
-            placeholder="E.g. Certified technician with 6+ years experience in Addis Ababa. I carry modern diagnostic tools, offer quick same-day emergency repairs, and guarantee all my work with escrow safety."
+            placeholder="Describe your services..."
             rows={4}
-          ></textarea>
-        </SectionCard>
+            className="setup-textarea"
+          />
+        </div>
 
-        {/* 5. AVAILABILITY STATUS */}
-        <SectionCard title="5. Initial Availability Status" subtitle="Clients can see when you are open for work">
-          <div className="flex gap-2">
-            <AvailabilityCard 
-              id="available" 
-              label="🟢 Available" 
-              sub="Accepting jobs now" 
-              selected={availability} 
-              onSelect={setAvailability} 
-            />
-            <AvailabilityCard 
-              id="busy" 
-              label="🟡 Busy" 
-              sub="Book in advance" 
-              selected={availability} 
-              onSelect={setAvailability} 
-            />
+        {/* Step 5: Availability */}
+        <div className="setup-step-glass-card">
+          <div className="step-card-header">
+            <h3 className="step-title">5. Initial Availability Status</h3>
+            <p className="step-sub">Clients can see your live status across the marketplace</p>
           </div>
-        </SectionCard>
 
-        <button 
+          <div className="availability-options-row">
+            <div
+              onClick={() => setAvailability('available')}
+              className={`availability-card ${availability === 'available' ? 'selected' : ''}`}
+            >
+              <strong className="avail-title text-emerald-700">🟢 Available Now</strong>
+              <span className="avail-sub">Accepting urgent & scheduled tasks</span>
+            </div>
+
+            <div
+              onClick={() => setAvailability('busy')}
+              className={`availability-card ${availability === 'busy' ? 'selected' : ''}`}
+            >
+              <strong className="avail-title text-amber-700">🟡 Scheduled / Busy</strong>
+              <span className="avail-sub">Accepting advance bookings only</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Submit Button */}
+        <button
+          type="button"
+          disabled={isSaving}
           onClick={handleSave}
-          className="w-full h-[52px] mt-3 bg-[#0F172A] rounded-[14px] text-white text-[15px] font-extrabold flex justify-center items-center"
+          className="setup-save-btn"
         >
-          Save & Launch Provider Profile 🚀
+          <Sparkles size={18} />
+          <span>{isSaving ? 'Launching Profile...' : 'Save & Launch Provider Profile 🚀'}</span>
         </button>
-
       </div>
-    </div>
-  );
-}
-
-function SectionCard({ title, subtitle, children }) {
-  return (
-    <div className="w-full bg-white border border-[#E2E8F0] rounded-[16px] p-4 flex flex-col">
-      <h3 className="text-[14px] font-extrabold text-[#0F172A]">{title}</h3>
-      <p className="text-[11.5px] text-[#64748B] mt-0.5 mb-3.5">{subtitle}</p>
-      {children}
-    </div>
-  );
-}
-
-function AvailabilityCard({ id, label, sub, selected, onSelect }) {
-  const isSelected = selected === id;
-  return (
-    <div 
-      onClick={() => onSelect(id)}
-      className={`flex-1 px-2.5 py-3 rounded-[12px] border cursor-pointer ${isSelected ? 'bg-[#E0F2FE] border-[#38BDF8] border-[1.5px]' : 'bg-[#F8FAFC] border-[#E2E8F0]'}`}
-    >
-      <div className="text-[13px] font-bold text-[#0F172A]">{label}</div>
-      <div className="text-[10.5px] text-[#64748B] mt-0.5">{sub}</div>
     </div>
   );
 }

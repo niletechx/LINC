@@ -33,6 +33,7 @@ router.use('/categories', categoriesRouter);
 router.use('/requests', requestsRouter);
 router.use('/matching', matchingRouter);
 router.use('/bookings', bookingRouter);
+router.use('/booking', bookingRouter);
 router.use('/messaging', messagingRouter);
 router.use('/reviews', reviewsRouter);
 router.use('/verification', verificationRouter);

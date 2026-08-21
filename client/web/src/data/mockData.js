@@ -2,6 +2,17 @@
  * LINC Mock Data ported 1:1 from mobile Flutter / client/mobile/lib/data/mock_data.dart
  */
 
+export const SUB_CITIES = [
+  { id: 'all', name: 'All Addis Ababa', amharic: 'መላው አዲስ አበባ', lat: 9.0192, lng: 38.7525, zoom: 12 },
+  { id: 'bole', name: 'Bole', amharic: 'ቦሌ', lat: 8.9950, lng: 38.7880, zoom: 14 },
+  { id: 'kazanchis', name: 'Kazanchis', amharic: 'ካዛንቺስ', lat: 9.0180, lng: 38.7660, zoom: 14 },
+  { id: 'piassa', name: 'Piassa / Arada', amharic: 'ፒያሳ / አራዳ', lat: 9.0340, lng: 38.7520, zoom: 14 },
+  { id: 'sarbet', name: 'Sarbet', amharic: 'ሳርቤት', lat: 9.0010, lng: 38.7360, zoom: 14 },
+  { id: 'cmc', name: 'CMC / Ayat', amharic: 'ሲኤምሲ / አያት', lat: 9.0220, lng: 38.8350, zoom: 14 },
+  { id: 'megenagna', name: 'Megenagna', amharic: 'መገናኛ', lat: 9.0200, lng: 38.7990, zoom: 14 },
+  { id: 'gerji', name: 'Gerji', amharic: 'ገርጂ', lat: 8.9920, lng: 38.8100, zoom: 14 },
+];
+
 export const MOCK_PROVIDERS = [
   {
     id: '1',
@@ -10,6 +21,9 @@ export const MOCK_PROVIDERS = [
     name: 'Abebe Girma',
     headline: 'Senior Plumber & Pipe Specialist',
     category: 'plumbing',
+    subCity: 'bole',
+    lat: 8.9985,
+    lng: 38.7865,
     rating: 4.9,
     reviewsCount: 42,
     distance: '1.8 km',
@@ -22,15 +36,56 @@ export const MOCK_PROVIDERS = [
     locationCity: 'Bole, Addis Ababa',
     phone: '+251911234567',
     availabilityStatus: 'available',
-    about: 'Licensed plumber with 8 years of experience across residential and commercial properties in Addis. Specializes in leak detection, pipe installations, and emergency repairs. Fast, clean, and reliable.',
+    workingHours: 'Mon – Sat: 8:00 AM – 7:00 PM (Emergency 24/7)',
+    languages: ['Amharic (Native)', 'English (Conversational)'],
+    credentials: [
+      { id: 'c1', title: 'Fayda Digital National ID', status: 'Verified', issuer: 'National ID Program Ethiopia', date: '2025' },
+      { id: 'c2', title: 'Ministry of Urban & Infrastructure Trade License', status: 'Active', issuer: 'FDRE Ministry of Trade', date: '2024–2026' },
+      { id: 'c3', title: 'Addis Ababa Police Criminal Clearance', status: 'Clean Record', issuer: 'Federal Police Commission', date: '2025' },
+      { id: 'c4', title: 'Certified Master Plumber', status: 'Verified', issuer: 'Entoto TVET College', date: '2019' },
+    ],
+    about: 'Licensed plumber with 8 years of experience across residential and commercial properties in Addis. Specializes in leak detection, pipe installations, water heater repairs, and emergency drainage overhauls. Fast, clean, and reliable.',
     services: [
-      { id: 's1', name: 'Leak Detection & Repair', tags: ['Emergency', 'Same-day'], duration: '1–3 hrs', price: '300 ETB/hr', fixed: false, amount: 300 },
-      { id: 's2', name: 'Full Pipe Installation', tags: ['Residential', 'Commercial'], duration: 'Half day', price: '1,500 ETB', fixed: true, amount: 1500 },
-      { id: 's3', name: 'Bathroom Fitting & Fixtures', tags: ['Renovation'], duration: '1–2 days', price: 'From 3,000 ETB', fixed: true, amount: 3000 },
+      { id: 's1', name: 'Leak Detection & Emergency Pipe Repair', tags: ['Emergency', 'Same-day'], duration: '1–3 hrs', price: '300 ETB/hr', fixed: false, amount: 300, description: 'Rapid acoustic and thermal leak pinpointing, pressure testing, and permanent pipe sealant/replacement.' },
+      { id: 's2', name: 'Full Building Pipe Installation', tags: ['Residential', 'Commercial'], duration: 'Half day', price: '1,500 ETB', fixed: true, amount: 1500, description: 'PPR/PVC pipe routing, main valve hookups, and leak-proof fitting for new or renovated apartments.' },
+      { id: 's3', name: 'Bathroom Fitting & Sanitary Fixtures', tags: ['Renovation'], duration: '1–2 days', price: '3,000 ETB', fixed: true, amount: 3000, description: 'Complete installation of sinks, showers, mixers, toilets, and modern drainage traps.' },
+    ],
+    portfolio: [
+      {
+        id: 'p1',
+        title: 'Emergency High-Pressure Pipe Burst Repair',
+        subCity: 'Bole Medhanealem',
+        duration: '1.5 hours',
+        cost: '600 ETB',
+        clientFeedback: '“Arrived in 20 minutes and stopped our apartment from flooding. Exceptional craftsmanship!” — Dawit K.',
+        description: 'Replaced a ruptured PPR mainline valve in a 4th-floor apartment building with zero collateral damage to wall tiles.',
+        tags: ['Plumbing', 'Emergency', 'PPR Pipe']
+      },
+      {
+        id: 'p2',
+        title: 'Complete Sanitary & Water Tank Overhaul',
+        subCity: 'Kazanchis Commercial Complex',
+        duration: '2 days',
+        cost: '4,200 ETB',
+        clientFeedback: '“High quality work and very transparent pricing. Abebe handled all permits and fittings.” — Tigist M.',
+        description: 'Installed twin 3,000L rooftop water tanks, automatic booster pump system, and dual-filter sediment purification.',
+        tags: ['Water Tank', 'Booster Pump', 'Filtration']
+      },
+      {
+        id: 'p3',
+        title: 'Luxury Bathroom Modernization & Hidden Drainage',
+        subCity: 'Old Airport Residential Villa',
+        duration: '3 days',
+        cost: '5,500 ETB',
+        clientFeedback: '“Cleanest plumbing finish we have seen in Addis. Highly recommended!” — Senait B.',
+        description: 'Fitted concealed cisterns, linear floor drains, and thermostatic brass mixer showers.',
+        tags: ['Sanitary', 'Modern Fitting', 'Renovation']
+      }
     ],
     reviews: [
       { id: 'r1', author: 'Yonas Molla', rating: 5, date: '2 days ago', comment: 'Fixed a major pipe burst in Bole within 40 minutes. Highly skilled and fair price!' },
       { id: 'r2', author: 'Meron Tadesse', rating: 5, date: '1 week ago', comment: 'Very professional, arrived with all necessary tools and replaced our bathroom plumbing.' },
+      { id: 'r3', author: 'Kidus Wolde', rating: 5, date: '3 weeks ago', comment: 'Excellent work installing our new water pump system. Arrived on time and cleaned up afterwards.' },
     ],
   },
   {
@@ -40,6 +95,9 @@ export const MOCK_PROVIDERS = [
     name: 'Sara Mekonnen',
     headline: 'House Cleaning Pro & Deep Clean Specialist',
     category: 'cleaning',
+    subCity: 'kazanchis',
+    lat: 9.0195,
+    lng: 38.7645,
     rating: 4.8,
     reviewsCount: 67,
     distance: '0.9 km',
@@ -52,14 +110,44 @@ export const MOCK_PROVIDERS = [
     locationCity: 'Kazanchis, Addis Ababa',
     phone: '+251922345678',
     availabilityStatus: 'available',
-    about: 'Professional cleaner offering deep-cleaning, post-construction cleaning, and regular maintenance packages. Uses eco-friendly products. Trusted by over 120 families in Bole and CMC area.',
+    workingHours: 'Mon – Sun: 7:30 AM – 6:30 PM',
+    languages: ['Amharic (Native)', 'English (Fluent)'],
+    credentials: [
+      { id: 'c5', title: 'Fayda Digital National ID', status: 'Verified', issuer: 'National ID Program Ethiopia', date: '2025' },
+      { id: 'c6', title: 'Hospitality & Hygiene Professional Certificate', status: 'Certified', issuer: 'Addis Ababa Chamber Training', date: '2021' },
+      { id: 'c7', title: 'Police Background Clearance', status: 'Clean Record', issuer: 'Kirkos Sub-City Police', date: '2025' },
+    ],
+    about: 'Professional cleaner offering deep-cleaning, post-construction cleaning, and regular maintenance packages. Uses eco-friendly, hypoallergenic products. Trusted by over 120 families in Bole, Kazanchis, and CMC areas.',
     services: [
-      { id: 's4', name: 'Standard Home Cleaning', tags: ['Weekly', 'Bi-weekly'], duration: '2–4 hrs', price: '250 ETB/hr', fixed: false, amount: 250 },
-      { id: 's5', name: 'Deep Cleaning Package', tags: ['One-time'], duration: 'Full day', price: '1,800 ETB', fixed: true, amount: 1800 },
-      { id: 's6', name: 'Move-in / Move-out Cleaning', tags: ['Post-construction'], duration: 'Full day', price: '2,500 ETB', fixed: true, amount: 2500 },
+      { id: 's4', name: 'Standard Residential Cleaning', tags: ['Weekly', 'Bi-weekly'], duration: '2–4 hrs', price: '250 ETB/hr', fixed: false, amount: 250, description: 'Dusting, floor mopping, kitchen degreasing, bathroom sanitization, and trash disposal.' },
+      { id: 's5', name: 'Comprehensive Deep Cleaning Package', tags: ['One-time'], duration: 'Full day', price: '1,800 ETB', fixed: true, amount: 1800, description: 'Full upholstery steam vacuuming, interior window scrubbing, tile grout descaling, and appliance interior cleaning.' },
+      { id: 's6', name: 'Post-Construction / Move-in Clean', tags: ['Heavy-duty'], duration: 'Full day', price: '2,500 ETB', fixed: true, amount: 2500, description: 'Paint splatter removal, cement dust extraction, fine surface polishing, and complete disinfection.' },
+    ],
+    portfolio: [
+      {
+        id: 'p4',
+        title: 'Luxury 3-Bedroom Apartment Deep Sanitization',
+        subCity: 'Kazanchis High-Rise',
+        duration: '5 hours',
+        cost: '1,800 ETB',
+        clientFeedback: '“Spotless! Our carpets and kitchen look brand new. Will book every month.” — Almaz K.',
+        description: 'Complete deep cleaning including mattress steam sanitation, oven degreasing, and balcony high-pressure washing.',
+        tags: ['Deep Clean', 'Steam Clean', 'Apartment']
+      },
+      {
+        id: 'p5',
+        title: 'Post-Renovation Clean for Tech Office',
+        subCity: 'Bole Olympia',
+        duration: '8 hours',
+        cost: '3,200 ETB',
+        clientFeedback: '“Sara and her team made our office ready for client meetings in 1 day.” — Bereket T.',
+        description: 'Removed drywall dust from 18 workstations, server room, polished glass partitions, and treated parquet floors.',
+        tags: ['Commercial', 'Post-Construction', 'Flooring']
+      }
     ],
     reviews: [
-      { id: 'r3', author: 'Almaz Kassa', rating: 5, date: '3 days ago', comment: 'Spotless cleaning! Our apartment looks brand new. Recommended!' },
+      { id: 'r4', author: 'Almaz Kassa', rating: 5, date: '3 days ago', comment: 'Spotless cleaning! Our apartment looks brand new. Recommended!' },
+      { id: 'r5', author: 'Bereket T.', rating: 5, date: '2 weeks ago', comment: 'Punctual, thorough, and trustworthy. Sara is the best cleaner in Kazanchis.' },
     ],
   },
   {
@@ -69,6 +157,9 @@ export const MOCK_PROVIDERS = [
     name: 'Dawit Tadesse',
     headline: 'IT Support & Hardware Repair Technician',
     category: 'it-tech',
+    subCity: 'megenagna',
+    lat: 9.0210,
+    lng: 38.8015,
     rating: 4.7,
     reviewsCount: 38,
     distance: '3.1 km',
@@ -81,14 +172,32 @@ export const MOCK_PROVIDERS = [
     locationCity: 'Megenagna, Addis Ababa',
     phone: '+251933456789',
     availabilityStatus: 'available',
-    about: 'IT technician specializing in laptop/PC repairs, networking, and software troubleshooting. Worked with 50+ businesses in Addis. Offers remote support and on-site visits.',
+    workingHours: 'Mon – Fri: 9:00 AM – 8:00 PM',
+    languages: ['Amharic (Native)', 'English (Fluent)'],
+    credentials: [
+      { id: 'c8', title: 'Fayda Digital National ID', status: 'Verified', issuer: 'National ID Program Ethiopia', date: '2025' },
+      { id: 'c9', title: 'Cisco CCNA & CompTIA A+ Certified', status: 'Certified', issuer: 'Cisco Systems', date: '2023' },
+    ],
+    about: 'IT technician specializing in laptop/PC repairs, networking, SSD upgrades, data recovery, and software troubleshooting. Worked with 50+ businesses in Addis. Offers remote support and on-site visits.',
     services: [
-      { id: 's7', name: 'Laptop / PC Repair & Diagnostics', tags: ['Hardware', 'Software'], duration: '1–4 hrs', price: '400 ETB/hr', fixed: false, amount: 400 },
-      { id: 's8', name: 'Network Setup & Wi-Fi Configuration', tags: ['Office', 'Home'], duration: '2–6 hrs', price: '1,200 ETB', fixed: true, amount: 1200 },
-      { id: 's9', name: 'Remote IT Support Session', tags: ['Remote'], duration: '30–60 min', price: '200 ETB', fixed: true, amount: 200 },
+      { id: 's7', name: 'Laptop / PC Diagnostics & Repair', tags: ['Hardware', 'Software'], duration: '1–4 hrs', price: '400 ETB/hr', fixed: false, amount: 400, description: 'Motherboard level repair, screen replacement, thermal paste repasting, and virus cleanup.' },
+      { id: 's8', name: 'Office Network Setup & Wi-Fi Mesh', tags: ['Office', 'Home'], duration: '2–6 hrs', price: '1,200 ETB', fixed: true, amount: 1200, description: 'MikroTik router configuration, structured cabling, Wi-Fi 6 access point deployment, and firewall rules.' },
+      { id: 's9', name: 'Emergency Data Recovery & Backup', tags: ['Critical'], duration: '1–3 hrs', price: '800 ETB', fixed: true, amount: 800, description: 'Corrupted partition retrieval, formatted drive file recovery, and automated cloud backup setup.' },
+    ],
+    portfolio: [
+      {
+        id: 'p6',
+        title: 'Corporate Network Infrastructure Deployment',
+        subCity: 'Megenagna Commercial Center',
+        duration: '1 day',
+        cost: '3,500 ETB',
+        clientFeedback: '“Fast Wi-Fi across all 3 floors with zero dead zones. Great technical expertise.” — Henok H.',
+        description: 'Installed 6 Ubiquiti UniFi access points, configured VLANs for guest and finance departments.',
+        tags: ['Networking', 'MikroTik', 'Wi-Fi 6']
+      }
     ],
     reviews: [
-      { id: 'r4', author: 'Henok Haile', rating: 5, date: '5 days ago', comment: 'Recovered all my lost data and replaced my SSD in 2 hours.' },
+      { id: 'r6', author: 'Henok Haile', rating: 5, date: '5 days ago', comment: 'Recovered all my lost data and replaced my SSD in 2 hours.' },
     ],
   },
   {
@@ -98,6 +207,9 @@ export const MOCK_PROVIDERS = [
     name: 'Helen Bekele',
     headline: 'Math & Science Tutor (Grades 7–12)',
     category: 'tutoring',
+    subCity: 'sarbet',
+    lat: 9.0025,
+    lng: 38.7345,
     rating: 5.0,
     reviewsCount: 23,
     distance: '2.2 km',
@@ -110,14 +222,31 @@ export const MOCK_PROVIDERS = [
     locationCity: 'Sarbet, Addis Ababa',
     phone: '+251944567890',
     availabilityStatus: 'available',
-    about: 'MSc graduate in Applied Mathematics. Tutors grades 7–12 and university entrance prep. Known for making complex concepts simple and building genuine understanding.',
+    workingHours: 'Mon – Sat: 3:30 PM – 8:30 PM (Weekends 9 AM – 6 PM)',
+    languages: ['Amharic (Native)', 'English (Fluent)'],
+    credentials: [
+      { id: 'c10', title: 'Fayda Digital National ID', status: 'Verified', issuer: 'National ID Program Ethiopia', date: '2025' },
+      { id: 'c11', title: 'MSc Applied Mathematics', status: 'Verified Degree', issuer: 'Addis Ababa University (AAU)', date: '2022' },
+    ],
+    about: 'MSc graduate in Applied Mathematics from AAU. Tutors grades 7–12 and university entrance exam prep. Known for making complex concepts simple and building genuine understanding.',
     services: [
-      { id: 's10', name: 'Secondary School Math Tutoring', tags: ['Grade 7–12'], duration: '1 hr', price: '350 ETB/hr', fixed: false, amount: 350 },
-      { id: 's11', name: 'University Entrance Prep', tags: ['Intensive'], duration: '2 hrs', price: '600 ETB', fixed: true, amount: 600 },
-      { id: 's12', name: 'Small Group Study Session (Max 4)', tags: ['Group', 'Discounted'], duration: '1.5 hrs', price: '200 ETB/student', fixed: true, amount: 200 },
+      { id: 's10', name: 'Secondary School Math & Physics Tutoring', tags: ['Grade 7–12'], duration: '1 hr', price: '350 ETB/hr', fixed: false, amount: 350, description: 'Curriculum-aligned concept explanation, problem-solving techniques, and homework support.' },
+      { id: 's11', name: 'National University Entrance Exam Intensive', tags: ['Grade 12'], duration: '2 hrs', price: '600 ETB', fixed: true, amount: 600, description: 'Past 10 years national exam breakdown, speed-solving shortcuts, and mock exams.' },
+    ],
+    portfolio: [
+      {
+        id: 'p7',
+        title: 'Grade 12 National Exam Prep (Top 5% Score)',
+        subCity: 'Sarbet Community School',
+        duration: '3 months',
+        cost: '4,500 ETB',
+        clientFeedback: '“Helen helped my son jump from 65% to 88% on the Ethiopian entrance exam.” — Rahel D.',
+        description: 'Structured 12-week intensive tutoring for 3 students covering calculus, matrices, and mechanics.',
+        tags: ['Math', 'Physics', 'Entrance Prep']
+      }
     ],
     reviews: [
-      { id: 'r5', author: 'Rahel Desta', rating: 5, date: '1 week ago', comment: 'My son increased his national exam score significantly. Helen is an amazing teacher!' },
+      { id: 'r7', author: 'Rahel Desta', rating: 5, date: '1 week ago', comment: 'My son increased his national exam score significantly. Helen is an amazing teacher!' },
     ],
   },
   {
@@ -127,6 +256,9 @@ export const MOCK_PROVIDERS = [
     name: 'Kalid Ahmed',
     headline: 'Licensed Electrician & Solar Installer',
     category: 'electric',
+    subCity: 'cmc',
+    lat: 9.0235,
+    lng: 38.8370,
     rating: 4.6,
     reviewsCount: 31,
     distance: '2.7 km',
@@ -139,10 +271,28 @@ export const MOCK_PROVIDERS = [
     locationCity: 'CMC / Ayat, Addis Ababa',
     phone: '+251955678901',
     availabilityStatus: 'available',
-    about: 'Certified industrial and residential electrician. Specializes in generator hookups, short circuit troubleshooting, and modern LED lighting.',
+    workingHours: 'Mon – Sat: 8:00 AM – 6:00 PM',
+    languages: ['Amharic (Native)', 'Oromo', 'English'],
+    credentials: [
+      { id: 'c12', title: 'Fayda Digital National ID', status: 'Verified', issuer: 'National ID Program Ethiopia', date: '2025' },
+      { id: 'c13', title: 'Certified Electrician Grade A', status: 'Verified', issuer: 'Ethiopian Electric Power', date: '2020' },
+    ],
+    about: 'Certified industrial and residential electrician. Specializes in solar hybrid inverter systems, backup generator hookups, short circuit troubleshooting, and modern LED lighting.',
     services: [
-      { id: 's13', name: 'Short Circuit & Fuse Repair', tags: ['Emergency'], duration: '1–2 hrs', price: '350 ETB/hr', fixed: false, amount: 350 },
-      { id: 's14', name: 'Full Building Rewiring', tags: ['Contract'], duration: '2–4 days', price: '4,500 ETB', fixed: true, amount: 4500 },
+      { id: 's13', name: 'Short Circuit & Fuse Box Troubleshooting', tags: ['Emergency'], duration: '1–2 hrs', price: '350 ETB/hr', fixed: false, amount: 350, description: 'Isolating ground faults, replacing burned breakers, and rebalancing phase loads.' },
+      { id: 's14', name: 'Solar Inverter & Battery Backup Hookup', tags: ['Solar', 'Backup'], duration: '1–2 days', price: '3,800 ETB', fixed: true, amount: 3800, description: 'Installing 5kVA hybrid solar inverters, lithium battery banks, and automatic transfer switches.' },
+    ],
+    portfolio: [
+      {
+        id: 'p8',
+        title: '5kVA Hybrid Solar System Installation',
+        subCity: 'CMC Real Estate Villa',
+        duration: '2 days',
+        cost: '5,000 ETB',
+        clientFeedback: '“Seamless switch during power cuts in CMC. Kalid did clean and safe wiring.” — Samuel A.',
+        description: 'Installed 8x 550W Tier-1 solar panels, 5kVA Growatt inverter, and 10kWh LiFePO4 battery pack.',
+        tags: ['Solar', 'Inverter', 'Battery']
+      }
     ],
     reviews: [],
   },
@@ -153,6 +303,9 @@ export const MOCK_PROVIDERS = [
     name: 'Biruk Tesfaye',
     headline: 'AC & HVAC Technician',
     category: 'it-tech',
+    subCity: 'piassa',
+    lat: 9.0355,
+    lng: 38.7510,
     rating: 4.5,
     reviewsCount: 44,
     distance: '1.2 km',
@@ -165,12 +318,89 @@ export const MOCK_PROVIDERS = [
     locationCity: 'Piassa / Arada, Addis Ababa',
     phone: '+251966789012',
     availabilityStatus: 'busy',
-    about: 'Expert HVAC maintenance and installation for homes and corporate offices.',
-    services: [
-      { id: 's15', name: 'AC Gas Refill & Cleaning', tags: ['Maintenance'], duration: '2 hrs', price: '800 ETB', fixed: true, amount: 800 },
+    workingHours: 'Mon – Sat: 8:30 AM – 6:00 PM',
+    languages: ['Amharic (Native)', 'English'],
+    credentials: [
+      { id: 'c14', title: 'Fayda Digital National ID', status: 'Verified', issuer: 'National ID Program Ethiopia', date: '2025' },
     ],
+    about: 'Expert HVAC maintenance and installation for homes and corporate offices across Addis Ababa.',
+    services: [
+      { id: 's15', name: 'AC Gas Refill & Cleaning', tags: ['Maintenance'], duration: '2 hrs', price: '800 ETB', fixed: true, amount: 800, description: 'R410A refrigerant recharge, coil antibacterial wash, and blower fan balancing.' },
+    ],
+    portfolio: [],
     reviews: [],
   },
+  {
+    id: '7',
+    initials: 'TG',
+    avatarColor: '#D97706',
+    name: 'Tewodros Girma',
+    headline: 'Master Automotive Mechanic & Electrician',
+    category: 'transport',
+    subCity: 'gerji',
+    lat: 8.9910,
+    lng: 38.8085,
+    rating: 4.9,
+    reviewsCount: 56,
+    distance: '2.5 km',
+    hourlyRate: 500,
+    priceLabel: '500 ETB/hr',
+    verified: true,
+    matchScore: 95,
+    completedJobs: 98,
+    responseTime: '~6 min',
+    locationCity: 'Gerji, Addis Ababa',
+    phone: '+251977890123',
+    availabilityStatus: 'available',
+    workingHours: 'Mon – Sun: 7:00 AM – 8:00 PM',
+    languages: ['Amharic (Native)', 'English'],
+    credentials: [
+      { id: 'c15', title: 'Fayda Digital National ID', status: 'Verified', issuer: 'National ID Program Ethiopia', date: '2025' },
+      { id: 'c16', title: 'Master Automotive Technician (Toyota / Hyundai)', status: 'Certified', issuer: 'General Motors / Moenco Training', date: '2018' },
+    ],
+    about: 'Expert mobile mechanic with specialized computer diagnostics and on-site roadside assistance across Addis Ababa.',
+    services: [
+      { id: 's16', name: 'Computerized Vehicle Diagnostics', tags: ['Mobile', 'Same-day'], duration: '1 hr', price: '600 ETB', fixed: true, amount: 600, description: 'OBD-II live sensor reading, engine check error clearing, and electrical glitch tracing.' },
+      { id: 's17', name: 'Emergency Battery & Starter Jump', tags: ['Emergency'], duration: '30 min', price: '400 ETB', fixed: true, amount: 400, description: 'Mobile starter jump, alternator voltage test, and battery terminal cleaning.' },
+    ],
+    portfolio: [],
+    reviews: [],
+  },
+  {
+    id: '8',
+    initials: 'MA',
+    avatarColor: '#E11D48',
+    name: 'Marta Assefa',
+    headline: 'Certified Physiotherapist & Wellness Coach',
+    category: 'wellness',
+    subCity: 'bole',
+    lat: 8.9920,
+    lng: 38.7840,
+    rating: 4.9,
+    reviewsCount: 39,
+    distance: '2.0 km',
+    hourlyRate: 600,
+    priceLabel: '600 ETB/hr',
+    verified: true,
+    matchScore: 92,
+    completedJobs: 73,
+    responseTime: '~10 min',
+    locationCity: 'Bole Brass, Addis Ababa',
+    phone: '+251988901234',
+    availabilityStatus: 'available',
+    workingHours: 'Mon – Sat: 8:00 AM – 6:00 PM',
+    languages: ['Amharic (Native)', 'English (Fluent)'],
+    credentials: [
+      { id: 'c17', title: 'Fayda Digital National ID', status: 'Verified', issuer: 'National ID Program Ethiopia', date: '2025' },
+      { id: 'c18', title: 'BSc Physiotherapy', status: 'Verified Degree', issuer: 'Gondar College of Medical Sciences', date: '2021' },
+    ],
+    about: 'Certified physiotherapist specializing in post-injury rehabilitation, ergonomic posture alignment, and in-home therapy sessions.',
+    services: [
+      { id: 's18', name: 'In-Home Physical Therapy Session', tags: ['In-home'], duration: '1 hr', price: '600 ETB/hr', fixed: false, amount: 600, description: 'Personalized muscle rehabilitation, stretching protocol, and mobility recovery.' },
+    ],
+    portfolio: [],
+    reviews: [],
+  }
 ];
 
 export const MOCK_OPEN_REQUESTS = [

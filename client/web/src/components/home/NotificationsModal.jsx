@@ -1,8 +1,23 @@
+import React, { useEffect } from 'react';
 import { Bell, CheckCheck, X } from 'lucide-react';
 import { useAppStore } from '../../stores/appStore';
+import { notificationService } from '../../services/notificationService';
 
 export default function NotificationsModal() {
   const { isNotificationsOpen, setNotificationsOpen, notifications, markAllNotificationsRead } = useAppStore();
+
+  useEffect(() => {
+    if (isNotificationsOpen) {
+      notificationService.getNotifications().catch(() => {});
+    }
+  }, [isNotificationsOpen]);
+
+  const handleMarkAllRead = async () => {
+    markAllNotificationsRead();
+    try {
+      await notificationService.markAllAsRead();
+    } catch {}
+  };
 
   if (!isNotificationsOpen) return null;
 
@@ -22,7 +37,7 @@ export default function NotificationsModal() {
           <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={markAllNotificationsRead}
+              onClick={handleMarkAllRead}
               className="btn btn-ghost btn-sm text-cyan text-xs"
               title="Mark all as read"
             >

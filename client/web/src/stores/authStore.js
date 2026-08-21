@@ -72,6 +72,11 @@ export const useAuthStore = create((set, get) => ({
     }
   },
 
+  setUser: (user) => {
+    localStorage.setItem(APP_CONFIG.storageKeys.user, JSON.stringify(user));
+    set({ user });
+  },
+
   /**
    * Fast 1-Click Demo Login
    */
@@ -89,6 +94,7 @@ export const useAuthStore = create((set, get) => ({
       location_city: demo.city,
       headline: demo.headline,
       is_verified: true,
+      is_admin: demo.is_admin || demo.role === 'admin',
       avatar_url: null,
     };
 

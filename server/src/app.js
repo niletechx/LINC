@@ -21,8 +21,29 @@ app.use(morgan('dev'));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// Health check
-app.get('/health', (req, res) => res.json({ status: 'ok', service: 'LINC API' }));
+const { checkDbConnection } = require('./config/db');
+
+// Health and Root checks
+app.get('/', (req, res) => res.json({
+  service: 'LINC API',
+  status: 'running',
+  version: '1.0.0',
+  environment: process.env.NODE_ENV || 'development',
+  timestamp: new Date().toISOString(),
+}));
+
+app.get('/health', (req, res) => res.json({
+  status: 'ok',
+  service: 'LINC API',
+  uptime: process.uptime(),
+  timestamp: new Date().toISOString(),
+}));
+
+app.get('/health/db', async (req, res) => {
+  const dbStatus = await checkDbConnection();
+  const statusCode = dbStatus.connected ? 200 : 503;
+  res.status(statusCode).json(dbStatus);
+});
 
 // All API routes
 app.use('/api', router);

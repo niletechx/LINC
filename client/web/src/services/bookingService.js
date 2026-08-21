@@ -7,7 +7,7 @@ export const bookingService = {
    */
   async getBookings() {
     try {
-      const response = await api.get('/booking');
+      const response = await api.get('/bookings');
       return response.data.data || MOCK_BOOKINGS;
     } catch {
       return MOCK_BOOKINGS;
@@ -19,7 +19,7 @@ export const bookingService = {
    */
   async createBooking(bookingData) {
     try {
-      const response = await api.post('/booking', bookingData);
+      const response = await api.post('/bookings', bookingData);
       return response.data.data;
     } catch (err) {
       throw new Error(extractErrorMessage(err));
@@ -43,7 +43,7 @@ export const bookingService = {
    */
   async markComplete(bookingId) {
     try {
-      const response = await api.post(`/booking/${bookingId}/complete`);
+      const response = await api.post(`/bookings/${bookingId}/complete`);
       return response.data.data;
     } catch (err) {
       throw new Error(extractErrorMessage(err));

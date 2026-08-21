@@ -1,13 +1,18 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useChatStore } from '../../stores/chatStore';
+import { useAppStore } from '../../stores/appStore';
+import { useProviderStore } from '../../stores/providerStore';
 
 export default function MobileNavigation() {
   const location = useLocation();
   const { conversations } = useChatStore();
+  const { appMode } = useAppStore();
+  const { jobs } = useProviderStore();
 
   const totalUnread = conversations.reduce((acc, c) => acc + (c.unread || 0), 0);
+  const activeJobsCount = jobs.filter((j) => j.stage !== 'completed').length;
 
-  const navItems = [
+  const clientNavItems = [
     { path: '/home', label: 'Home', icon: '🏠' },
     { path: '/search', label: 'Search', icon: '🔍' },
     { path: '/ai', label: 'LINC AI', icon: '✨', highlight: true },
@@ -15,6 +20,17 @@ export default function MobileNavigation() {
     { path: '/messages', label: 'Chat', icon: '💬', badge: totalUnread },
     { path: '/profile', label: 'Profile', icon: '👤' },
   ];
+
+  const providerNavItems = [
+    { path: '/home', label: 'Overview', icon: '📊' },
+    { path: '/provider/jobs', label: 'Jobs', icon: '🛠️', badge: activeJobsCount },
+    { path: '/requests', label: 'Market', icon: '🌍' },
+    { path: '/provider/wallet', label: 'Wallet', icon: '💳', highlight: true },
+    { path: '/messages', label: 'Chat', icon: '💬', badge: totalUnread },
+    { path: '/profile', label: 'Profile', icon: '👤' },
+  ];
+
+  const navItems = appMode === 'provider' ? providerNavItems : clientNavItems;
 
   return (
     <nav className="fixed md:hidden bottom-0 left-0 right-0 bg-white border-t border-[#E2E8F0] pb-safe pt-2 px-2 flex justify-between items-end z-50 h-[65px]">

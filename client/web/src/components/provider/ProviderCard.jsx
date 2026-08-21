@@ -1,3 +1,4 @@
+import React from 'react';
 import { Star, ShieldCheck, MapPin, Clock, Briefcase, MessageSquare, Calendar, Zap } from 'lucide-react';
 import { useChatStore } from '../../stores/chatStore';
 import { useAuthStore } from '../../stores/authStore';
@@ -33,82 +34,106 @@ export default function ProviderCard({ provider }) {
     navigate(`/provider/${provider.id}`);
   };
 
+  // Collect skills / service tags
+  const tags = provider.services?.flatMap((s) => s.tags || []).slice(0, 3) || [];
+  const isOnline = provider.availabilityStatus === 'available';
+
   return (
-    <div className="provider-card" onClick={handleCardClick}>
-      {/* Top Header */}
-      <div className="provider-card-top">
-        <div className="provider-avatar-box" style={{ backgroundColor: provider.avatarColor || '#7EC8E3' }}>
-          <span>{provider.initials || provider.name?.slice(0, 2).toUpperCase()}</span>
+    <div className="provider-spotlight-card" onClick={handleCardClick}>
+      {/* ── Top Row: Avatar & Identity Header ── */}
+      <div className="card-top-identity-row">
+        <div className="card-avatar-box">
+          <div className="card-avatar-squircle" style={{ backgroundColor: provider.avatarColor || '#0284C7' }}>
+            <span>{provider.initials || provider.name?.slice(0, 2).toUpperCase()}</span>
+            <span className={`avatar-status-dot ${isOnline ? 'online' : 'busy'}`} title={isOnline ? 'Online & Available' : 'Busy'} />
+          </div>
+          {provider.matchScore && (
+            <div className="card-match-chip" title="AI Match Confidence">
+              <Zap size={10} />
+              <span>{provider.matchScore}%</span>
+            </div>
+          )}
         </div>
 
-        <div className="provider-identity">
-          <div className="provider-name-row">
-            <h4 className="provider-name">{provider.name}</h4>
+        <div className="card-name-headline-group">
+          <div className="card-name-badge-line">
+            <h4 className="provider-card-name">{provider.name}</h4>
             {provider.verified && (
-              <span className="verified-badge-icon" title="Verified Professional">
-                <ShieldCheck size={16} className="text-emerald" />
+              <span className="provider-verified-tag" title="Identity & Skill Verified with Fayda ID">
+                <ShieldCheck size={12} className="text-emerald" />
+                <span>Verified</span>
               </span>
             )}
           </div>
-          <p className="provider-headline">{provider.headline}</p>
-        </div>
 
-        {provider.matchScore && (
-          <div className="provider-match-badge" title="AI Match Confidence">
-            <Zap size={12} />
-            <span>{provider.matchScore}%</span>
+          <p className="provider-card-headline">{provider.headline}</p>
+
+          <div className="provider-rating-inline">
+            <Star size={12} fill="#F59E0B" className="text-amber" />
+            <strong className="rating-score">{(provider.rating || 4.9).toFixed(1)}</strong>
+            <span className="rating-reviews-count">({provider.reviewsCount || 42} reviews)</span>
           </div>
-        )}
-      </div>
-
-      {/* Metrics Row */}
-      <div className="provider-metrics-row">
-        <div className="metric-badge metric-rating">
-          <Star size={13} fill="#F59E0B" className="text-amber" />
-          <span className="metric-val">{(provider.rating || 4.9).toFixed(1)}</span>
-          <span className="metric-sub">({provider.reviewsCount || 42})</span>
-        </div>
-
-        <div className="metric-badge">
-          <MapPin size={13} className="text-muted" />
-          <span className="metric-val">{provider.distance || '1.8 km'}</span>
-        </div>
-
-        <div className="metric-badge">
-          <Briefcase size={13} className="text-muted" />
-          <span className="metric-val">{provider.completedJobs || 80}+ jobs</span>
-        </div>
-
-        <div className="metric-badge">
-          <Clock size={13} className="text-muted" />
-          <span className="metric-val">{provider.responseTime || '~5 min'}</span>
         </div>
       </div>
 
-      {/* Price & Action Footer */}
-      <div className="provider-card-footer">
-        <div className="provider-price-box">
-          <span className="price-label">Starting at</span>
-          <span className="price-amount">{provider.priceLabel || `${provider.hourlyRate || 300} ETB/hr`}</span>
+      {/* ── Middle: Skill Tags ── */}
+      {tags.length > 0 && (
+        <div className="card-tags-strip">
+          {tags.map((tag, idx) => (
+            <span key={idx} className="card-tag-pill">
+              {tag}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {/* ── Middle: Location & Performance Stats Strip ── */}
+      <div className="card-metrics-strip-row">
+        <span className="metric-chip">
+          <MapPin size={12} className="text-muted" />
+          <span>{provider.locationCity?.split(',')[0] || 'Addis'}</span>
+        </span>
+
+        <span className="metric-sep">•</span>
+
+        <span className="metric-chip">
+          <Briefcase size={12} className="text-muted" />
+          <span>{provider.completedJobs || 80}+ jobs</span>
+        </span>
+
+        <span className="metric-sep">•</span>
+
+        <span className="metric-chip">
+          <Clock size={12} className="text-muted" />
+          <span>{provider.responseTime || '~5 min'}</span>
+        </span>
+      </div>
+
+      {/* ── Bottom Row: Pricing & Actions ── */}
+      <div className="card-bottom-footer-row">
+        <div className="card-rate-group">
+          <span className="rate-tiny-label">STARTING RATE</span>
+          <strong className="rate-amount-val">{provider.priceLabel || `${provider.hourlyRate || 300} ETB/hr`}</strong>
         </div>
 
-        <div className="provider-action-group">
+        <div className="card-actions-buttons">
           <button
             type="button"
             onClick={handleChat}
-            className="btn btn-outline btn-sm provider-chat-btn"
-            title="Chat directly with provider"
+            className="card-chat-btn"
+            title="Chat directly with specialist"
           >
-            <MessageSquare size={14} />
+            <MessageSquare size={13} />
             <span>Chat</span>
           </button>
 
           <button
             type="button"
             onClick={handleBook}
-            className="btn btn-primary btn-sm provider-book-btn"
+            className="card-book-btn"
+            title="Book with Chapa Escrow"
           >
-            <Calendar size={14} />
+            <Calendar size={13} />
             <span>Book</span>
           </button>
         </div>

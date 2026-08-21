@@ -136,7 +136,30 @@ export default function ClientHome() {
         </form>
       </section>
 
-      {/* ── 2. Quick Filter Chips Carousel ── */}
+      {/* ── 2. AI Matchmaker Spotlight Banner ── */}
+      <div 
+        onClick={() => navigate('/ai')}
+        className="ai-matchmaker-banner"
+        role="button"
+        tabIndex={0}
+      >
+        <div className="ai-banner-content">
+          <div className="ai-banner-badge">
+            <Sparkles size={14} />
+            <span>POWERED BY LINC INTELLIGENCE</span>
+          </div>
+          <h2 className="ai-banner-title">Need the right specialist in minutes?</h2>
+          <p className="ai-banner-desc">
+            Describe your problem in plain English or Amharic. Our AI matches your budget, urgency, and location with vetted local specialists.
+          </p>
+        </div>
+        <button type="button" className="btn btn-secondary ai-banner-btn">
+          <span>Try AI Matchmaker</span>
+          <ArrowRight size={16} />
+        </button>
+      </div>
+
+      {/* ── 3. Quick Filter Chips Carousel ── */}
       <section className="category-scroll-section">
         <div className="category-chips-carousel">
           <button
@@ -161,29 +184,6 @@ export default function ClientHome() {
           ))}
         </div>
       </section>
-
-      {/* ── 3. AI Matchmaker Spotlight Banner ── */}
-      <div 
-        onClick={() => navigate('/ai')}
-        className="ai-matchmaker-banner"
-        role="button"
-        tabIndex={0}
-      >
-        <div className="ai-banner-content">
-          <div className="ai-banner-badge">
-            <Sparkles size={14} />
-            <span>POWERED BY LINC INTELLIGENCE</span>
-          </div>
-          <h2 className="ai-banner-title">Need the right specialist in minutes?</h2>
-          <p className="ai-banner-desc">
-            Describe your problem in plain English or Amharic. Our AI matches your budget, urgency, and location with vetted local specialists.
-          </p>
-        </div>
-        <button type="button" className="btn btn-secondary ai-banner-btn">
-          <span>Try AI Matchmaker</span>
-          <ArrowRight size={16} />
-        </button>
-      </div>
 
       {/* ── 4. Main Two-Column Dashboard Content ── */}
       <div className="home-dashboard-grid">

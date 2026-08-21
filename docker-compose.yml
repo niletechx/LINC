@@ -1,0 +1,63 @@
+services:
+  # ============================================================================
+  # Application Service (Node.js Express Backend)
+  # ============================================================================
+  app:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    image: ermizamr/app:1.0
+    container_name: linc_app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=linc_user
+      - DB_PASSWORD=linc_secure_pass
+      - DB_NAME=linc_db
+      - SKIP_ENV_VALIDATION=false
+      - JWT_SECRET=super_secret_devops_assignment_key_2026
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - linc_network
+
+  # ============================================================================
+  # Database Service (PostgreSQL 16 on Alpine)
+  # ============================================================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: linc_postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=linc_user
+      - POSTGRES_PASSWORD=linc_secure_pass
+      - POSTGRES_DB=linc_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U linc_user -d linc_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    networks:
+      - linc_network
+
+# ==============================================================================
+# Persistent Named Volumes & Custom Bridge Network
+# ==============================================================================
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  linc_network:
+    driver: bridge

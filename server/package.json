@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "dev": "nodemon server.js",
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "node --test tests/api.test.js"
   },
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
@@ -19,6 +20,7 @@
     "helmet": "^8.0.0",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
+    "pg": "^8.23.0",
     "socket.io": "^4.8.1",
     "winston": "^3.17.0",
     "zod": "^3.23.8"

@@ -62,10 +62,21 @@ export const DEMO_ACCOUNTS = [
     password: 'password123',
     headline: 'Master Plumber & Pipe Specialist',
     category: 'plumbing',
-    hourlyRate: 350,
-    city: 'Addis Ababa, Bole',
     avatar: '🔧',
     tag: '5.0 ★ Top Rated',
+  },
+  {
+    id: 'admin-superuser',
+    role: 'admin',
+    roleLabel: 'Super Admin',
+    name: 'Super Admin',
+    email: 'admin@linc.et',
+    password: 'password123',
+    headline: 'System Administrator & Governance',
+    city: 'Addis Ababa',
+    avatar: '👑',
+    tag: '👑 Super Admin',
+    is_admin: true,
   },
 ];
 

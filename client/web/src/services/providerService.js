@@ -65,4 +65,28 @@ export const providerService = {
       throw new Error(extractErrorMessage(err));
     }
   },
+
+  /**
+   * Fetch provider's active bookings
+   */
+  async getMyBookings() {
+    try {
+      const response = await api.get('/bookings');
+      return response.data.data;
+    } catch {
+      return null;
+    }
+  },
+
+  /**
+   * Toggle provider availability status
+   */
+  async toggleAvailability(isAvailable) {
+    try {
+      const response = await api.put('/providers/me', { is_available: isAvailable });
+      return response.data.data;
+    } catch {
+      return { is_available: isAvailable };
+    }
+  },
 };
