@@ -7,7 +7,8 @@ import '../../providers/data_providers.dart';
 class SearchScreen extends ConsumerStatefulWidget {
   final String? initialQuery;
   final String? initialCategory;
-  const SearchScreen({super.key, this.initialQuery, this.initialCategory});
+  final String? initialFilter;
+  const SearchScreen({super.key, this.initialQuery, this.initialCategory, this.initialFilter});
 
   @override
   ConsumerState<SearchScreen> createState() => _SearchScreenState();
@@ -15,7 +16,7 @@ class SearchScreen extends ConsumerStatefulWidget {
 
 class _SearchScreenState extends ConsumerState<SearchScreen> {
   late final TextEditingController _queryController;
-  String _activeFilter = 'all';
+  late String _activeFilter;
   late String _activeCategory;
   String _sortBy = 'match';
 
@@ -24,12 +25,116 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     super.initState();
     _queryController = TextEditingController(text: widget.initialQuery ?? '');
     _activeCategory = widget.initialCategory ?? 'all';
+    _activeFilter = widget.initialFilter ?? 'all';
   }
 
   @override
   void dispose() {
     _queryController.dispose();
     super.dispose();
+  }
+
+  String _getCategoryDisplayName(String slug) {
+    switch (slug.toLowerCase()) {
+      case 'plumbing': return 'Plumbing & Water';
+      case 'electric': return 'Electrical Work';
+      case 'cleaning': return 'Cleaning & Maid';
+      case 'it-tech':
+      case 'it': return 'IT & Tech Support';
+      case 'tutoring':
+      case 'tutor': return 'Tutoring & Lessons';
+      case 'transport': return 'Transport & Moving';
+      case 'wellness': return 'Health & Wellness';
+      case 'creative': return 'Painting & Design';
+      default: return 'Service';
+    }
+  }
+
+  bool _isProviderInCategory(dynamic provider, String catSlug) {
+    if (catSlug == 'all') return true;
+    final headline = provider.headline.toLowerCase();
+    final about = provider.about.toLowerCase();
+    final servicesText = provider.services.map((s) => s.name.toLowerCase()).join(' ');
+    final combined = '$headline $about $servicesText';
+
+    switch (catSlug.toLowerCase()) {
+      case 'plumbing':
+      case 'repairs':
+        return combined.contains('plumb') ||
+            combined.contains('pipe') ||
+            combined.contains('leak') ||
+            combined.contains('drain') ||
+            combined.contains('water') ||
+            combined.contains('sanitary') ||
+            combined.contains('repair');
+      case 'electric':
+      case 'electrical':
+        return combined.contains('electr') ||
+            combined.contains('wire') ||
+            combined.contains('circuit') ||
+            combined.contains('breaker') ||
+            combined.contains('light') ||
+            combined.contains('power') ||
+            combined.contains('solar') ||
+            combined.contains('socket');
+      case 'cleaning':
+        return combined.contains('clean') ||
+            combined.contains('maid') ||
+            combined.contains('housekeep') ||
+            combined.contains('sanitize') ||
+            combined.contains('wash') ||
+            combined.contains('scrub') ||
+            combined.contains('carpet');
+      case 'it-tech':
+      case 'it':
+      case 'tech':
+        return combined.contains('it') ||
+            combined.contains('tech') ||
+            combined.contains('computer') ||
+            combined.contains('laptop') ||
+            combined.contains('screen') ||
+            combined.contains('software') ||
+            combined.contains('hardware') ||
+            combined.contains('network') ||
+            combined.contains('windows');
+      case 'tutoring':
+      case 'tutor':
+        return combined.contains('tutor') ||
+            combined.contains('teach') ||
+            combined.contains('math') ||
+            combined.contains('english') ||
+            combined.contains('calculus') ||
+            combined.contains('lesson') ||
+            combined.contains('study') ||
+            combined.contains('academic');
+      case 'transport':
+        return combined.contains('transport') ||
+            combined.contains('move') ||
+            combined.contains('driver') ||
+            combined.contains('cargo') ||
+            combined.contains('freight') ||
+            combined.contains('truck') ||
+            combined.contains('relocation');
+      case 'wellness':
+        return combined.contains('wellness') ||
+            combined.contains('massage') ||
+            combined.contains('fitness') ||
+            combined.contains('trainer') ||
+            combined.contains('gym') ||
+            combined.contains('physio') ||
+            combined.contains('health');
+      case 'creative':
+        return combined.contains('creative') ||
+            combined.contains('paint') ||
+            combined.contains('decor') ||
+            combined.contains('interior') ||
+            combined.contains('carpenter') ||
+            combined.contains('wood') ||
+            combined.contains('renovation') ||
+            combined.contains('design');
+      default:
+        return combined.contains(catSlug.toLowerCase());
+    }
   }
 
   @override
@@ -101,7 +206,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               ),
             ),
 
-            // 1. Categories Horizontal Row
+            // 1. Categories Horizontal Row (All 8 categories)
             Container(
               color: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
@@ -113,9 +218,11 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                     _buildCategoryChip('plumbing', '🔧 Plumbing'),
                     _buildCategoryChip('electric', '⚡ Electric'),
                     _buildCategoryChip('cleaning', '🧹 Cleaning'),
-                    _buildCategoryChip('it', '💻 Tech & IT'),
-                    _buildCategoryChip('tutor', '📚 Tutoring'),
+                    _buildCategoryChip('it-tech', '💻 Tech & IT'),
+                    _buildCategoryChip('tutoring', '📚 Tutoring'),
                     _buildCategoryChip('transport', '🚗 Transport'),
+                    _buildCategoryChip('wellness', '💆 Wellness'),
+                    _buildCategoryChip('creative', '🎨 Painting & Design'),
                   ],
                 ),
               ),
@@ -192,13 +299,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                     }
                     if (_activeFilter == 'toprated' && p.rating < 4.8) return false;
 
-                    if (_activeCategory != 'all') {
-                      final headline = p.headline.toLowerCase();
-                      final about = p.about.toLowerCase();
-                      if (!headline.contains(_activeCategory.toLowerCase()) &&
-                          !about.contains(_activeCategory.toLowerCase())) {
-                        return false;
-                      }
+                    if (!_isProviderInCategory(p, _activeCategory)) {
+                      return false;
                     }
 
                     if (_queryController.text.isNotEmpty) {
@@ -229,6 +331,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                     });
                   }
 
+                  final isCategoryEmpty = _activeCategory != 'all' && filteredProviders.isEmpty;
+
                   return Column(
                     children: [
                       // Results count & sort bar
@@ -244,9 +348,11 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                                     text: '${filteredProviders.length}',
                                     style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
                                   ),
-                                  const TextSpan(
-                                    text: ' verified specialists',
-                                    style: TextStyle(fontSize: 12, color: Color(0xFF64748B), fontWeight: FontWeight.w500),
+                                  TextSpan(
+                                    text: _activeCategory != 'all'
+                                        ? ' ${_getCategoryDisplayName(_activeCategory)} specialists'
+                                        : ' verified specialists',
+                                    style: const TextStyle(fontSize: 12, color: Color(0xFF64748B), fontWeight: FontWeight.w500),
                                   ),
                                 ],
                               ),
@@ -282,18 +388,28 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                                           borderRadius: BorderRadius.circular(20),
                                         ),
                                         alignment: Alignment.center,
-                                        child: const Text('🔍', style: TextStyle(fontSize: 28)),
+                                        child: Text(
+                                          isCategoryEmpty ? '📂' : '🔍',
+                                          style: const TextStyle(fontSize: 28),
+                                        ),
                                       ),
                                       const SizedBox(height: 16),
-                                      const Text(
-                                        'No matching providers found',
-                                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
+                                      Text(
+                                        isCategoryEmpty
+                                            ? 'No service providers in this category yet'
+                                            : (_queryController.text.isNotEmpty
+                                                ? 'No providers matching "${_queryController.text}"'
+                                                : 'No matching providers found'),
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
                                       ),
                                       const SizedBox(height: 6),
-                                      const Text(
-                                        'Try searching for another service, keyword, or clear your filters.',
+                                      Text(
+                                        isCategoryEmpty
+                                            ? 'There are currently no verified ${_getCategoryDisplayName(_activeCategory)} specialists registered in your area.'
+                                            : 'Try searching for another service, keyword, or clear your filters.',
                                         textAlign: TextAlign.center,
-                                        style: TextStyle(fontSize: 12.5, color: Color(0xFF64748B), height: 1.4),
+                                        style: const TextStyle(fontSize: 12.5, color: Color(0xFF64748B), height: 1.4),
                                       ),
                                       const SizedBox(height: 18),
                                       ElevatedButton(
@@ -308,7 +424,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                                             _activeCategory = 'all';
                                           });
                                         },
-                                        child: const Text('Clear Filters', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+                                        child: Text(
+                                          isCategoryEmpty ? 'View All Service Providers' : 'Clear Filters',
+                                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+                                        ),
                                       ),
                                     ],
                                   ),

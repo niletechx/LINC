@@ -1024,12 +1024,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: [
-                      _buildQuickChip(context, '🚨', 'Urgent', isUrgent: true),
-                      _buildQuickChip(context, '🧹', 'Cleaning'),
-                      _buildQuickChip(context, '📚', 'Tutor'),
-                      _buildQuickChip(context, '💻', 'IT Help'),
-                      _buildQuickChip(context, '🔧', 'Repairs'),
-                      _buildQuickChip(context, '🚗', 'Transport'),
+                      _buildQuickChip(context, '🚨', 'Urgent', isUrgent: true, categorySlug: 'all', filter: 'verified'),
+                      _buildQuickChip(context, '🧹', 'Cleaning', categorySlug: 'cleaning'),
+                      _buildQuickChip(context, '📚', 'Tutoring', categorySlug: 'tutoring'),
+                      _buildQuickChip(context, '💻', 'IT & Tech', categorySlug: 'it-tech'),
+                      _buildQuickChip(context, '🔧', 'Plumbing', categorySlug: 'plumbing'),
+                      _buildQuickChip(context, '🚗', 'Transport', categorySlug: 'transport'),
                     ],
                   ),
                 ),
@@ -1053,7 +1053,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         ),
                         const Spacer(),
                         GestureDetector(
-                          onTap: () => context.push('/search'),
+                          onTap: () => context.push('/search?category=all'),
                           child: const Text(
                             'See all',
                             style: TextStyle(color: Color(0xFF7EC8E3), fontSize: 13, fontWeight: FontWeight.w600),
@@ -1065,20 +1065,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     IntrinsicHeight(
                       child: Row(
                         children: [
-                          _buildCategoryCell(context, '🔧', 'Repairs', const Color(0xFF7EC8E3), showRightBorder: true, showBottomBorder: true),
-                          _buildCategoryCell(context, '🧹', 'Cleaning', const Color(0xFF059669), showRightBorder: true, showBottomBorder: true),
-                          _buildCategoryCell(context, '💻', 'IT & Tech', const Color(0xFF0891B2), showRightBorder: true, showBottomBorder: true),
-                          _buildCategoryCell(context, '📚', 'Tutoring', const Color(0xFFD97706), showRightBorder: false, showBottomBorder: true),
+                          _buildCategoryCell(context, '🔧', 'Plumbing', 'plumbing', const Color(0xFF7EC8E3), showRightBorder: true, showBottomBorder: true),
+                          _buildCategoryCell(context, '🧹', 'Cleaning', 'cleaning', const Color(0xFF059669), showRightBorder: true, showBottomBorder: true),
+                          _buildCategoryCell(context, '💻', 'IT & Tech', 'it-tech', const Color(0xFF0891B2), showRightBorder: true, showBottomBorder: true),
+                          _buildCategoryCell(context, '📚', 'Tutoring', 'tutoring', const Color(0xFFD97706), showRightBorder: false, showBottomBorder: true),
                         ],
                       ),
                     ),
                     IntrinsicHeight(
                       child: Row(
                         children: [
-                          _buildCategoryCell(context, '⚡', 'Electric', const Color(0xFF7EC8E3), showRightBorder: true, showBottomBorder: false),
-                          _buildCategoryCell(context, '🚗', 'Transport', const Color(0xFF7C3AED), showRightBorder: true, showBottomBorder: false),
-                          _buildCategoryCell(context, '💆', 'Wellness', const Color(0xFF0F766E), showRightBorder: true, showBottomBorder: false),
-                          _buildCategoryCell(context, '🎨', 'Creative', const Color(0xFFBE185D), showRightBorder: false, showBottomBorder: false),
+                          _buildCategoryCell(context, '⚡', 'Electric', 'electric', const Color(0xFF7EC8E3), showRightBorder: true, showBottomBorder: false),
+                          _buildCategoryCell(context, '🚗', 'Transport', 'transport', const Color(0xFF7C3AED), showRightBorder: true, showBottomBorder: false),
+                          _buildCategoryCell(context, '💆', 'Wellness', 'wellness', const Color(0xFF0F766E), showRightBorder: true, showBottomBorder: false),
+                          _buildCategoryCell(context, '🎨', 'Creative', 'creative', const Color(0xFFBE185D), showRightBorder: false, showBottomBorder: false),
                         ],
                       ),
                     ),
@@ -1108,7 +1108,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           ),
                           const Spacer(),
                           GestureDetector(
-                            onTap: () => context.push('/search'),
+                            onTap: () => context.push('/search?category=all'),
                             child: const Text(
                               'See all',
                               style: TextStyle(color: Color(0xFF7EC8E3), fontSize: 13, fontWeight: FontWeight.w600),
@@ -1272,10 +1272,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _buildQuickChip(BuildContext context, String emoji, String label, {bool isUrgent = false}) {
+  Widget _buildQuickChip(
+    BuildContext context,
+    String emoji,
+    String label, {
+    bool isUrgent = false,
+    String categorySlug = 'all',
+    String? filter,
+  }) {
     return GestureDetector(
       onTap: () {
-        context.push('/search?query=${Uri.encodeComponent(label)}');
+        if (filter != null) {
+          context.push('/search?filter=$filter');
+        } else {
+          context.push('/search?category=$categorySlug');
+        }
       },
       child: Container(
         margin: const EdgeInsets.only(right: 8),
@@ -1303,10 +1314,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _buildCategoryCell(BuildContext context, String emoji, String label, Color color, {required bool showRightBorder, required bool showBottomBorder}) {
+  Widget _buildCategoryCell(
+    BuildContext context,
+    String emoji,
+    String label,
+    String categorySlug,
+    Color color, {
+    required bool showRightBorder,
+    required bool showBottomBorder,
+  }) {
     return Expanded(
       child: GestureDetector(
-        onTap: () => context.push('/search?query=${Uri.encodeComponent(label)}'),
+        onTap: () => context.push('/search?category=$categorySlug'),
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(

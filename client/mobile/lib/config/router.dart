@@ -148,7 +148,8 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final query = state.uri.queryParameters['query'];
           final category = state.uri.queryParameters['category'];
-          return SearchScreen(initialQuery: query, initialCategory: category);
+          final filter = state.uri.queryParameters['filter'];
+          return SearchScreen(initialQuery: query, initialCategory: category, initialFilter: filter);
         },
       ),
       GoRoute(
