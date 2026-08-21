@@ -155,6 +155,11 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
                             duration: const Duration(seconds: 3),
                           ),
                         );
+                        // After releasing funds, prompt the client to leave a review
+                        await Future.delayed(const Duration(milliseconds: 800));
+                        if (context.mounted) {
+                          _showReviewModal(context, b);
+                        }
                       }
                     } catch (e) {
                       if (context.mounted) {
@@ -165,6 +170,11 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
                             duration: const Duration(seconds: 3),
                           ),
                         );
+                        // Still prompt for review even if backend call partially failed
+                        await Future.delayed(const Duration(milliseconds: 800));
+                        if (context.mounted) {
+                          _showReviewModal(context, b);
+                        }
                       }
                     }
                   },
@@ -499,6 +509,9 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
     final Color statusColor;
     final String statusLabel;
     final isReleased = _releasedEscrows[b.id] == true;
+    // Only clients can release escrow — providers should never see this button
+    final isProviderMode = ref.watch(appModeProvider) == AppMode.provider;
+    final isClientView = !isProviderMode && !b.isProviderView;
 
     switch (b.status) {
       case BookingStatus.confirmed:
@@ -611,7 +624,7 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
             decoration: const BoxDecoration(
               border: Border(top: BorderSide(color: Color(0xFFF1F5F9))),
             ),
-            child: b.status == BookingStatus.confirmed && !isReleased
+            child: b.status == BookingStatus.confirmed && !isReleased && isClientView
                 ? Row(
                     children: [
                       Expanded(

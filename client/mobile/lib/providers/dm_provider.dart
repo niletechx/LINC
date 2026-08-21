@@ -114,6 +114,7 @@ class DMNotifier extends StateNotifier<DMState> {
     final currentUserId = user?.id ?? '1';
     final senderType = user?.role == 'provider' ? 'provider' : 'user';
 
+    // Add optimistic message immediately for instant UI feedback
     final optimisticMsg = DMMessage(
       fromMe: true,
       text: text,
@@ -125,21 +126,15 @@ class DMNotifier extends StateNotifier<DMState> {
     msgs[key] = [...(msgs[key] ?? []), optimisticMsg];
     state = state.copyWith(messages: msgs, input: '');
 
+    // Send via socket ONLY — the server broadcasts it back via onNewMessage
+    // which replaces the optimistic placeholder with the real persisted message.
+    // Do NOT also call _messageService.sendMessage() to avoid double messages.
     _socketService.sendMessage(
       conversationId: key,
       senderId: currentUserId,
       senderType: senderType,
       content: text,
     );
-
-    try {
-      await _messageService.sendMessage(
-        conversationId: key,
-        content: text,
-        senderType: senderType,
-        senderId: currentUserId,
-      );
-    } catch (_) {}
 
     if (text.toLowerCase().contains('@ai')) {
       await Future.delayed(const Duration(milliseconds: 600));

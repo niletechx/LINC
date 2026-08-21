@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../models/provider_model.dart';
 import '../../providers/data_providers.dart';
-
 import '../../services/message_service.dart';
+import '../../services/review_service.dart';
 import '../../providers/auth_provider.dart';
 
 class ProviderProfileScreen extends ConsumerStatefulWidget {
@@ -17,6 +17,26 @@ class ProviderProfileScreen extends ConsumerStatefulWidget {
 
 class _ProviderProfileScreenState extends ConsumerState<ProviderProfileScreen> {
   int? expandedService;
+  List<dynamic> _reviews = [];
+  bool _reviewsLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadReviews();
+  }
+
+  Future<void> _loadReviews() async {
+    try {
+      final reviews = await ReviewService().getReviewsForEntity(
+        'provider',
+        widget.providerId.toString(),
+      );
+      if (mounted) setState(() { _reviews = reviews; _reviewsLoading = false; });
+    } catch (_) {
+      if (mounted) setState(() { _reviewsLoading = false; });
+    }
+  }
 
   Future<void> _startChatWithProvider(ProviderModel p) async {
     try {
@@ -519,10 +539,12 @@ class _ProviderProfileScreenState extends ConsumerState<ProviderProfileScreen> {
   }
 
   Widget _buildReviews(ProviderModel p) {
-    final reviews = [
-      {'name':'Mekdes A.','initials':'MA','color':const Color(0xFF7C3AED),'stars':5,'text':'Incredibly professional. Fixed our leak in under an hour and cleaned up after himself.','date':'Aug 3','verified':true},
-      {'name':'Yared G.','initials':'YG','color':const Color(0xFF0891B2),'stars':5,'text':'Fast response, fair price, quality work. Will definitely call again.','date':'Jul 19','verified':true},
-      {'name':'Tigist B.','initials':'TB','color':const Color(0xFF059669),'stars':4,'text':'Good work overall. Came on time and was very honest about what needed repair vs replacement.','date':'Jun 28','verified':false},
+    final colors = [
+      const Color(0xFF7C3AED),
+      const Color(0xFF0891B2),
+      const Color(0xFF059669),
+      const Color(0xFFD97706),
+      const Color(0xFF0284C7),
     ];
 
     return Container(
@@ -541,80 +563,123 @@ class _ProviderProfileScreenState extends ConsumerState<ProviderProfileScreen> {
               ],
             ),
           ),
-          ...reviews.asMap().entries.map((e) {
-            final idx = e.key;
-            final rev = e.value;
-            final isLast = idx == reviews.length - 1;
-
-            return Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-              decoration: BoxDecoration(
-                border: Border(
-                  bottom: isLast ? BorderSide.none : const BorderSide(color: Color(0xFFE2E8F0)),
+          if (_reviewsLoading)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 24),
+              child: Center(child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF7EC8E3))),
+            )
+          else if (_reviews.isEmpty)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+              child: Center(
+                child: Column(
+                  children: [
+                    Icon(Icons.star_outline_rounded, size: 36, color: Color(0xFFCBD5E1)),
+                    SizedBox(height: 8),
+                    Text('No reviews yet', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Color(0xFF64748B))),
+                    SizedBox(height: 4),
+                    Text('Be the first to leave a review after your booking.', textAlign: TextAlign.center, style: TextStyle(fontSize: 11.5, color: Color(0xFF94A3B8))),
+                  ],
                 ),
               ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    width: 32,
-                    height: 32,
-                    decoration: BoxDecoration(
-                      color: rev['color'] as Color,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(rev['initials'] as String, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700)),
+            )
+          else
+            ..._reviews.asMap().entries.map((e) {
+              final idx = e.key;
+              final rev = e.value as Map<String, dynamic>;
+              final isLast = idx == _reviews.length - 1;
+              final reviewerName = rev['users']?['full_name'] ?? rev['reviewer_name'] ?? 'Verified Client';
+              final initials = reviewerName.isNotEmpty ? reviewerName.substring(0, 1).toUpperCase() : 'V';
+              final stars = (rev['rating'] as num?)?.toInt() ?? 5;
+              final comment = rev['comment'] as String? ?? '';
+              final date = rev['created_at'] != null
+                  ? _formatDate(rev['created_at'] as String)
+                  : '';
+              final avatarColor = colors[idx % colors.length];
+
+              return Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                decoration: BoxDecoration(
+                  border: Border(
+                    bottom: isLast ? BorderSide.none : const BorderSide(color: Color(0xFFE2E8F0)),
                   ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Text(rev['name'] as String, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Color(0xFF0F172A))),
-                            if (rev['verified'] as bool) ...[
-                              const SizedBox(width: 4),
-                              Container(
-                                width: 12, height: 12,
-                                decoration: const BoxDecoration(color: Color(0xFF10B981), shape: BoxShape.circle),
-                                alignment: Alignment.center,
-                                child: const Icon(Icons.check, color: Colors.white, size: 8),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 32,
+                      height: 32,
+                      decoration: BoxDecoration(
+                        color: avatarColor,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(initials, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700)),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Row(
+                                  children: [
+                                    Text(reviewerName, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Color(0xFF0F172A))),
+                                    const SizedBox(width: 4),
+                                    Container(
+                                      width: 12, height: 12,
+                                      decoration: const BoxDecoration(color: Color(0xFF10B981), shape: BoxShape.circle),
+                                      alignment: Alignment.center,
+                                      child: const Icon(Icons.check, color: Colors.white, size: 8),
+                                    ),
+                                  ],
+                                ),
                               ),
+                              Text(date, style: const TextStyle(fontSize: 10.5, color: Color(0xFF94A3B8))),
                             ],
-                            const Spacer(),
-                            Text(rev['date'] as String, style: const TextStyle(fontSize: 10.5, color: Color(0xFF94A3B8))),
+                          ),
+                          const SizedBox(height: 2),
+                          Row(
+                            children: List.generate(5, (starIdx) {
+                              return Text(
+                                '★',
+                                style: TextStyle(
+                                  color: starIdx < stars ? const Color(0xFFF59E0B) : const Color(0xFFE2E8F0),
+                                  fontSize: 11.5,
+                                  letterSpacing: 0.04,
+                                ),
+                              );
+                            }),
+                          ),
+                          if (comment.isNotEmpty) ...[
+                            const SizedBox(height: 6),
+                            Text(
+                              comment,
+                              style: const TextStyle(fontSize: 12.5, color: Color(0xFF475569), height: 1.55),
+                            ),
                           ],
-                        ),
-                        const SizedBox(height: 2),
-                        Row(
-                          children: List.generate(5, (starIdx) {
-                            final stars = rev['stars'] as int;
-                            return Text(
-                              '★',
-                              style: TextStyle(
-                                color: starIdx < stars ? const Color(0xFFF59E0B) : const Color(0xFFE2E8F0),
-                                fontSize: 11.5,
-                                letterSpacing: 0.04,
-                              ),
-                            );
-                          }),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          rev['text'] as String,
-                          style: const TextStyle(fontSize: 12.5, color: Color(0xFF475569), height: 1.55),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            );
-          }),
+                  ],
+                ),
+              );
+            }),
         ],
       ),
     );
+  }
+
+  String _formatDate(String isoDate) {
+    try {
+      final dt = DateTime.parse(isoDate);
+      const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      return '${months[dt.month - 1]} ${dt.day}';
+    } catch (_) {
+      return '';
+    }
   }
 }

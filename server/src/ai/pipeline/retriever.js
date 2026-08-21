@@ -107,23 +107,28 @@ async function retrieveMatches(intent, userLat, userLng) {
       .eq('availability_status', 'available').limit(30);
     rawProviders = data || [];
   }
-  if (rawProviders.length === 0) {
+  // If category-linked services didn't find anyone, try headline/bio keyword search
+  if (rawProviders.length === 0 && service_category) {
     let query = supabase
       .from('provider_profiles').select(PROVIDER_SELECT)
       .eq('is_active', true).eq('availability_status', 'available');
-    if (service_category) {
-      query = query.or(`headline.ilike.%${service_category}%,bio.ilike.%${service_category}%`);
-    }
+    query = query.or(`headline.ilike.%${service_category}%,bio.ilike.%${service_category}%`);
     const { data } = await query.limit(30);
-    if (data && data.length > 0) {
-      rawProviders = data;
-    } else {
-      const { data: allProv } = await supabase
-        .from('provider_profiles').select(PROVIDER_SELECT)
-        .eq('is_active', true).eq('availability_status', 'available').limit(15);
-      rawProviders = allProv || [];
-    }
+    rawProviders = data || [];
   }
+  // Also try matching against individual keywords if category search still found nothing
+  if (rawProviders.length === 0 && keywords.length > 0) {
+    const kw = keywords[0];
+    const { data } = await supabase
+      .from('provider_profiles').select(PROVIDER_SELECT)
+      .eq('is_active', true).eq('availability_status', 'available')
+      .or(`headline.ilike.%${kw}%,bio.ilike.%${kw}%`)
+      .limit(20);
+    rawProviders = data || [];
+  }
+  // NOTE: We intentionally do NOT load all providers as a catch-all fallback.
+  // If nothing relevant is found, we return an empty list and the AI explains
+  // that it couldn't find matching providers rather than showing unrelated results.
 
   // Businesses
   let rawBusinesses = [];
@@ -132,7 +137,9 @@ async function retrieveMatches(intent, userLat, userLng) {
       .from('businesses').select(BUSINESS_SELECT)
       .in('id', businessIds).eq('is_active', true).limit(30);
     rawBusinesses = data || [];
-  } else if (categoryIds.length === 0) {
+  }
+  // Only load businesses if no specific category was searched (avoid unrelated results)
+  else if (!service_category && categoryIds.length === 0 && keywords.length === 0) {
     const { data } = await supabase
       .from('businesses').select(BUSINESS_SELECT)
       .eq('is_active', true).limit(15);
@@ -146,7 +153,9 @@ async function retrieveMatches(intent, userLat, userLng) {
       .from('organizations').select(ORG_SELECT)
       .in('id', orgIds).eq('is_active', true).limit(30);
     rawOrgs = data || [];
-  } else if (categoryIds.length === 0) {
+  }
+  // Only load orgs if no specific category was searched
+  else if (!service_category && categoryIds.length === 0 && keywords.length === 0) {
     const { data } = await supabase
       .from('organizations').select(ORG_SELECT)
       .eq('is_active', true).limit(10);
