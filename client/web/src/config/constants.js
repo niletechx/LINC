@@ -8,7 +8,7 @@ export const APP_CONFIG = {
   appAmharicName: 'ሊንክ',
   appTagline: 'Life Infrastructure Network',
   appDescription: 'Connect with verified professionals, businesses, and clients across Ethiopia with AI matching and secure escrow payments.',
-  defaultApiUrl: 'http://localhost:5000/api',
+  defaultApiUrl: import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '/api' : 'http://localhost:5000/api'),
   storageKeys: {
     token: 'linc_auth_token',
     user: 'linc_auth_user',

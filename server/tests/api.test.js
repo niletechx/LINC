@@ -123,8 +123,10 @@ describe('LINC Backend Production API Test Suite', () => {
     });
   });
 
-  // ── 3. Public Discovery & Catalog ───────────────────────────────────────────
+  // ── 3. Public Discovery & Catalog ──────────────────────────────────────────
   describe('Discovery & Provider Catalog', () => {
+    let sampleProviderId;
+
     test('GET /api/providers returns provider list', async () => {
       const res = await fetch(`${baseUrl}/api/providers`);
       assert.equal(res.status, 200);
@@ -132,10 +134,12 @@ describe('LINC Backend Production API Test Suite', () => {
       assert.equal(body.success, true);
       assert.ok(Array.isArray(body.data));
       assert.ok(body.data.length > 0, 'Expected at least 1 mock provider');
+      sampleProviderId = body.data[0].id;
     });
 
     test('GET /api/providers/:id returns individual provider detail', async () => {
-      const res = await fetch(`${baseUrl}/api/providers/1`);
+      const id = sampleProviderId || '1';
+      const res = await fetch(`${baseUrl}/api/providers/${id}`);
       assert.equal(res.status, 200);
       const body = await res.json();
       assert.equal(body.success, true);
@@ -159,7 +163,8 @@ describe('LINC Backend Production API Test Suite', () => {
     });
 
     test('GET /api/reviews/:entityType/:entityId returns reviews', async () => {
-      const res = await fetch(`${baseUrl}/api/reviews/provider/1`);
+      const id = sampleProviderId || '1';
+      const res = await fetch(`${baseUrl}/api/reviews/provider/${id}`);
       assert.equal(res.status, 200);
       const body = await res.json();
       assert.equal(body.success, true);
