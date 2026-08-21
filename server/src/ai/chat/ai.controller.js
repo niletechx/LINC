@@ -81,6 +81,9 @@ const chatStream = async (req, res) => {
  * Returns the authenticated user's AI conversation list.
  */
 const getConversations = asyncHandler(async (req, res) => {
+  if (!req.user) {
+    return success(res, []);
+  }
   const result = await aiService.getUserConversations(req.user.id);
   return success(res, result);
 });
@@ -90,6 +93,9 @@ const getConversations = asyncHandler(async (req, res) => {
  * Returns the full message history for a specific AI conversation.
  */
 const getConversationMessages = asyncHandler(async (req, res) => {
+  if (!req.user) {
+    return success(res, []);
+  }
   const result = await aiService.getConversationMessages(req.user.id, req.params.id);
   return success(res, result);
 });
@@ -100,6 +106,9 @@ const getConversationMessages = asyncHandler(async (req, res) => {
  */
 const createConversation = asyncHandler(async (req, res) => {
   const { title } = req.body;
+  if (!req.user) {
+    return success(res, { id: 'guest-' + Date.now(), title: title || 'New Conversation' }, 'Conversation created', 201);
+  }
   const result = await aiService.createConversation(req.user.id, title || 'New Conversation');
   return success(res, result, 'Conversation created', 201);
 });
@@ -109,6 +118,9 @@ const createConversation = asyncHandler(async (req, res) => {
  * Deletes a conversation thread.
  */
 const deleteConversation = asyncHandler(async (req, res) => {
+  if (!req.user) {
+    return success(res, { deleted: true }, 'Conversation deleted');
+  }
   const result = await aiService.deleteConversation(req.user.id, req.params.id);
   return success(res, result, 'Conversation deleted');
 });

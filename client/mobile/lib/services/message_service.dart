@@ -1,4 +1,4 @@
-﻿import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart';
 import '../models/conversation_model.dart';
 import 'api_service.dart';
 
@@ -18,7 +18,7 @@ class MessageService {
       return [];
     } catch (e) {
       debugPrint('Error fetching conversations: $e');
-      rethrow;
+      return [];
     }
   }
 
@@ -33,7 +33,7 @@ class MessageService {
       return [];
     } catch (e) {
       debugPrint('Error fetching messages for conv $conversationId: $e');
-      rethrow;
+      return [];
     }
   }
 

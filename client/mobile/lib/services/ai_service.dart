@@ -30,8 +30,8 @@ class AiService {
     try {
       final response = await _client.dio.get('/ai/conversations');
       return response.data['data'] as List<dynamic>? ?? [];
-    } catch (e) {
-      throw _client.extractErrorMessage(e);
+    } catch (_) {
+      return [];
     }
   }
 
@@ -39,8 +39,8 @@ class AiService {
     try {
       final response = await _client.dio.get('/ai/conversations/$conversationId/messages');
       return response.data['data'] as List<dynamic>? ?? [];
-    } catch (e) {
-      throw _client.extractErrorMessage(e);
+    } catch (_) {
+      return [];
     }
   }
 
@@ -51,8 +51,8 @@ class AiService {
         data: {'title': title ?? 'New Conversation'},
       );
       return response.data['data'] as Map<String, dynamic>;
-    } catch (e) {
-      throw _client.extractErrorMessage(e);
+    } catch (_) {
+      return {'id': 'guest-${DateTime.now().millisecondsSinceEpoch}', 'title': title ?? 'New Conversation'};
     }
   }
 

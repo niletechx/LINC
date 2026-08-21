@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const messagingController = require('./messaging.controller');
-const authMiddleware = require('../../middleware/auth.middleware');
+const { optionalAuth } = require('../../middleware/auth.middleware');
 
-router.use(authMiddleware);
+router.use(optionalAuth);
 router.get('/conversations', messagingController.listConversations);
 router.post('/conversations', messagingController.createConversation);
 router.get('/conversations/:id', messagingController.listMessages);

@@ -3,6 +3,9 @@ const { success } = require('../../utils/apiResponse');
 const asyncHandler = require('../../utils/asyncHandler');
 
 const listNotifications = asyncHandler(async (req, res) => {
+  if (!req.user) {
+    return success(res, []);
+  }
   const notifications = await notificationsService.listNotifications(req.user.id);
   return success(res, notifications);
 });

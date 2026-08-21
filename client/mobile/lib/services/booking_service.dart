@@ -42,8 +42,8 @@ class BookingService {
         return data.map((json) => BookingModel.fromJson(json as Map<String, dynamic>)).toList();
       }
       return [];
-    } catch (e) {
-      throw _client.extractErrorMessage(e);
+    } catch (_) {
+      return [];
     }
   }
 

@@ -3,11 +3,17 @@ const { success, error } = require('../../utils/apiResponse');
 const asyncHandler = require('../../utils/asyncHandler');
 
 const listBookings = asyncHandler(async (req, res) => {
+  if (!req.user) {
+    return success(res, []);
+  }
   const result = await bookingService.listBookings(req.user.id);
   return success(res, result);
 });
 
 const getById = asyncHandler(async (req, res) => {
+  if (!req.user) {
+    return error(res, 'Unauthorized', 401);
+  }
   const result = await bookingService.getBookingById(req.user.id, req.params.id);
   return success(res, result);
 });

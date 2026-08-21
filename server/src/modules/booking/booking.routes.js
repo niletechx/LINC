@@ -2,14 +2,14 @@ const express = require('express');
 const router = express.Router();
 const bookingController = require('./booking.controller');
 const authMiddleware = require('../../middleware/auth.middleware');
+const { optionalAuth } = require('../../middleware/auth.middleware');
 
-router.use(authMiddleware);
-router.get('/', bookingController.listBookings);
-router.get('/:id', bookingController.getById);
-router.post('/', bookingController.createBooking);
-router.put('/:id', bookingController.updateBooking);
+router.get('/', optionalAuth, bookingController.listBookings);
+router.get('/:id', optionalAuth, bookingController.getById);
+router.post('/', authMiddleware, bookingController.createBooking);
+router.put('/:id', authMiddleware, bookingController.updateBooking);
 
 // Provider marks a booking as complete (starts 72h escrow window if applicable)
-router.post('/:id/complete', bookingController.markComplete);
+router.post('/:id/complete', authMiddleware, bookingController.markComplete);
 
 module.exports = router;
