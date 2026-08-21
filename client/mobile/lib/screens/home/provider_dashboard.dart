@@ -259,7 +259,7 @@ class _ProviderDashboardState extends ConsumerState<ProviderDashboard> {
     final user = ref.watch(authProvider).user;
 
     final bookings = bookingsAsync.value ?? [];
-    final directBookings = bookings.where((b) => b.isProviderView || b.entityId != null).toList();
+    final directBookings = bookings.where((b) => b.isProviderView).toList();
     final pendingBookings = directBookings.where((b) => b.status == BookingStatus.upcoming || b.status == BookingStatus.pending || b.statusText.toLowerCase().contains('pending')).toList();
     final activeBookings = directBookings.where((b) => b.status == BookingStatus.confirmed).toList();
     final completedBookings = directBookings.where((b) => b.status == BookingStatus.completed).toList();

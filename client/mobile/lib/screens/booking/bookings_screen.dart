@@ -684,15 +684,34 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
                           ),
                         ],
                       )
-                    : TextButton(
-                        style: TextButton.styleFrom(
-                          backgroundColor: const Color(0xFFFFFBEB),
-                          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-                          minimumSize: const Size(double.infinity, 44),
-                        ),
-                        onPressed: () => _showReviewModal(context, b),
-                        child: const Text('★ Leave Review', style: TextStyle(color: Color(0xFFD97706), fontSize: 12.5, fontWeight: FontWeight.w700)),
-                      ),
+                    : isClientView
+                        ? TextButton(
+                            style: TextButton.styleFrom(
+                              backgroundColor: const Color(0xFFFFFBEB),
+                              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                              minimumSize: const Size(double.infinity, 44),
+                            ),
+                            onPressed: () => _showReviewModal(context, b),
+                            child: const Text('★ Leave Review', style: TextStyle(color: Color(0xFFD97706), fontSize: 12.5, fontWeight: FontWeight.w700)),
+                          )
+                        : Container(
+                            height: 44,
+                            alignment: Alignment.center,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFFF8FAFC),
+                            ),
+                            child: const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.check_circle_outline, color: Color(0xFF059669), size: 16),
+                                SizedBox(width: 6),
+                                Text(
+                                  'Job Completed & Escrow Paid',
+                                  style: TextStyle(color: Color(0xFF059669), fontSize: 12, fontWeight: FontWeight.w700),
+                                ),
+                              ],
+                            ),
+                          ),
           ),
         ],
       ),

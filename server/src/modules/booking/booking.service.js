@@ -69,7 +69,7 @@ async function listBookings(userId) {
         }
       }
 
-      const isProvider = userEntityIds.includes(String(b.entity_id));
+      const isProvider = userEntityIds.includes(String(b.entity_id)) && String(b.requester_id) !== String(userId);
 
       return {
         ...b,

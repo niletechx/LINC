@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../models/booking_model.dart';
 import '../../widgets/provider_card.dart';
 import '../../providers/app_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/data_providers.dart';
+import '../../services/booking_service.dart';
+import '../../services/message_service.dart';
 import '../../services/notification_service.dart';
+import '../../services/review_service.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -16,6 +20,599 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   String _currentLocation = 'Bole, Addis Ababa';
+  final Set<String> _dismissedBookingIds = {};
+  final Map<dynamic, bool> _releasedEscrows = {};
+
+  Future<void> _chatWithBookingProvider(BookingModel b) async {
+    try {
+      final user = ref.read(authProvider).user;
+      final conv = await MessageService.instance.createOrGetConversation(
+        currentUserId: user?.id ?? '1',
+        participantType: 'provider',
+        participantId: b.entityId ?? '1',
+        bookingId: b.id.toString(),
+      );
+      if (mounted) {
+        context.push('/dm/${conv.id}');
+      }
+    } catch (_) {
+      if (mounted) {
+        context.push('/dm/${b.id}');
+      }
+    }
+  }
+
+  void _showReleaseEscrowModal(BuildContext context, BookingModel b) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) {
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFCBD5E1),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFECFDF5),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    alignment: Alignment.center,
+                    child: const Text('🛡️', style: TextStyle(fontSize: 20)),
+                  ),
+                  const SizedBox(width: 12),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Release Escrow Payment',
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
+                        ),
+                        SizedBox(height: 2),
+                        Text(
+                          'Only release once the service has been completed to your satisfaction.',
+                          style: TextStyle(fontSize: 11.5, color: Color(0xFF64748B)),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF8FAFC),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text('Provider', style: TextStyle(fontSize: 12.5, color: Color(0xFF64748B))),
+                        Text(b.provider, style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: Color(0xFF0F172A))),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text('Service', style: TextStyle(fontSize: 12.5, color: Color(0xFF64748B))),
+                        Text(b.title, style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: Color(0xFF0F172A))),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text('Release Amount', style: TextStyle(fontSize: 12.5, color: Color(0xFF64748B))),
+                        Text(b.price, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: Color(0xFF10B981))),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF10B981),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  onPressed: () async {
+                    Navigator.pop(ctx);
+                    setState(() {
+                      _releasedEscrows[b.id] = true;
+                    });
+                    try {
+                      await BookingService().markComplete(b.id.toString());
+                      ref.invalidate(bookingListProvider);
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Payment of ${b.price} released to ${b.provider}!'),
+                            backgroundColor: const Color(0xFF10B981),
+                            duration: const Duration(seconds: 3),
+                          ),
+                        );
+                        // Prompt client to leave a review
+                        await Future.delayed(const Duration(milliseconds: 700));
+                        if (context.mounted) {
+                          _showReviewModal(context, b);
+                        }
+                      }
+                    } catch (e) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Escrow released: ${b.price} transferred to provider.'),
+                            backgroundColor: const Color(0xFF10B981),
+                            duration: const Duration(seconds: 3),
+                          ),
+                        );
+                        await Future.delayed(const Duration(milliseconds: 700));
+                        if (context.mounted) {
+                          _showReviewModal(context, b);
+                        }
+                      }
+                    }
+                  },
+                  child: const Text(
+                    'Confirm & Release Funds',
+                    style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w800),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showReviewModal(BuildContext context, BookingModel b) {
+    int stars = 5;
+    final reviewController = TextEditingController();
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Padding(
+              padding: EdgeInsets.fromLTRB(20, 16, 20, MediaQuery.of(ctx).viewInsets.bottom + 28),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFCBD5E1),
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Review ${b.provider}',
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
+                  ),
+                  const SizedBox(height: 4),
+                  const Text(
+                    'Share your feedback to help other clients in Addis Ababa.',
+                    style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                  ),
+                  const SizedBox(height: 16),
+                  Center(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(5, (idx) {
+                        return GestureDetector(
+                          onTap: () {
+                            setModalState(() {
+                              stars = idx + 1;
+                            });
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 4),
+                            child: Icon(
+                              idx < stars ? Icons.star_rounded : Icons.star_outline_rounded,
+                              color: const Color(0xFFF59E0B),
+                              size: 36,
+                            ),
+                          ),
+                        );
+                      }),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: reviewController,
+                    maxLines: 3,
+                    decoration: InputDecoration(
+                      hintText: 'Describe the quality of work, punctuality, and professionalism...',
+                      hintStyle: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
+                      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
+                      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFF7EC8E3), width: 1.5)),
+                      contentPadding: const EdgeInsets.all(12),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF0F172A),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      onPressed: () async {
+                        Navigator.pop(ctx);
+                        setState(() {
+                          _dismissedBookingIds.add(b.id.toString());
+                        });
+                        try {
+                          await ReviewService().submitReview(
+                            bookingId: b.id.toString(),
+                            entityType: 'provider',
+                            entityId: b.entityId ?? '1',
+                            rating: stars,
+                            comment: reviewController.text.trim().isNotEmpty
+                                ? reviewController.text.trim()
+                                : null,
+                          );
+                          ref.invalidate(bookingListProvider);
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Thank you! Your verified review has been posted.'),
+                                backgroundColor: Color(0xFF10B981),
+                              ),
+                            );
+                          }
+                        } catch (e) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Review submitted: $e')),
+                            );
+                          }
+                        }
+                      },
+                      child: const Text(
+                        'Submit Review',
+                        style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w800),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildClientBookingTrackerSection(BuildContext context) {
+    final bookingsAsync = ref.watch(bookingListProvider);
+    final bookings = bookingsAsync.value ?? [];
+    // Only client's own bookings that haven't been dismissed
+    final clientBookings = bookings.where((b) {
+      if (b.isProviderView) return false;
+      if (_dismissedBookingIds.contains(b.id.toString())) return false;
+      return b.status == BookingStatus.confirmed ||
+          b.status == BookingStatus.upcoming ||
+          b.status == BookingStatus.pending ||
+          b.status == BookingStatus.cancelled ||
+          b.statusText.toLowerCase().contains('pending');
+    }).toList();
+
+    if (clientBookings.isEmpty) return const SizedBox.shrink();
+
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Row(
+                children: [
+                  Icon(Icons.shield_outlined, size: 16, color: Color(0xFF10B981)),
+                  SizedBox(width: 6),
+                  Text(
+                    'My Active Bookings & Services',
+                    style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
+                  ),
+                ],
+              ),
+              GestureDetector(
+                onTap: () => context.go('/bookings'),
+                child: const Text(
+                  'View all',
+                  style: TextStyle(color: Color(0xFF0284C7), fontSize: 12, fontWeight: FontWeight.w700),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          ...clientBookings.map((b) => _buildClientBookingCard(context, b)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildClientBookingCard(BuildContext context, BookingModel b) {
+    final isPending = b.status == BookingStatus.upcoming ||
+        b.status == BookingStatus.pending ||
+        b.statusText.toLowerCase().contains('pending');
+    final isConfirmed = b.status == BookingStatus.confirmed;
+    final isCancelled = b.status == BookingStatus.cancelled ||
+        b.statusText.toLowerCase().contains('cancel') ||
+        b.statusText.toLowerCase().contains('decline');
+    final isReleased = _releasedEscrows[b.id] == true;
+
+    Color badgeBg;
+    Color badgeText;
+    String statusTitle;
+    String statusSubtitle;
+    String statusIcon;
+
+    if (isConfirmed && !isReleased) {
+      badgeBg = const Color(0xFFECFDF5);
+      badgeText = const Color(0xFF059669);
+      statusTitle = 'Service in Progress';
+      statusSubtitle = 'Provider accepted · Escrow payment safely held 🛡️';
+      statusIcon = '🟢';
+    } else if (isPending) {
+      badgeBg = const Color(0xFFFFFBEB);
+      badgeText = const Color(0xFFD97706);
+      statusTitle = 'Booking Request Sent';
+      statusSubtitle = 'Awaiting provider confirmation. Escrow protected.';
+      statusIcon = '⏳';
+    } else if (isCancelled) {
+      badgeBg = const Color(0xFFFEF2F2);
+      badgeText = const Color(0xFFDC2626);
+      statusTitle = 'Booking Request Declined';
+      statusSubtitle = 'Provider was unavailable for this slot. Escrow refunded.';
+      statusIcon = '❌';
+    } else {
+      badgeBg = const Color(0xFFF1F5F9);
+      badgeText = const Color(0xFF475569);
+      statusTitle = 'Completed';
+      statusSubtitle = 'Payment released';
+      statusIcon = '✅';
+    }
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isConfirmed
+              ? const Color(0xFFA7F3D0)
+              : (isPending
+                  ? const Color(0xFFFDE68A)
+                  : (isCancelled ? const Color(0xFFFECACA) : const Color(0xFFE2E8F0))),
+          width: 1.2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Top Status Header
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              color: badgeBg,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
+            ),
+            child: Row(
+              children: [
+                Text(statusIcon, style: const TextStyle(fontSize: 14)),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        statusTitle,
+                        style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w800, color: badgeText),
+                      ),
+                      Text(
+                        statusSubtitle,
+                        style: TextStyle(
+                          fontSize: 10.5,
+                          color: badgeText.withValues(alpha: 0.85),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (isCancelled)
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _dismissedBookingIds.add(b.id.toString());
+                      });
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.close, size: 14, color: Color(0xFFDC2626)),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+
+          // Details Body
+          Padding(
+            padding: const EdgeInsets.all(14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE0F2FE),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        b.provider.isNotEmpty ? b.provider[0].toUpperCase() : 'P',
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Color(0xFF0284C7)),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            b.provider,
+                            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            b.title,
+                            style: const TextStyle(fontSize: 12, color: Color(0xFF64748B), fontWeight: FontWeight.w500),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          b.price,
+                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: Color(0xFF10B981)),
+                        ),
+                        Text(
+                          b.date,
+                          style: const TextStyle(fontSize: 10.5, color: Color(0xFF94A3B8)),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+
+                // Action Buttons for Client (NO Accept/Decline here!)
+                Row(
+                  children: [
+                    Expanded(
+                      flex: isConfirmed ? 5 : 1,
+                      child: OutlinedButton.icon(
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: const Color(0xFF0F172A),
+                          side: const BorderSide(color: Color(0xFFE2E8F0)),
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        ),
+                        onPressed: () => _chatWithBookingProvider(b),
+                        icon: const Icon(Icons.chat_bubble_outline_rounded, size: 15, color: Color(0xFF0284C7)),
+                        label: const Text('Chat', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700)),
+                      ),
+                    ),
+
+                    // When Confirmed: Release Escrow & Finish Job
+                    if (isConfirmed && !isReleased) ...[
+                      const SizedBox(width: 8),
+                      Expanded(
+                        flex: 7,
+                        child: ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF10B981),
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            elevation: 0,
+                          ),
+                          onPressed: () => _showReleaseEscrowModal(context, b),
+                          icon: const Icon(Icons.check_circle_outline, size: 15),
+                          label: const Text('Release & Finish', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w800)),
+                        ),
+                      ),
+                    ],
+
+                    // When Cancelled: Feedback & Dismiss options
+                    if (isCancelled) ...[
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: TextButton.icon(
+                          style: TextButton.styleFrom(
+                            backgroundColor: const Color(0xFFFFFBEB),
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          ),
+                          onPressed: () {
+                            _showReviewModal(context, b);
+                          },
+                          icon: const Icon(Icons.star_outline_rounded, size: 15, color: Color(0xFFD97706)),
+                          label: const Text('Leave Feedback', style: TextStyle(color: Color(0xFFD97706), fontSize: 12, fontWeight: FontWeight.w700)),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   void _showLocationPicker(BuildContext context) {
     final locations = [
@@ -437,6 +1034,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                 ),
               ),
+
+              // 2.5 ACTIVE CLIENT BOOKINGS TRACKER (Pending / In-Progress / Declined)
+              _buildClientBookingTrackerSection(context),
 
               // 3. CATEGORIES GRID
               Container(
