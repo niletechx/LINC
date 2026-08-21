@@ -223,197 +223,213 @@ export default function ProviderDashboard() {
   };
 
   return (
-    <div className="provider-dashboard-view">
+    <div className="min-h-screen bg-slate-50/50 pb-24 text-slate-900">
+      
       {/* ── 1. Provider Hero Status Banner ── */}
-      <section className="provider-dashboard-hero">
-        <div className="provider-hero-top">
-          <div>
-            <div className="provider-hero-badge">
-              <ShieldCheck size={14} />
-              <span>VERIFIED ETHIOPIAN SPECIALIST • FAYDA ID VERIFIED</span>
+      <section className="bg-white border-b border-slate-200/80 pt-8 pb-8 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto space-y-6">
+          
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-50 border border-teal-200 text-teal-800 text-xs font-bold mb-2">
+                <ShieldCheck size={13} className="text-teal-600" />
+                <span>FAYDA ID VERIFIED SPECIALIST • ADDIS ABABA</span>
+              </div>
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+                Welcome back, {displayName}
+              </h1>
+              <p className="text-sm text-slate-600 mt-1">
+                {profile.headline}
+              </p>
             </div>
-            <h1 className="provider-hero-title">
-              Welcome back, {displayName}
-            </h1>
-            <p className="provider-hero-headline">
-              {profile.headline}
-            </p>
+
+            <div className="flex flex-col sm:items-end gap-1.5">
+              <span className="text-xs font-bold text-slate-400">Live Status</span>
+              <button
+                type="button"
+                onClick={handleToggleAvailability}
+                className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold border transition-all cursor-pointer shadow-xs ${
+                  profile.isAvailable
+                    ? 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100'
+                    : 'bg-slate-100 text-slate-600 border-slate-300 hover:bg-slate-200'
+                }`}
+              >
+                <span className={`w-2 h-2 rounded-full ${profile.isAvailable ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}`} />
+                <span>{profile.isAvailable ? 'Online & Ready for Bookings' : 'Currently Busy / Offline'}</span>
+              </button>
+            </div>
           </div>
 
-          <div className="provider-availability-box">
-            <span className="availability-label">Availability Status</span>
-            <button
-              type="button"
-              onClick={handleToggleAvailability}
-              className={`availability-toggle-btn ${profile.isAvailable ? 'available' : 'busy'}`}
-            >
-              <span className="status-dot" />
-              <span>{profile.isAvailable ? 'Online & Available' : 'Currently Busy'}</span>
-            </button>
-          </div>
-        </div>
+          {/* Quick Actions & Escrow Balance Bar */}
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-100">
+            <div className="flex items-center gap-2 flex-wrap">
+              <button
+                type="button"
+                onClick={toggleMode}
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition-colors cursor-pointer"
+              >
+                <User size={13} />
+                <span>Switch to Client Mode</span>
+              </button>
 
-        {/* Quick Mode Switch & Profile Setup Bar */}
-        <div className="provider-hero-actions-bar">
-          <div className="flex items-center gap-2 flex-wrap">
-            <button
-              type="button"
-              onClick={toggleMode}
-              className="provider-action-btn primary"
-            >
-              <User size={14} />
-              <span>Switch to Client Mode</span>
-            </button>
+              <button
+                type="button"
+                onClick={() => navigate('/provider/services')}
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition-colors cursor-pointer"
+              >
+                <Settings size={13} />
+                <span>Services & Rates</span>
+              </button>
 
-            <button
-              type="button"
-              onClick={() => navigate('/provider/services')}
-              className="provider-action-btn secondary"
-            >
-              <Settings size={14} />
-              <span>Services, Rates & Sub-Cities</span>
-            </button>
+              <button
+                type="button"
+                onClick={() => navigate('/provider/showcase')}
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition-colors cursor-pointer"
+              >
+                <Sparkles size={13} className="text-amber-500" />
+                <span>Portfolio & Reviews</span>
+              </button>
+            </div>
 
-            <button
-              type="button"
-              onClick={() => navigate('/provider/showcase')}
-              className="provider-action-btn secondary"
-            >
-              <Sparkles size={14} />
-              <span>Portfolio & Reviews</span>
-            </button>
-          </div>
-
-          <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={() => navigate('/provider/wallet')}
-              className="provider-action-btn wallet-btn"
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-teal-50 hover:bg-teal-100 border border-teal-200 text-teal-900 text-xs font-bold transition-colors cursor-pointer"
             >
-              <Wallet size={14} className="text-cyan" />
+              <Wallet size={13} className="text-teal-700" />
               <span>Wallet: <strong>{wallet.availableBalance.toLocaleString()} ETB</strong></span>
             </button>
           </div>
+
         </div>
       </section>
 
-      {/* ── 2. Performance Metrics 4-Column Grid ── */}
-      <section className="provider-metrics-grid">
-        <div 
-          onClick={() => navigate('/provider/wallet')}
-          className="provider-metric-card cursor-pointer hover:border-cyan-400 transition-all"
-        >
-          <div className="p-metric-icon" style={{ background: 'rgba(6, 182, 212, 0.15)', color: '#0284C7' }}>
-            <DollarSign size={22} />
+      {/* ── 2. Ramp-Style Performance Metrics 4-Column Grid ── */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          
+          <div 
+            onClick={() => navigate('/provider/wallet')}
+            className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs space-y-1 hover:border-teal-300 transition-colors cursor-pointer"
+          >
+            <div className="flex items-center justify-between text-xs text-slate-500 font-semibold">
+              <span>Available to Withdraw</span>
+              <DollarSign size={15} className="text-teal-600" />
+            </div>
+            <div className="text-xl font-black text-slate-900">{wallet.availableBalance.toLocaleString()} ETB</div>
+            <div className="text-[11px] font-semibold text-emerald-600">
+              Instant CBE / Telebirr Payout
+            </div>
           </div>
-          <div className="p-metric-data">
-            <span className="p-metric-value">{wallet.availableBalance.toLocaleString()} ETB</span>
-            <span className="p-metric-label">Available Balance (Withdraw)</span>
-          </div>
-        </div>
 
-        <div 
-          onClick={() => navigate('/provider/jobs')}
-          className="provider-metric-card cursor-pointer hover:border-emerald-400 transition-all"
-        >
-          <div className="p-metric-icon" style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#059669' }}>
-            <Briefcase size={22} />
+          <div 
+            onClick={() => navigate('/provider/jobs')}
+            className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs space-y-1 hover:border-teal-300 transition-colors cursor-pointer"
+          >
+            <div className="flex items-center justify-between text-xs text-slate-500 font-semibold">
+              <span>Active Escrow Tasks</span>
+              <Briefcase size={15} className="text-amber-500" />
+            </div>
+            <div className="text-xl font-black text-slate-900">{activeOngoingJobs.length} Active</div>
+            <div className="text-[11px] font-semibold text-slate-500">
+              100% Escrow Protected
+            </div>
           </div>
-          <div className="p-metric-data">
-            <span className="p-metric-value">{activeOngoingJobs.length} Active</span>
-            <span className="p-metric-label">Ongoing Escrow Jobs</span>
-          </div>
-        </div>
 
-        <div className="provider-metric-card">
-          <div className="p-metric-icon" style={{ background: 'rgba(245, 158, 11, 0.15)', color: '#D97706' }}>
-            <Zap size={22} />
+          <div className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs space-y-1">
+            <div className="flex items-center justify-between text-xs text-slate-500 font-semibold">
+              <span>Acceptance Rate</span>
+              <Zap size={15} className="text-amber-500" />
+            </div>
+            <div className="text-xl font-black text-slate-900">{profile.acceptanceRate || 98}%</div>
+            <div className="text-[11px] font-bold text-amber-600">
+              Top 5% in Bole & Yeka
+            </div>
           </div>
-          <div className="p-metric-data">
-            <span className="p-metric-value">{profile.acceptanceRate || 98}%</span>
-            <span className="p-metric-label">Job Acceptance Rate</span>
-          </div>
-        </div>
 
-        <div 
-          onClick={() => navigate('/provider/showcase')}
-          className="provider-metric-card cursor-pointer hover:border-purple-400 transition-all"
-        >
-          <div className="p-metric-icon" style={{ background: 'rgba(124, 58, 237, 0.15)', color: '#7C3AED' }}>
-            <Star size={22} />
+          <div 
+            onClick={() => navigate('/provider/showcase')}
+            className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs space-y-1 hover:border-teal-300 transition-colors cursor-pointer"
+          >
+            <div className="flex items-center justify-between text-xs text-slate-500 font-semibold">
+              <span>Verified Rating</span>
+              <Star size={15} className="text-amber-500 fill-amber-500" />
+            </div>
+            <div className="text-xl font-black text-slate-900">4.9 ★</div>
+            <div className="text-[11px] font-semibold text-slate-500">
+              {profile.reviewsCount || 58} verified clients
+            </div>
           </div>
-          <div className="p-metric-data">
-            <span className="p-metric-value">4.9 ★</span>
-            <span className="p-metric-label">{profile.reviewsCount || 58} Verified Reviews</span>
-          </div>
+
         </div>
       </section>
 
       {/* ── 3. Incoming Direct Client Requests ── */}
       {incomingJobs.length > 0 && (
-        <section style={{ marginTop: '4px' }}>
-          <div className="section-title-row">
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+          <div className="flex items-center justify-between pb-2 border-b border-slate-200">
             <div className="flex items-center gap-2">
-              <h2 className="section-heading text-rose-600">🚨 Incoming Urgent Client Requests</h2>
-              <span className="badge-pulse-rose">{incomingJobs.length} new</span>
+              <h2 className="text-lg font-extrabold text-red-600">🚨 Incoming Urgent Client Requests</h2>
+              <span className="text-[11px] font-extrabold px-2 py-0.5 rounded-full bg-red-100 text-red-700">
+                {incomingJobs.length} new
+              </span>
             </div>
             <button 
               type="button" 
               onClick={() => navigate('/provider/jobs')}
-              className="view-all-link"
+              className="text-xs font-bold text-teal-700 hover:text-teal-800 cursor-pointer"
             >
-              <span>Manage All Jobs</span>
-              <ArrowRight size={14} />
+              Manage All Jobs →
             </button>
           </div>
 
-          <div className="provider-jobs-list">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
             {incomingJobs.map((job) => (
-              <div key={job.id} className="provider-job-card incoming-highlight">
-                <div className="job-card-header">
+              <div key={job.id} className="bg-white rounded-3xl p-5 border-2 border-red-200 shadow-sm space-y-3">
+                <div className="flex items-start justify-between gap-3">
                   <div>
                     <div className="flex items-center gap-2 flex-wrap mb-1">
-                      <h3 className="job-title">{job.title}</h3>
+                      <h3 className="font-bold text-slate-900 text-base">{job.title}</h3>
                       {job.urgency === 'urgent' && (
-                        <span className="urgent-badge">⚡ URGENT</span>
+                        <span className="text-[10px] font-extrabold px-2 py-0.5 rounded bg-red-100 text-red-700">
+                          ⚡ URGENT
+                        </span>
                       )}
                     </div>
-                    <p className="job-client">
+                    <p className="text-xs text-slate-600">
                       Client: <strong>{job.clientName}</strong> • {job.address}
                     </p>
                   </div>
-                  <div className="job-price-badge">
-                    <span>{job.agreedPrice} {job.currency || 'ETB'}</span>
-                    <span className="escrow-pill">🛡️ Escrow Funded</span>
+                  <div className="text-right">
+                    <span className="text-base font-extrabold text-slate-900">{job.agreedPrice} {job.currency || 'ETB'}</span>
+                    <span className="block text-[10px] font-bold text-teal-700">🛡️ Escrow Funded</span>
                   </div>
                 </div>
 
                 {job.notes && (
-                  <p className="text-slate-600 text-xs my-2 italic">
+                  <p className="text-xs text-slate-600 italic bg-slate-50 p-2 rounded-lg">
                     "{job.notes}"
                   </p>
                 )}
 
-                <div className="job-card-meta">
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                    <Clock size={13} />
+                <div className="flex items-center justify-between text-xs text-slate-400 pt-2 border-t border-slate-100">
+                  <span className="flex items-center gap-1">
+                    <Clock size={12} />
                     <span>Requested {job.requestedAt}</span>
                   </span>
-                  <span>•</span>
                   <span>Scheduled: <strong>{job.scheduledTime}</strong></span>
                 </div>
 
-                <div className="job-card-actions">
+                <div className="flex items-center gap-2 pt-1">
                   <button 
                     type="button" 
                     onClick={() => {
                       declineJob(job.id);
                       showToast('Request declined', 'info');
                     }}
-                    className="btn btn-outline btn-sm"
+                    className="flex-1 py-2 rounded-full border border-slate-300 hover:bg-slate-100 text-xs font-bold text-slate-700 transition-colors cursor-pointer"
                   >
-                    <XCircle size={14} />
-                    <span>Decline</span>
+                    Decline
                   </button>
                   <button 
                     type="button" 
@@ -422,10 +438,9 @@ export default function ProviderDashboard() {
                       showToast(`Accepted booking from ${job.clientName}! Escrow funded in vault.`, 'success');
                       navigate('/provider/jobs');
                     }}
-                    className="btn btn-primary btn-sm"
+                    className="flex-2 py-2 rounded-full bg-teal-700 hover:bg-teal-800 text-white text-xs font-bold transition-colors cursor-pointer shadow-xs"
                   >
-                    <CheckCircle2 size={14} />
-                    <span>Accept & Lock Escrow ({job.agreedPrice} ETB)</span>
+                    Accept & Lock ({job.agreedPrice} ETB)
                   </button>
                 </div>
               </div>
@@ -434,70 +449,69 @@ export default function ProviderDashboard() {
         </section>
       )}
 
-      {/* ── 4. Active Ongoing Tasks Tracker ── */}
-      <section style={{ marginTop: '4px' }}>
-        <div className="section-title-row">
+      {/* ── 4. Active Ongoing Tasks Tracker (Linear / ClickUp Inspiration) ── */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+        <div className="flex items-center justify-between pb-2 border-b border-slate-200">
           <div className="flex items-center gap-2">
-            <h2 className="section-heading">Active Ongoing Tasks ({activeOngoingJobs.length})</h2>
+            <h2 className="text-lg font-extrabold text-slate-900">Active Ongoing Tasks ({activeOngoingJobs.length})</h2>
             <span className="text-xs text-slate-500">• 100% Chapa Escrow Secured</span>
           </div>
           <button 
             type="button" 
             onClick={() => navigate('/provider/jobs')}
-            className="view-all-link"
+            className="text-xs font-bold text-teal-700 hover:text-teal-800 cursor-pointer"
           >
-            <span>View Full Jobs Queue</span>
-            <ArrowRight size={14} />
+            View Full Queue →
           </button>
         </div>
 
         {activeOngoingJobs.length > 0 ? (
-          <div className="provider-jobs-list">
+          <div className="space-y-4 mt-3">
             {activeOngoingJobs.map((job) => {
               const isEnRoute = job.stage === 'en_route';
               const isInProgress = job.stage === 'in_progress';
               const isSubmitted = job.stage === 'completion_submitted';
 
               return (
-                <div key={job.id} className="provider-job-card active-job-card">
-                  <div className="job-card-header">
+                <div key={job.id} className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/90 shadow-stripe-card space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
                     <div>
                       <div className="flex items-center gap-2 flex-wrap mb-1">
-                        <h3 className="job-title">{job.title}</h3>
-                        <span className={`p-status-pill stage-${job.stage}`}>
+                        <h3 className="text-base font-bold text-slate-900">{job.title}</h3>
+                        <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-teal-50 text-teal-800">
                           {isEnRoute && '🚗 En Route'}
                           {isInProgress && '⚙️ In Progress'}
                           {isSubmitted && '⏱️ Pending Client Release'}
                           {!isEnRoute && !isInProgress && !isSubmitted && '✓ Accepted'}
                         </span>
                       </div>
-                      <p className="job-client">
+                      <p className="text-xs text-slate-500">
                         Client: <strong>{job.clientName}</strong> • {job.address}
                       </p>
                     </div>
 
-                    <div className="job-price-badge">
-                      <span>{job.agreedPrice} {job.currency || 'ETB'}</span>
-                      <span className="escrow-pill">🛡️ Escrow Locked</span>
+                    <div className="text-right">
+                      <span className="text-lg font-black text-slate-900">{job.agreedPrice} {job.currency || 'ETB'}</span>
+                      <span className="block text-xs font-bold text-emerald-600">🛡️ Escrow Locked</span>
                     </div>
                   </div>
 
-                  {/* Stage Advance Actions */}
-                  <div className="job-card-actions mt-3">
+                  {/* Stage Advance & Client Interaction Actions */}
+                  <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
                     <div className="flex items-center gap-2">
                       <a
                         href={`tel:${job.clientPhone}`}
-                        className="btn btn-outline btn-sm"
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full border border-slate-200 text-slate-700 text-xs font-bold hover:bg-slate-50 transition-colors"
                       >
-                        <Phone size={13} />
+                        <Phone size={12} />
                         <span>Call Client</span>
                       </a>
                       <button
                         type="button"
                         onClick={() => handleStartChatWithClient(job)}
-                        className="btn btn-outline btn-sm"
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full border border-slate-200 text-slate-700 text-xs font-bold hover:bg-slate-50 transition-colors cursor-pointer"
                       >
-                        <MessageSquare size={13} />
+                        <MessageSquare size={12} />
                         <span>Chat</span>
                       </button>
                     </div>
@@ -510,9 +524,9 @@ export default function ProviderDashboard() {
                             advanceJobStage(job.id, 'en_route');
                             showToast(`🚗 En route to ${job.clientSubCity}!`, 'success');
                           }}
-                          className="btn btn-primary btn-sm"
+                          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-teal-700 hover:bg-teal-800 text-white text-xs font-bold transition-colors cursor-pointer shadow-xs"
                         >
-                          <Navigation size={14} />
+                          <Navigation size={13} />
                           <span>Mark En Route 🚗</span>
                         </button>
                       )}
@@ -524,9 +538,9 @@ export default function ProviderDashboard() {
                             advanceJobStage(job.id, 'in_progress');
                             showToast(`⚙️ Started work for ${job.clientName}!`, 'info');
                           }}
-                          className="btn btn-primary btn-sm"
+                          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-teal-700 hover:bg-teal-800 text-white text-xs font-bold transition-colors cursor-pointer shadow-xs"
                         >
-                          <Play size={14} />
+                          <Play size={13} />
                           <span>Arrived & Start Work ⚙️</span>
                         </button>
                       )}
@@ -535,9 +549,9 @@ export default function ProviderDashboard() {
                         <button
                           type="button"
                           onClick={() => handleOpenProofModal(job)}
-                          className="btn btn-primary btn-sm animate-pulse"
+                          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-colors cursor-pointer shadow-xs animate-pulse"
                         >
-                          <Camera size={14} />
+                          <Camera size={13} />
                           <span>Submit Completion & Proof 📸</span>
                         </button>
                       )}
@@ -555,56 +569,55 @@ export default function ProviderDashboard() {
             })}
           </div>
         ) : (
-          <div className="p-6 bg-white/60 border border-slate-200 rounded-xl text-center text-slate-500">
-            <p>No active jobs in progress. Check new leads below or browse the open marketplace.</p>
+          <div className="p-8 bg-white border border-slate-200 rounded-3xl text-center text-slate-500 mt-3">
+            <p className="text-sm font-medium">No active jobs in progress. Check new leads below or browse open requests.</p>
           </div>
         )}
       </section>
 
       {/* ── 5. Market Leads Radar ── */}
-      <section style={{ marginTop: '8px' }}>
-        <div className="section-title-row">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+        <div className="flex items-center justify-between pb-2 border-b border-slate-200">
           <div className="flex items-center gap-2">
-            <Sparkles size={16} className="text-cyan-600" />
-            <h2 className="section-heading">Open Job Requests in Addis Ababa (Market Leads)</h2>
+            <Sparkles size={16} className="text-teal-600" />
+            <h2 className="text-lg font-extrabold text-slate-900">Open Job Requests in Addis Ababa (Market Leads)</h2>
           </div>
           <button 
             type="button" 
             onClick={() => navigate('/requests')}
-            className="view-all-link"
+            className="text-xs font-bold text-teal-700 hover:text-teal-800 cursor-pointer"
           >
-            <span>View All Leads</span>
-            <ArrowRight size={14} />
+            View All Leads →
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
           {marketLeads.slice(0, 4).map((lead, i) => (
-            <div key={lead.id || i} className="bg-white/80 border border-slate-200/80 p-4 rounded-xl shadow-xs flex flex-col justify-between">
+            <div key={lead.id || i} className="bg-white border border-slate-200/80 p-5 rounded-3xl shadow-xs flex flex-col justify-between hover:border-slate-300 transition-colors">
               <div>
                 <div className="flex justify-between items-start mb-2">
-                  <span className="text-xs font-bold px-2 py-0.5 bg-cyan-50 text-cyan-700 rounded-md">
+                  <span className="text-xs font-bold px-2 py-0.5 bg-slate-100 text-slate-700 rounded-md">
                     {lead.category || 'Specialist Need'}
                   </span>
-                  <strong className="text-slate-900 font-extrabold text-sm">{lead.budget || 'Custom Quote'}</strong>
+                  <strong className="text-slate-900 font-black text-sm">{lead.budget || 'Custom Quote'}</strong>
                 </div>
 
-                <h4 className="font-bold text-slate-800 text-sm mb-1">{lead.title}</h4>
-                <p className="text-slate-600 text-xs mb-3 line-clamp-2">{lead.description}</p>
+                <h4 className="font-bold text-slate-900 text-sm mb-1">{lead.title}</h4>
+                <p className="text-slate-500 text-xs mb-3 line-clamp-2">{lead.description}</p>
               </div>
 
-              <div className="flex justify-between items-center text-xs text-slate-500 pt-2 border-t border-slate-100">
+              <div className="flex justify-between items-center text-xs text-slate-500 pt-3 border-t border-slate-100">
                 <span className="flex items-center gap-1">
-                  <MapPin size={12} className="text-cyan-600" />
+                  <MapPin size={12} className="text-teal-600" />
                   <span>{lead.location || 'Addis Ababa'}</span>
                 </span>
 
                 <button
                   type="button"
                   onClick={() => handleOpenQuote(lead)}
-                  className="btn btn-primary btn-sm text-xs py-1 px-3"
+                  className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-full bg-teal-700 hover:bg-teal-800 text-white text-xs font-bold transition-colors cursor-pointer shadow-xs"
                 >
-                  <Zap size={12} />
+                  <Zap size={11} />
                   <span>Submit Quote ⚡</span>
                 </button>
               </div>
@@ -617,40 +630,40 @@ export default function ProviderDashboard() {
       {/* ── IN-PLACE MODAL: SUBMIT QUOTE ON MARKET LEAD ──                     */}
       {/* ═══════════════════════════════════════════════════════════════════════ */}
       {isQuoteModalOpen && selectedLeadForQuote && (
-        <div className="modal-backdrop" onClick={closeQuoteModal}>
-          <div className="modal-card modal-card-md animate-fade-in" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <div className="modal-title-group">
-                <div className="modal-icon-badge" style={{ background: '#E0F2FE', color: '#0284C7' }}>
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4" onClick={closeQuoteModal}>
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4 animate-fade-in" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-full bg-teal-50 text-teal-700 flex items-center justify-center font-bold">
                   <Zap size={18} />
                 </div>
                 <div>
-                  <h3 className="modal-title">Submit Quote / Bid</h3>
-                  <p className="modal-subtitle">{selectedLeadForQuote.title}</p>
+                  <h3 className="text-base font-bold text-slate-900">Submit Quote / Bid</h3>
+                  <p className="text-xs text-slate-500 truncate max-w-[280px]">{selectedLeadForQuote.title}</p>
                 </div>
               </div>
-              <button type="button" onClick={closeQuoteModal} className="modal-close-btn">
+              <button type="button" onClick={closeQuoteModal} className="p-1 rounded-full text-slate-400 hover:text-slate-700 cursor-pointer">
                 <X size={18} />
               </button>
             </div>
 
-            <form onSubmit={handleSubmitQuote}>
-              <div className="modal-body">
+            <form onSubmit={handleSubmitQuote} className="space-y-4">
+              <div className="space-y-3">
                 {/* Lead Summary Pill */}
-                <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs flex justify-between items-center">
+                <div className="p-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs flex justify-between items-center">
                   <div>
-                    <span className="font-semibold text-slate-800">Client's Budget:</span>{' '}
+                    <span className="font-semibold text-slate-700">Client's Budget:</span>{' '}
                     <span className="font-bold text-emerald-600">{selectedLeadForQuote.budget || 'Open for quotes'}</span>
                   </div>
                   <div className="flex items-center gap-1 text-slate-500">
-                    <MapPin size={11} className="text-cyan-600" />
+                    <MapPin size={11} className="text-teal-600" />
                     <span>{selectedLeadForQuote.location}</span>
                   </div>
                 </div>
 
                 {/* Proposed Amount */}
-                <div className="form-group">
-                  <label className="form-label font-bold text-xs">
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-700 block">
                     Your Proposed Price (ETB) <span className="text-rose-500">*</span>
                   </label>
                   <div className="relative flex items-center">
@@ -659,11 +672,11 @@ export default function ProviderDashboard() {
                       value={quoteAmount}
                       onChange={(e) => setQuoteAmount(e.target.value)}
                       placeholder="e.g. 650"
-                      className="form-input text-base font-extrabold"
+                      className="w-full px-4 py-2.5 text-base font-extrabold text-slate-900 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-teal-600"
                       required
                     />
                     <span className="absolute right-3 text-xs font-bold text-slate-400 pointer-events-none">
-                      ETB (Escrow Locked)
+                      ETB Escrow
                     </span>
                   </div>
                   <div className="flex gap-2 mt-1.5">
@@ -672,7 +685,7 @@ export default function ProviderDashboard() {
                         key={preset}
                         type="button"
                         onClick={() => setQuoteAmount(preset)}
-                        className="px-2 py-0.5 text-xs bg-slate-100 hover:bg-cyan-50 hover:text-cyan-700 rounded border border-slate-200"
+                        className="px-2.5 py-1 text-xs bg-slate-100 hover:bg-teal-50 hover:text-teal-700 rounded-lg border border-slate-200 font-semibold cursor-pointer"
                       >
                         {preset} ETB
                       </button>
@@ -680,48 +693,48 @@ export default function ProviderDashboard() {
                   </div>
                 </div>
 
-                {/* Estimated Arrival / Duration */}
-                <div className="form-group">
-                  <label className="form-label font-bold text-xs">Estimated Arrival / ETA</label>
+                {/* Estimated Arrival */}
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-700 block">Estimated Arrival / ETA</label>
                   <input
                     type="text"
                     value={quoteEta}
                     onChange={(e) => setQuoteEta(e.target.value)}
                     placeholder="e.g. Within 45 mins / Today 3:00 PM"
-                    className="form-input text-xs"
+                    className="w-full px-3 py-2 text-xs font-medium text-slate-900 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-teal-600"
                     required
                   />
                 </div>
 
                 {/* Custom Proposal Message */}
-                <div className="form-group">
-                  <label className="form-label font-bold text-xs">Introductory Message to Client</label>
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-700 block">Introductory Message to Client</label>
                   <textarea
                     rows={3}
                     value={quoteProposal}
                     onChange={(e) => setQuoteProposal(e.target.value)}
                     placeholder="Describe how you will solve their problem, what tools you have, and your warranty..."
-                    className="form-input text-xs"
+                    className="w-full px-3 py-2 text-xs font-medium text-slate-900 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-teal-600"
                   />
                 </div>
 
                 {/* Chapa Escrow Safety Notice */}
-                <div className="p-2.5 bg-emerald-50 border border-emerald-200 rounded-lg text-xs text-emerald-800 flex items-start gap-2">
-                  <ShieldCheck size={16} className="text-emerald-600 flex-shrink-0 mt-0.5" />
+                <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-900 flex items-start gap-2">
+                  <ShieldCheck size={16} className="text-emerald-600 shrink-0 mt-0.5" />
                   <span>
                     When client accepts, their <strong>{quoteAmount || 0} ETB</strong> is locked in Chapa Escrow before you travel. 100% payout guaranteed upon work completion.
                   </span>
                 </div>
               </div>
 
-              <div className="modal-footer-sticky">
-                <button type="button" onClick={closeQuoteModal} className="btn btn-outline btn-sm">
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+                <button type="button" onClick={closeQuoteModal} className="px-4 py-2 text-xs font-bold text-slate-600 hover:text-slate-900 cursor-pointer">
                   Cancel
                 </button>
                 <button 
                   type="submit" 
                   disabled={isSubmittingQuote || !quoteAmount}
-                  className="btn btn-primary btn-sm flex items-center gap-1.5"
+                  className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-teal-700 hover:bg-teal-800 text-white text-xs font-bold shadow-sm transition-colors cursor-pointer"
                 >
                   <Send size={13} />
                   <span>{isSubmittingQuote ? 'Submitting...' : 'Send Official Quote ⚡'}</span>
@@ -736,27 +749,27 @@ export default function ProviderDashboard() {
       {/* ── IN-PLACE MODAL: SUBMIT PROOF OF COMPLETION ──                      */}
       {/* ═══════════════════════════════════════════════════════════════════════ */}
       {isProofModalOpen && activeProofJob && (
-        <div className="modal-backdrop" onClick={() => setIsProofModalOpen(false)}>
-          <div className="modal-card modal-card-md animate-fade-in" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <div className="modal-title-group">
-                <div className="modal-icon-badge" style={{ background: '#ECFDF5', color: '#059669' }}>
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setIsProofModalOpen(false)}>
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4 animate-fade-in" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-full bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold">
                   <Camera size={18} />
                 </div>
                 <div>
-                  <h3 className="modal-title">Submit Proof of Completion</h3>
-                  <p className="modal-subtitle">{activeProofJob.title} • {activeProofJob.clientName}</p>
+                  <h3 className="text-base font-bold text-slate-900">Submit Proof of Completion</h3>
+                  <p className="text-xs text-slate-500 truncate max-w-[280px]">{activeProofJob.title} • {activeProofJob.clientName}</p>
                 </div>
               </div>
-              <button type="button" onClick={() => setIsProofModalOpen(false)} className="modal-close-btn">
+              <button type="button" onClick={() => setIsProofModalOpen(false)} className="p-1 rounded-full text-slate-400 hover:text-slate-700 cursor-pointer">
                 <X size={18} />
               </button>
             </div>
 
-            <form onSubmit={handleConfirmCompletion}>
-              <div className="modal-body">
-                <div className="form-group">
-                  <label className="form-label font-bold text-xs">
+            <form onSubmit={handleConfirmCompletion} className="space-y-4">
+              <div className="space-y-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-700 block">
                     Summary of Work Performed <span className="text-rose-500">*</span>
                   </label>
                   <textarea
@@ -764,25 +777,25 @@ export default function ProviderDashboard() {
                     value={completionSummary}
                     onChange={(e) => setCompletionSummary(e.target.value)}
                     placeholder="Describe the fix or service provided in detail..."
-                    className="form-input text-xs"
+                    className="w-full px-3 py-2 text-xs font-medium text-slate-900 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-teal-600"
                     required
                   />
                 </div>
 
-                <div className="form-group">
-                  <label className="form-label font-bold text-xs">Parts or Materials Replaced (If Any)</label>
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-700 block">Parts or Materials Replaced (If Any)</label>
                   <input
                     type="text"
                     value={partsReplaced}
                     onChange={(e) => setPartsReplaced(e.target.value)}
                     placeholder="e.g. PPR valve 25mm, brass connector, Teflon seal"
-                    className="form-input text-xs"
+                    className="w-full px-3 py-2 text-xs font-medium text-slate-900 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-teal-600"
                   />
                 </div>
 
                 {/* Proof Checklist Chips */}
-                <div className="form-group">
-                  <label className="form-label font-bold text-xs">Quality & Guarantee Verification</label>
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-700 block">Quality & Guarantee Verification</label>
                   <div className="flex flex-wrap gap-1.5 mt-1">
                     {proofTagOptions.map((tag) => {
                       const isSelected = selectedProofTags.includes(tag);
@@ -791,9 +804,9 @@ export default function ProviderDashboard() {
                           key={tag}
                           type="button"
                           onClick={() => toggleProofTag(tag)}
-                          className={`px-2.5 py-1 rounded-full text-xs font-semibold border transition-all flex items-center gap-1 ${
+                          className={`px-3 py-1 rounded-full text-xs font-semibold border transition-all flex items-center gap-1 cursor-pointer ${
                             isSelected
-                              ? 'bg-emerald-500 text-white border-emerald-600'
+                              ? 'bg-emerald-600 text-white border-emerald-600'
                               : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
                           }`}
                         >
@@ -806,22 +819,22 @@ export default function ProviderDashboard() {
                 </div>
 
                 {/* Escrow Release Notice */}
-                <div className="p-3 bg-cyan-50 border border-cyan-200 rounded-xl text-xs text-cyan-900 flex items-start gap-2">
-                  <ShieldCheck size={16} className="text-cyan-700 flex-shrink-0 mt-0.5" />
+                <div className="p-3 bg-teal-50 border border-teal-200 rounded-2xl text-xs text-teal-900 flex items-start gap-2">
+                  <ShieldCheck size={16} className="text-teal-700 shrink-0 mt-0.5" />
                   <span>
                     Submitting opens the 72-hour inspection window. Client will be prompted to release your <strong>{activeProofJob.agreedPrice} ETB</strong> payment directly to your wallet.
                   </span>
                 </div>
               </div>
 
-              <div className="modal-footer-sticky">
-                <button type="button" onClick={() => setIsProofModalOpen(false)} className="btn btn-outline btn-sm">
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+                <button type="button" onClick={() => setIsProofModalOpen(false)} className="px-4 py-2 text-xs font-bold text-slate-600 hover:text-slate-900 cursor-pointer">
                   Cancel
                 </button>
                 <button 
                   type="submit" 
                   disabled={isSubmittingProof || !completionSummary.trim()}
-                  className="btn btn-primary btn-sm flex items-center gap-1.5"
+                  className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm transition-colors cursor-pointer"
                 >
                   <CheckCircle2 size={13} />
                   <span>{isSubmittingProof ? 'Submitting...' : `Submit & Request ${activeProofJob.agreedPrice} ETB`}</span>

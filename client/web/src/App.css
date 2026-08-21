@@ -5,55 +5,8 @@
 body {
   margin: 0;
   padding: 0;
-  background-color: #56b4e0;
-  background-image: linear-gradient(140deg, #62c3ea 0%, #7ec8e3 45%, #4faad9 100%);
-  background-attachment: fixed;
   min-height: 100vh;
   overflow-x: hidden;
-  color: #0f172a;
-}
-
-/* ── Fixed Native-Resolution Light Sky Wallpaper Layer ──────────────────── */
-.fixed-background-wallpaper {
-  position: fixed;
-  inset: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 0;
-  overflow: hidden;
-  pointer-events: none;
-  background: linear-gradient(140deg, #62c3ea 0%, #7ec8e3 45%, #4faad9 100%);
-}
-
-.global-sky-glow {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(90px);
-  pointer-events: none;
-}
-
-.global-glow-top-right {
-  width: 600px;
-  height: 600px;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.1) 70%, transparent 100%);
-  top: -150px;
-  right: -100px;
-}
-
-.global-glow-bottom-left {
-  width: 550px;
-  height: 550px;
-  background: radial-gradient(circle, rgba(15, 23, 42, 0.12) 0%, transparent 70%);
-  bottom: -150px;
-  left: -100px;
-}
-
-.global-sky-mesh {
-  position: absolute;
-  inset: 0;
-  background-image: radial-gradient(rgba(15, 23, 42, 0.04) 1px, transparent 1px);
-  background-size: 32px 32px;
-  pointer-events: none;
 }
 
 .app-main-layout {

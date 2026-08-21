@@ -1,116 +1,153 @@
-:root {
-  /* LINC Design System Color Tokens */
-  --primary-blue: #7EC8E3;
-  --primary-blue-hover: #68b8d6;
-  --deep-midnight: #0F172A;
-  --deep-midnight-hover: #1e293b;
-  --slate-blue: #1E5F7A;
-  --cyan: #06B6D4;
-  --cyan-light: #E0F2FE;
-  --emerald: #10B981;
-  --emerald-light: #ECFDF5;
-  --amber: #F59E0B;
-  --amber-dark: #D97706;
-  --amber-light: #FFFBEB;
-  --red: #EF4444;
-  --red-light: #FEF2F2;
-  --violet: #7C3AED;
+@import "tailwindcss";
 
-  /* Surfaces & Backgrounds */
-  --bg-app: #F8FAFC;
-  --bg-card: #FFFFFF;
-  --bg-subtle: #F1F5F9;
-  --border-color: #E2E8F0;
-  --border-focus: #7EC8E3;
+@layer base {
+  :root {
+    /* Brand Tokens - Stripe Style Precision */
+    --color-primary: #0F172A;
+    --color-primary-hover: #1E293B;
+    --color-teal: #0D9488;
+    --color-teal-hover: #0F766E;
+    --color-amber: #F59E0B;
+    --color-emerald: #10B981;
+    --color-cyan: #06B6D4;
+    --color-violet: #8B5CF6;
+    --color-magenta: #EC4899;
 
-  /* Typography */
-  --text-primary: #0F172A;
-  --text-secondary: #64748B;
-  --text-muted: #94A3B8;
-  --text-slate: #334155;
+    /* Surface Tokens */
+    --bg-page: #FAFAF9;
+    --bg-surface: #FFFFFF;
+    --border-subtle: #E2E8F0;
+    --border-card: #F1F5F9;
 
-  /* Typography families */
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans Ethiopic', sans-serif;
-  --font-ethiopic: 'Noto Sans Ethiopic', 'Inter', sans-serif;
+    /* Typography */
+    --text-main: #0F172A;
+    --text-muted: #64748B;
+    --text-faint: #94A3B8;
 
-  /* Shadows */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
-  --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.03);
-  --shadow-xl: 0 20px 25px -5px rgba(15, 23, 42, 0.1), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
-  --shadow-glow: 0 0 25px rgba(126, 200, 227, 0.35);
-
-  /* Radii */
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 20px;
-  --radius-pill: 9999px;
-}
-
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-html,
-body {
-  min-height: 100vh;
-  font-family: var(--font-sans);
-  background-color: var(--bg-app);
-  color: var(--text-primary);
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-#root {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-button,
-input,
-select,
-textarea {
-  font-family: inherit;
-  font-size: inherit;
-}
-
-/* Animations */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
+    /* Font Family */
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  html,
+  body {
+    min-height: 100vh;
+    font-family: var(--font-sans);
+    background-color: #FFFFFF;
+    color: var(--text-main);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+
+  #root {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
   }
 }
 
-@keyframes pulseGlow {
-  0%, 100% {
-    opacity: 0.6;
-    transform: scale(1);
+/* ── Stripe-Grade Aurora Mesh Background & Diagonal Plane ── */
+.stripe-diagonal-container {
+  position: relative;
+  overflow: hidden;
+  background-color: #FFFFFF;
+}
+
+.stripe-aurora-mesh {
+  position: absolute;
+  top: -120px;
+  right: -100px;
+  width: 75vw;
+  max-width: 1100px;
+  height: 800px;
+  transform: skewY(-8deg);
+  transform-origin: top right;
+  border-radius: 40px;
+  background: radial-gradient(circle at 80% 20%, rgba(245, 158, 11, 0.45) 0%, transparent 45%),
+              radial-gradient(circle at 50% 50%, rgba(6, 182, 212, 0.4) 0%, transparent 55%),
+              radial-gradient(circle at 20% 70%, rgba(236, 72, 153, 0.45) 0%, transparent 60%),
+              radial-gradient(circle at 75% 85%, rgba(139, 92, 246, 0.5) 0%, transparent 65%);
+  filter: blur(55px);
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.85;
+  animation: auroraFlow 16s ease-in-out infinite alternate;
+}
+
+@keyframes auroraFlow {
+  0% {
+    transform: skewY(-8deg) scale(1) rotate(0deg);
+    filter: blur(55px);
   }
   50% {
-    opacity: 0.9;
-    transform: scale(1.05);
+    transform: skewY(-7deg) scale(1.04) rotate(2deg);
+    filter: blur(65px);
+  }
+  100% {
+    transform: skewY(-9deg) scale(0.98) rotate(-1deg);
+    filter: blur(50px);
   }
 }
 
-.animate-fade-in {
-  animation: fadeIn 0.25s ease-out forwards;
+/* ── Floating Card Realistic Shadows ── */
+.shadow-stripe-card {
+  box-shadow: 0 16px 32px -8px rgba(15, 23, 42, 0.08), 
+              0 6px 12px -4px rgba(15, 23, 42, 0.03),
+              0 0 0 1px rgba(15, 23, 42, 0.04);
 }
 
-.animate-pulse {
-  animation: pulseGlow 2.5s infinite ease-in-out;
+.shadow-stripe-elevated {
+  box-shadow: 0 24px 48px -12px rgba(15, 23, 42, 0.12),
+              0 10px 20px -6px rgba(15, 23, 42, 0.05),
+              0 0 0 1px rgba(15, 23, 42, 0.05);
+}
+
+.shadow-stripe-hover {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.shadow-stripe-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 32px 64px -16px rgba(15, 23, 42, 0.14),
+              0 16px 28px -8px rgba(15, 23, 42, 0.06),
+              0 0 0 1px rgba(15, 23, 42, 0.06);
+}
+
+/* ── Exact Mockup Grid & Aurora Styling ── */
+.linc-grid-bg {
+  background-color: #FFFFFF;
+  background-image: 
+    linear-gradient(to right, rgba(226, 232, 240, 0.7) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(226, 232, 240, 0.7) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+.linc-hero-aurora {
+  position: absolute;
+  top: -60px;
+  right: -80px;
+  width: 740px;
+  height: 640px;
+  background: 
+    radial-gradient(circle at 75% 25%, rgba(245, 158, 11, 0.55) 0%, transparent 40%),
+    radial-gradient(circle at 45% 55%, rgba(6, 182, 212, 0.5) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(217, 70, 239, 0.45) 0%, transparent 55%),
+    radial-gradient(circle at 90% 40%, rgba(139, 92, 246, 0.45) 0%, transparent 50%);
+  filter: blur(70px);
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.85;
+}
+
+.btn-linc-teal {
+  background-color: #007A78;
+  color: #FFFFFF;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-linc-teal:hover {
+  background-color: #006664;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 122, 120, 0.25);
 }

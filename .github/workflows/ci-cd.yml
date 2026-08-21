@@ -1,0 +1,77 @@
+name: CI/CD Pipeline - Containerization & Automated Testing
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  # ============================================================================
+  # Stage 1: Automated Testing Pipeline
+  # ============================================================================
+  test:
+    name: Run Automated Tests
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./server
+
+    steps:
+      - name: Checkout Code Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js Environment (LTS 20)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: server/package.json
+
+      - name: Install Project Dependencies
+        run: npm install
+
+      - name: Execute Automated Test Suite
+        run: npm test
+        env:
+          NODE_ENV: test
+          SKIP_ENV_VALIDATION: true
+
+  # ============================================================================
+  # Stage 2: Docker Build & Registry Publishing Pipeline
+  # ============================================================================
+  build-and-publish:
+    name: Build & Push Docker Image
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+
+    steps:
+      - name: Checkout Code Repository
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        if: env.DOCKERHUB_TOKEN != ''
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME || 'ermizamr' }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+        env:
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./server
+          file: ./server/Dockerfile
+          push: ${{ secrets.DOCKERHUB_TOKEN != '' }}
+          tags: |
+            ermizamr/app:1.0
+            ermizamr/app:latest

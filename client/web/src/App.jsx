@@ -22,6 +22,7 @@ import BusinessManagementPage from './pages/BusinessManagementPage';
 import PaymentResultPage from './pages/PaymentResultPage';
 import Navbar from './components/layout/Navbar';
 import AuthPromptModal from './components/auth/AuthPromptModal';
+import ProviderDetailsModal from './components/provider/ProviderDetailsModal';
 import { useAuthStore } from './stores/authStore';
 import { useAppStore } from './stores/appStore';
 import './App.css';
@@ -41,13 +42,12 @@ function GlobalToast() {
   );
 }
 
-// Unified Layout Shell: Navbar on top + Floating Content Card
+// Unified Layout Shell: Full-width sticky Navbar + flexible content canvas
 function AppLayout() {
   return (
-    <div className="app-main-layout">
+    <div className="min-h-screen flex flex-col bg-white">
       <Navbar />
-
-      <main className="app-content-card">
+      <main className="flex-1 w-full">
         <Outlet />
       </main>
     </div>
@@ -59,15 +59,9 @@ export default function App() {
 
   return (
     <BrowserRouter>
-      {/* Light Sky Cyan Ambient Wallpaper Layer */}
-      <div className="fixed-background-wallpaper" aria-hidden="true">
-        <div className="global-sky-glow global-glow-top-right" />
-        <div className="global-sky-glow global-glow-bottom-left" />
-        <div className="global-sky-mesh" />
-      </div>
-
       <GlobalToast />
       <AuthPromptModal />
+      <ProviderDetailsModal />
       <Routes>
         {/* Fullscreen Dedicated Auth Pages (Matches Exact User Prototype) */}
         <Route path="/login" element={<AuthPage initialMode="login" />} />
