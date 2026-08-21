@@ -48,7 +48,7 @@ class AppConfig {
     } catch (_) {}
   }
 
-  /// The root base URL (e.g. `https://linc-backend.onrender.com` or `http://10.2.64.251:5000`) without trailing slash or `/api`.
+  /// The root base URL (e.g. `https://linc-backend.onrender.com`) without trailing slash or `/api`.
   static String get baseUrl {
     if (_overrideBaseUrl != null && _overrideBaseUrl!.isNotEmpty) {
       return _overrideBaseUrl!;
@@ -56,13 +56,7 @@ class AppConfig {
     if (_envBaseUrl.isNotEmpty) {
       return _normalizeUrl(_envBaseUrl);
     }
-    if (kReleaseMode) {
-      return defaultRenderHost;
-    }
-    if (kIsWeb) {
-      return 'http://127.0.0.1:5000';
-    }
-    return 'http://$defaultDevHost';
+    return defaultRenderHost;
   }
 
   /// The REST API endpoint prefix (e.g. `http://10.186.1.187:5000/api`).
