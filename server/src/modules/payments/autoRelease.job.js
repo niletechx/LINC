@@ -34,14 +34,27 @@ async function runAutoReleaseCheck() {
   }
 }
 
+let _jobInterval = null;
+
 /**
  * Start the auto-release background job.
  * Call this once from server startup.
  */
 function startAutoReleaseJob() {
   logger.info(`AutoRelease job started — checking every ${CHECK_INTERVAL_MS / 60000} minutes`);
-  // Run check on interval
-  return setInterval(runAutoReleaseCheck, CHECK_INTERVAL_MS);
+  _jobInterval = setInterval(runAutoReleaseCheck, CHECK_INTERVAL_MS);
+  return _jobInterval;
 }
 
-module.exports = { startAutoReleaseJob, runAutoReleaseCheck };
+/**
+ * Stop the auto-release background job.
+ */
+function stopAutoReleaseJob() {
+  if (_jobInterval) {
+    clearInterval(_jobInterval);
+    _jobInterval = null;
+    logger.info('AutoRelease background job stopped');
+  }
+}
+
+module.exports = { startAutoReleaseJob, stopAutoReleaseJob, runAutoReleaseCheck };

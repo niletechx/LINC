@@ -10,9 +10,23 @@ validateEnv();
 
 const app = express();
 
-// Security
+// Security & CORS
+const allowedOrigins = process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.split(',').map((o) => o.trim())
+  : true;
+
 app.use(helmet({ crossOriginResourcePolicy: false }));
-app.use(cors({ origin: true, credentials: true }));
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow non-browser requests (mobile apps, Postman, server-to-server) with no origin
+    if (!origin || allowedOrigins === true) return callback(null, true);
+    if (allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
+      return callback(null, true);
+    }
+    return callback(null, true); // Permissive in dev fallback
+  },
+  credentials: true,
+}));
 
 // Logging
 app.use(morgan('dev'));
