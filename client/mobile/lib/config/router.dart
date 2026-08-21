@@ -35,54 +35,7 @@ class AppShell extends ConsumerWidget {
 
     void gotoOrGate(String route, {bool requiresAuth = false}) {
       if (requiresAuth && isGuest) {
-        // Show sign-in sheet
-        showModalBottomSheet(
-          context: context,
-          backgroundColor: Colors.white,
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-          ),
-          builder: (ctx) => Padding(
-            padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(width: 40, height: 4, decoration: BoxDecoration(color: const Color(0xFFCBD5E1), borderRadius: BorderRadius.circular(2))),
-                const SizedBox(height: 20),
-                Container(
-                  width: 60, height: 60,
-                  decoration: BoxDecoration(color: const Color(0xFFEFF6FF), borderRadius: BorderRadius.circular(18)),
-                  alignment: Alignment.center,
-                  child: const Icon(Icons.lock_outline_rounded, size: 28, color: Color(0xFF3B82F6)),
-                ),
-                const SizedBox(height: 14),
-                const Text('Sign in to continue', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)), textAlign: TextAlign.center),
-                const SizedBox(height: 6),
-                const Text('Create a free account to access messaging, bookings, and more.', textAlign: TextAlign.center, style: TextStyle(fontSize: 13, color: Color(0xFF64748B), height: 1.4)),
-                const SizedBox(height: 24),
-                SizedBox(
-                  width: double.infinity, height: 50,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0F172A), foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
-                    onPressed: () { Navigator.pop(ctx); context.go('/signup'); },
-                    child: const Text('Create Account — Free', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                SizedBox(
-                  width: double.infinity, height: 50,
-                  child: OutlinedButton(
-                    style: OutlinedButton.styleFrom(side: const BorderSide(color: Color(0xFFE2E8F0), width: 1.5), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
-                    onPressed: () { Navigator.pop(ctx); context.go('/login'); },
-                    child: const Text('Sign In', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Color(0xFF0F172A))),
-                  ),
-                ),
-                const SizedBox(height: 14),
-                GestureDetector(onTap: () => Navigator.pop(ctx), child: const Text('Continue exploring as guest', style: TextStyle(fontSize: 12.5, color: Color(0xFF94A3B8)))),
-              ],
-            ),
-          ),
-        );
+        context.go('/welcome');
       } else {
         context.go(route);
       }
@@ -96,15 +49,15 @@ class AppShell extends ConsumerWidget {
           if (isProvider) {
             switch (index) {
               case 0: gotoOrGate('/home'); break;
-              case 1: gotoOrGate('/messages', requiresAuth: true); break;
+              case 1: gotoOrGate('/messages'); break;                      // guests allowed
               case 2: gotoOrGate('/bookings', requiresAuth: true); break;
               case 3: gotoOrGate('/profile', requiresAuth: true); break;
             }
           } else {
             switch (index) {
               case 0: gotoOrGate('/home'); break;
-              case 1: gotoOrGate('/messages', requiresAuth: true); break;
-              case 2: gotoOrGate('/ai', requiresAuth: true); break;
+              case 1: gotoOrGate('/messages'); break;                      // guests allowed
+              case 2: gotoOrGate('/ai'); break;                            // guests allowed
               case 3: gotoOrGate('/bookings', requiresAuth: true); break;
               case 4: gotoOrGate('/profile', requiresAuth: true); break;
             }
@@ -160,18 +113,19 @@ final routerProvider = Provider<GoRouter>((ref) {
           path.startsWith('/signup') ||
           path.startsWith('/forgot');
 
-      // Routes accessible without signing in (explore/browse mode)
+      // Routes accessible without signing in (explore + ai + chat)
       final isPublicRoute = path.startsWith('/explore') ||
           path.startsWith('/search') ||
-          path.startsWith('/provider/');
+          path.startsWith('/provider/') ||
+          path.startsWith('/ai') ||
+          path.startsWith('/messages') ||
+          path.startsWith('/dm/');
 
-      // Guest can access public + home view; redirect anything else to welcome
+      // Guest: allow home + all public routes; only /bookings and /profile need auth
       if (!isAuthed && isGuest) {
-        // Guest trying to access auth screens → stay or go to explore
         if (isAuthRoute) return null;
-        // Guest accessing public routes → allowed
         if (isPublicRoute || path.startsWith('/home')) return null;
-        // Guest accessing protected routes (booking, messages, ai, profile) → welcome
+        // Only bookings and profile require sign-in for guests
         return '/welcome';
       }
 

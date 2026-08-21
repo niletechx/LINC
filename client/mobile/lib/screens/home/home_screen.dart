@@ -362,7 +362,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
               GestureDetector(
                 onTap: () {
-                  if (!_guestGate(context, action: 'view your bookings')) return;
+                  final authState = ref.read(authProvider);
+                  if (!authState.isAuthed) {
+                    context.go('/welcome');
+                    return;
+                  }
                   context.go('/bookings');
                 },
                 child: const Text(
@@ -615,97 +619,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ],
       ),
     );
-  }
-
-  /// Shows a bottom-sheet prompting the guest to sign in or create an account.
-  /// Returns true if the user is authenticated (not a guest), false otherwise.
-  bool _guestGate(BuildContext context, {String? action}) {
-    final authState = ref.read(authProvider);
-    if (authState.isAuthed) return true; // allowed
-
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (ctx) {
-        return Padding(
-          padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 40, height: 4,
-                decoration: BoxDecoration(color: const Color(0xFFCBD5E1), borderRadius: BorderRadius.circular(2)),
-              ),
-              const SizedBox(height: 20),
-              Container(
-                width: 60, height: 60,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFEFF6FF),
-                  borderRadius: BorderRadius.circular(18),
-                ),
-                alignment: Alignment.center,
-                child: const Icon(Icons.lock_outline_rounded, size: 28, color: Color(0xFF3B82F6)),
-              ),
-              const SizedBox(height: 14),
-              Text(
-                action != null ? 'Sign in to $action' : 'Sign in to continue',
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 6),
-              const Text(
-                'Create a free account or sign in to use this feature. It only takes a minute!',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 13, color: Color(0xFF64748B), height: 1.4),
-              ),
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity, height: 50,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF0F172A),
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                  ),
-                  onPressed: () {
-                    Navigator.pop(ctx);
-                    context.go('/signup');
-                  },
-                  child: const Text('Create Account — Free', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
-                ),
-              ),
-              const SizedBox(height: 10),
-              SizedBox(
-                width: double.infinity, height: 50,
-                child: OutlinedButton(
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Color(0xFFE2E8F0), width: 1.5),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                  ),
-                  onPressed: () {
-                    Navigator.pop(ctx);
-                    context.go('/login');
-                  },
-                  child: const Text('Sign In', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Color(0xFF0F172A))),
-                ),
-              ),
-              const SizedBox(height: 14),
-              GestureDetector(
-                onTap: () => Navigator.pop(ctx),
-                child: const Text(
-                  'Continue exploring as guest',
-                  style: TextStyle(fontSize: 12.5, color: Color(0xFF94A3B8), fontWeight: FontWeight.w500),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-    return false; // not authenticated
   }
 
   void _showLocationPicker(BuildContext context) {
@@ -975,12 +888,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       const SizedBox(width: 8),
                       const Expanded(
                         child: Text(
-                          'Browsing as guest · Sign in to book & message providers',
+                          'Browsing as guest · Sign in or create account to book',
                           style: TextStyle(color: Colors.white, fontSize: 11.5, fontWeight: FontWeight.w500),
                         ),
                       ),
                       GestureDetector(
-                        onTap: () => context.go('/login'),
+                        onTap: () => context.go('/welcome'),
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                           decoration: BoxDecoration(

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../models/chat_message_model.dart';
 import '../../models/provider_model.dart';
 import '../../providers/ai_provider.dart';
+import '../../providers/auth_provider.dart';
 import '../../widgets/formatted_markdown_text.dart';
 
 class AiScreen extends ConsumerStatefulWidget {
@@ -739,7 +740,14 @@ class _AiScreenState extends ConsumerState<AiScreen> with SingleTickerProviderSt
             children: [
               Expanded(
                 child: InkWell(
-                  onTap: () => context.push('/booking/$id'),
+                  onTap: () {
+                    final authState = ref.read(authProvider);
+                    if (!authState.isAuthed) {
+                      context.go('/welcome');
+                      return;
+                    }
+                    context.push('/booking/$id');
+                  },
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 10),
                     alignment: Alignment.center,
