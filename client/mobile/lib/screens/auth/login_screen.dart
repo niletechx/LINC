@@ -199,115 +199,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               border: Border.all(color: Colors.red.shade200),
                               borderRadius: BorderRadius.circular(10),
                             ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            child: Row(
                               children: [
-                                Row(
-                                  children: [
-                                    const Icon(Icons.error_outline, color: Colors.red, size: 20),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      child: Text(
-                                        _error,
-                                        style: const TextStyle(color: Colors.red, fontSize: 13),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 8),
-                                InkWell(
-                                  onTap: () {
-                                    ref.read(authProvider.notifier).signIn();
-                                    context.go('/home');
-                                  },
-                                  child: const Text(
-                                    '👉 Or Continue in Demo Mode',
-                                    style: TextStyle(color: Color(0xFF0284C7), fontWeight: FontWeight.bold, fontSize: 12),
+                                const Icon(Icons.error_outline, color: Colors.red, size: 20),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    _error,
+                                    style: const TextStyle(color: Colors.red, fontSize: 13),
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                        
-                        // Quick Demo Login Helper
-                        Container(
-                          margin: const EdgeInsets.only(bottom: 20),
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF0F9FF),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: const Color(0xFFBAE6FD)),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Row(
-                                children: [
-                                  Icon(Icons.lightbulb_outline, color: Color(0xFF0284C7), size: 16),
-                                  SizedBox(width: 6),
-                                  Text(
-                                    'Demo Accounts (Auto-fill & Sign In)',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w700,
-                                      color: Color(0xFF0369A1),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: InkWell(
-                                      onTap: () {
-                                        _emailController.text = 'yonas.molla@email.com';
-                                        _passwordController.text = 'password123';
-                                        _handleSignIn();
-                                      },
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 8),
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius: BorderRadius.circular(8),
-                                          border: Border.all(color: const Color(0xFF7DD3FC)),
-                                        ),
-                                        child: const Text(
-                                          '👤 Client: Yonas',
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700, color: Color(0xFF0284C7)),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: InkWell(
-                                      onTap: () {
-                                        _emailController.text = 'samuel.girma@email.com';
-                                        _passwordController.text = 'password123';
-                                        _handleSignIn();
-                                      },
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 8),
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius: BorderRadius.circular(8),
-                                          border: Border.all(color: const Color(0xFF7DD3FC)),
-                                        ),
-                                        child: const Text(
-                                          '🔧 Provider: Samuel',
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700, color: Color(0xFF0284C7)),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
                         
                         // Email field
                         const Text(

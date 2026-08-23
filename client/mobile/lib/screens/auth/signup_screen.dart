@@ -326,30 +326,14 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                         border: Border.all(color: Colors.red.shade200),
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      child: Row(
                         children: [
-                          Row(
-                            children: [
-                              const Icon(Icons.error_outline, color: Colors.red, size: 20),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  _error,
-                                  style: const TextStyle(color: Colors.red, fontSize: 13),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 8),
-                          InkWell(
-                            onTap: () {
-                              ref.read(authProvider.notifier).signIn();
-                              context.go('/home');
-                            },
-                            child: const Text(
-                              '👉 Or Continue in Demo Mode',
-                              style: TextStyle(color: Color(0xFF0284C7), fontWeight: FontWeight.bold, fontSize: 12),
+                          const Icon(Icons.error_outline, color: Colors.red, size: 20),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              _error,
+                              style: const TextStyle(color: Colors.red, fontSize: 13),
                             ),
                           ),
                         ],
