@@ -49,6 +49,7 @@ class UserModel {
       'role': role,
       'is_admin': isAdmin,
       'is_active': isActive,
+      'location_city': locationCity,
     };
   }
 

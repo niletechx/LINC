@@ -80,7 +80,7 @@ class ConversationModel {
       avatarUrl: other['avatar_url']?.toString(),
       color: hashColor(name),
       lastMsg: json['last_message']?.toString() ?? 'Conversation started',
-      time: formatTime(json['last_message_time'] ?? json['last_message_at'] ?? json['created_at']),
+      time: formatTime(json['last_message_at'] ?? json['created_at']),
       unread: (json['unread_count'] is num) ? (json['unread_count'] as num).toInt() : 0,
       online: true,
     );

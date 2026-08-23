@@ -49,14 +49,21 @@ class AuthState {
 class AuthNotifier extends StateNotifier<AuthState> {
   final AuthService _authService = AuthService();
 
-  AuthNotifier() : super(const AuthState(isInitialized: true, isAuthed: false)) {
+  AuthNotifier() : super(const AuthState(isInitialized: false, isAuthed: false)) {
     initialize();
   }
 
   Future<void> initialize() async {
     try {
-      await StorageService.clear();
+      final token = await StorageService.getToken();
+      final user = await StorageService.getUser();
+      if (token != null && token.isNotEmpty && user != null) {
+        // Restore existing session — user stays logged in across launches
+        state = AuthState(isInitialized: true, isAuthed: true, isGuest: false, user: user, token: token);
+        return;
+      }
     } catch (_) {}
+    // No valid session — start as unauthenticated guest
     state = const AuthState(isInitialized: true, isAuthed: false, isGuest: true, user: null, token: null);
   }
 

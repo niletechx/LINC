@@ -40,8 +40,9 @@ async function createUser({ email, password_hash, full_name, username, phone, lo
       username: username.toLowerCase(),
       phone: phone || null,
       location_city: location_city || 'Addis Ababa',
+      role: ['client', 'provider', 'admin'].includes(role) ? role : 'client',
     })
-    .select('id, email, full_name, username, avatar_url, phone, location_city, is_admin, created_at')
+    .select('id, email, full_name, username, avatar_url, phone, location_city, role, is_admin, created_at')
     .single();
   if (error) throw error;
 

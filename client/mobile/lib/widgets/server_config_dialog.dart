@@ -86,8 +86,8 @@ class _ServerConfigDialogState extends State<ServerConfigDialog> {
                   icon: Icons.cloud_done_rounded,
                 ),
                 _buildPresetChip(
-                  label: 'Wi-Fi PC (10.2.64.251)',
-                  url: 'http://10.2.64.251:5000',
+                  label: 'Wi-Fi PC (192.168.147.214)',
+                  url: 'http://192.168.147.214:5000',
                   icon: Icons.wifi,
                 ),
                 _buildPresetChip(

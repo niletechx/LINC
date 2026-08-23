@@ -36,7 +36,7 @@ async function seed() {
     console.log(`✓ Inserted/Updated ${categories?.length} categories`);
   }
 
-  // 2. Demo Users
+  // 2. Demo Users — mark provider users with role='provider'
   const usersData = [
     {
       email: 'yonas.molla@email.com',
@@ -44,6 +44,7 @@ async function seed() {
       full_name: 'Yonas Molla',
       username: 'yonas_m',
       location_city: 'Addis Ababa',
+      role: 'client',
       is_admin: false,
     },
     {
@@ -52,6 +53,7 @@ async function seed() {
       full_name: 'Samuel Girma',
       username: 'samuel_plumbing',
       location_city: 'Addis Ababa',
+      role: 'provider',
       is_admin: false,
     },
     {
@@ -60,6 +62,7 @@ async function seed() {
       full_name: 'Helen Tadesse',
       username: 'helen_clean',
       location_city: 'Addis Ababa',
+      role: 'provider',
       is_admin: false,
     },
     {
@@ -68,6 +71,7 @@ async function seed() {
       full_name: 'Dawit Bekele',
       username: 'dawit_tech',
       location_city: 'Addis Ababa',
+      role: 'provider',
       is_admin: false,
     },
     {
@@ -76,6 +80,7 @@ async function seed() {
       full_name: 'Bethelhem Hailu',
       username: 'bethelhem_tutor',
       location_city: 'Addis Ababa',
+      role: 'provider',
       is_admin: false,
     },
     {
@@ -84,6 +89,7 @@ async function seed() {
       full_name: 'Abebe Kebede',
       username: 'abebe_electric',
       location_city: 'Addis Ababa',
+      role: 'provider',
       is_admin: false,
     },
   ];
@@ -197,7 +203,59 @@ async function seed() {
     console.log(`✓ Inserted/Updated ${providers?.length} provider profiles`);
   }
 
-  // 4. Open Requests
+  // 4. Seed a default service for each provider (needed for bookings FK)
+  const categorySlugMap = {};
+  (categories || []).forEach((c) => { categorySlugMap[c.slug] = c.id; });
+
+  const providerServiceMap = {}; // provider.id → service.id
+  if (providers && providers.length > 0 && categories && categories.length > 0) {
+    const categoryForProvider = {
+      'samuel_plumbing': 'plumbing',
+      'helen_clean':     'cleaning',
+      'dawit_tech':      'tech',
+      'bethelhem_tutor': 'tutoring',
+      'abebe_electric':  'electrical',
+    };
+
+    const serviceSeeds = providers.map((prov) => {
+      const provUsername = Object.keys(userMap).find((k) => userMap[k] === prov.user_id) || '';
+      const slug = categoryForProvider[provUsername] || 'cleaning';
+      const catId = categorySlugMap[slug] || categories[0].id;
+      return {
+        provider_id: prov.id,
+        category_id: catId,
+        title: prov.headline,
+        description: prov.bio,
+        price_type: 'hourly',
+        price_amount: prov.hourly_rate,
+        currency: prov.currency,
+        location_city: prov.location_city,
+        is_available: true,
+        is_active: true,
+      };
+    });
+
+    console.log('Inserting provider services...');
+    const { data: services, error: svcErr } = await supabase
+      .from('services')
+      .insert(serviceSeeds)
+      .select();
+
+    if (svcErr) {
+      console.warn('Warning seeding services (may already exist):', svcErr.message);
+      // Fetch existing ones
+      const { data: existingServices } = await supabase
+        .from('services')
+        .select('id, provider_id')
+        .in('provider_id', providers.map((p) => p.id));
+      (existingServices || []).forEach((s) => { providerServiceMap[s.provider_id] = s.id; });
+    } else {
+      (services || []).forEach((s) => { providerServiceMap[s.provider_id] = s.id; });
+      console.log(`✓ Inserted ${services?.length} provider services`);
+    }
+  }
+
+  // 5. Open Requests
   if (userMap['yonas_m']) {
     const requestsData = [
       {
@@ -236,21 +294,27 @@ async function seed() {
     ];
 
     console.log('Inserting demo requests...');
-    const { data: reqs, error: reqsError } = await supabase
+    const { error: reqsError } = await supabase
       .from('requests')
-      .insert(requestsData)
-      .select();
+      .insert(requestsData);
+    if (reqsError) {
+      console.warn('Warning inserting requests (may already exist):', reqsError.message);
+    } else {
+      console.log(`✓ Inserted ${requestsData.length} demo requests`);
+    }
 
-    // 5. Seed Bookings & Customer Reviews
+    // 6. Seed Bookings & Customer Reviews — FIXED field names per schema
     console.log('Inserting demo bookings & customer reviews...');
     const reviewerId = userMap['yonas_m'];
 
     for (const prov of (providers || [])) {
-      // Create a completed booking first
-      const { data: booking } = await supabase
+      const serviceId = providerServiceMap[prov.id] || null;
+
+      const { data: booking, error: bookErr } = await supabase
         .from('bookings')
         .insert({
           requester_id: reviewerId,
+          service_id: serviceId,       // FK — required by schema
           entity_type: 'provider',
           entity_id: prov.id,
           scheduled_at: new Date(Date.now() - 86400000 * 3).toISOString(),
@@ -261,6 +325,11 @@ async function seed() {
         })
         .select()
         .single();
+
+      if (bookErr) {
+        console.warn(`Warning booking for provider ${prov.id}:`, bookErr.message);
+        continue;
+      }
 
       if (booking) {
         let reviewComment = 'Excellent work, very professional and punctual!';
@@ -276,14 +345,19 @@ async function seed() {
           reviewComment = 'Abebe solved an intricate circuit trip in our main distribution board safely and quickly. True professional.';
         }
 
-        await supabase.from('reviews').insert({
+        // FIXED: entity_type / entity_id (not target_entity_type / target_entity_id)
+        const { error: revErr } = await supabase.from('reviews').insert({
           booking_id: booking.id,
           reviewer_id: reviewerId,
-          target_entity_type: 'provider',
-          target_entity_id: prov.id,
+          entity_type: 'provider',
+          entity_id: prov.id,
           rating: 5,
           comment: reviewComment,
         });
+
+        if (revErr) {
+          console.warn(`Warning review for booking ${booking.id}:`, revErr.message);
+        }
       }
     }
     console.log('✓ Inserted demo bookings and customer reviews');

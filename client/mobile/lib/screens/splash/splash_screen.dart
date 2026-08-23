@@ -85,7 +85,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> with SingleTickerPr
 
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
-        _navigateToDestination();
+        _tryNavigate();
       }
     });
 
@@ -96,6 +96,22 @@ class _SplashScreenState extends ConsumerState<SplashScreen> with SingleTickerPr
   void dispose() {
     _controller.dispose();
     super.dispose();
+  }
+
+  /// Called when animation completes. If auth hasn't finished initializing
+  /// (session restore is still in-flight), we wait; otherwise navigate.
+  void _tryNavigate() {
+    final authState = ref.read(authProvider);
+    if (!authState.isInitialized) {
+      // Auth init is still in flight — listen for the first state update
+      ref.listenManual(authProvider, (_, next) {
+        if (next.isInitialized) {
+          _navigateToDestination();
+        }
+      }, fireImmediately: true);
+    } else {
+      _navigateToDestination();
+    }
   }
 
   void _navigateToDestination() {

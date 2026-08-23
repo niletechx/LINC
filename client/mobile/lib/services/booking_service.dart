@@ -24,7 +24,10 @@ class BookingService {
           'agreed_price': agreedPrice,
           'currency': 'ETB',
           'notes': notes,
-          'status': paymentMethod == 'escrow' ? 'paid_escrow' : 'pending',
+          // Always start as 'pending' — the DB CHECK constraint does not allow
+          // 'paid_escrow' as an initial status. Escrow is managed server-side
+          // via the /payments/escrow endpoint after booking is confirmed.
+          'status': 'pending',
         },
       );
 

@@ -97,14 +97,25 @@ class HomeModeWrapper extends ConsumerWidget {
 }
 
 // ── Router ────────────────────────────────────────────────────────────────────
+//
+// IMPORTANT: The GoRouter must be a stable singleton. Using ref.watch on
+// authProvider inside this Provider would cause a brand-new GoRouter (with
+// initialLocation='/splash') to be created every time auth state changes,
+// resetting navigation to the splash screen in an infinite loop.
+//
+// Fix: create the router once, then use ref.listen + router.refresh() so the
+// existing redirect callback re-runs with up-to-date state — without
+// recreating the router.
 final routerProvider = Provider<GoRouter>((ref) {
-  final authState = ref.watch(authProvider);
-  final isAuthed = authState.isAuthed;
-  final needsProviderSetup = ref.watch(needsProviderSetupProvider);
 
-  return GoRouter(
+  final router = GoRouter(
     initialLocation: '/splash',
     redirect: (context, state) {
+      // Read current values each time the redirect runs — not stale closures.
+      final authState = ref.read(authProvider);
+      final isAuthed = authState.isAuthed;
+      final needsProviderSetup = ref.read(needsProviderSetupProvider);
+
       final path = state.uri.path;
 
       // Splash route — always allowed
@@ -200,4 +211,12 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/provider-setup', builder: (_, __) => const ProviderSetupScreen()),
     ],
   );
+
+  // When auth state changes, tell the existing router to re-run its redirect
+  // callback — without creating a new GoRouter (which would reset navigation
+  // to initialLocation: '/splash').
+  ref.listen(authProvider, (_, __) => router.refresh());
+  ref.listen(needsProviderSetupProvider, (_, __) => router.refresh());
+
+  return router;
 });

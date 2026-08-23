@@ -11,7 +11,7 @@ import '../services/storage_service.dart';
 class AppConfig {
   AppConfig._();
 
-  static const String defaultDevHost = '10.2.64.251:5000';
+  static const String defaultDevHost = 'http://127.0.0.1:5000';
   static const String defaultRenderHost = 'https://linc-backend.onrender.com';
   static const String _envBaseUrl = String.fromEnvironment('BASE_URL');
 
@@ -48,13 +48,17 @@ class AppConfig {
     } catch (_) {}
   }
 
-  /// The root base URL (e.g. `https://linc-backend.onrender.com`) without trailing slash or `/api`.
+  /// The root base URL (e.g. `http://127.0.0.1:5000` or `https://linc-backend.onrender.com`).
   static String get baseUrl {
     if (_overrideBaseUrl != null && _overrideBaseUrl!.isNotEmpty) {
       return _overrideBaseUrl!;
     }
     if (_envBaseUrl.isNotEmpty) {
       return _normalizeUrl(_envBaseUrl);
+    }
+    // In debug mode, default to local dev server (works via USB adb reverse or emulator)
+    if (kDebugMode) {
+      return defaultDevHost;
     }
     return defaultRenderHost;
   }
