@@ -114,6 +114,8 @@ class ProviderService {
       ),
     ];
 
+    final avatarUrl = user['avatar_url'] as String? ?? json['avatar_url'] as String?;
+
     return ProviderModel(
       id: id,
       initials: initials,
@@ -129,6 +131,7 @@ class ProviderService {
       jobs: jobs,
       response: '~5 min',
       about: bio.isNotEmpty ? bio : '$name is a verified professional with high ratings across Addis Ababa.',
+      avatarUrl: avatarUrl,
       services: services,
     );
   }

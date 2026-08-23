@@ -6,6 +6,7 @@ import '../../providers/data_providers.dart';
 import '../../services/message_service.dart';
 import '../../services/review_service.dart';
 import '../../providers/auth_provider.dart';
+import '../../widgets/user_avatar.dart';
 
 class ProviderProfileScreen extends ConsumerStatefulWidget {
   final dynamic providerId;
@@ -277,19 +278,12 @@ class _ProviderProfileScreenState extends ConsumerState<ProviderProfileScreen> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                width: 66,
-                height: 66,
-                decoration: BoxDecoration(
-                  color: p.color,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: Colors.white.withValues(alpha: 0.12), width: 2.5),
-                ),
-                alignment: Alignment.center,
-                child: Text(
-                  p.name.substring(0, 1),
-                  style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800),
-                ),
+              UserAvatar(
+                avatarUrl: p.avatarUrl,
+                initials: p.name.substring(0, 1),
+                size: 66,
+                borderRadius: 20,
+                backgroundColor: p.color,
               ),
               const SizedBox(width: 14),
               Expanded(

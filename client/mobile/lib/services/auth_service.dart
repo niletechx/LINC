@@ -88,6 +88,33 @@ class AuthService {
     }
   }
 
+  Future<UserModel> updateProfile({
+    String? fullName,
+    String? bio,
+    String? phone,
+    String? avatarUrl,
+    String? locationCity,
+  }) async {
+    try {
+      final response = await _client.dio.put(
+        '/users/me',
+        data: {
+          if (fullName != null) 'full_name': fullName.trim(),
+          if (bio != null) 'bio': bio.trim(),
+          if (phone != null) 'phone': phone.trim(),
+          if (avatarUrl != null) 'avatar_url': avatarUrl.trim(),
+          if (locationCity != null) 'location_city': locationCity.trim(),
+        },
+      );
+      final data = response.data['data'] as Map<String, dynamic>;
+      final user = UserModel.fromJson(data);
+      await StorageService.saveUser(user);
+      return user;
+    } catch (e) {
+      throw _client.extractErrorMessage(e);
+    }
+  }
+
   Future<void> logout() async {
     try {
       await _client.dio.post('/auth/logout');

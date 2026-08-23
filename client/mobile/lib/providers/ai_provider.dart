@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/chat_message_model.dart';
 import '../services/ai_service.dart';
+import 'auth_provider.dart';
 
 const _kWelcomeMessage = ChatMessage(
   role: MessageRole.ai,
@@ -51,9 +52,10 @@ class AIChatState {
 }
 
 class AIChatNotifier extends StateNotifier<AIChatState> {
+  final Ref _ref;
   final AiService _aiService = AiService();
 
-  AIChatNotifier()
+  AIChatNotifier(this._ref)
       : super(const AIChatState(
           messages: [_kWelcomeMessage],
           activeTitle: 'New Chat',
@@ -63,13 +65,31 @@ class AIChatNotifier extends StateNotifier<AIChatState> {
 
   void setInput(String v) => state = state.copyWith(input: v);
 
+  void resetForUser() {
+    state = const AIChatState(
+      messages: [_kWelcomeMessage],
+      activeTitle: 'New Chat',
+      conversations: [],
+      conversationId: null,
+      loading: false,
+      loadingSessions: false,
+    );
+    loadSessions();
+  }
+
   Future<void> loadSessions() async {
+    final auth = _ref.read(authProvider);
+    if (!auth.isAuthed) {
+      state = state.copyWith(conversations: const [], loadingSessions: false);
+      return;
+    }
+
     state = state.copyWith(loadingSessions: true);
     try {
       final list = await _aiService.getConversations();
       state = state.copyWith(conversations: list, loadingSessions: false);
     } catch (_) {
-      state = state.copyWith(loadingSessions: false);
+      state = state.copyWith(conversations: const [], loadingSessions: false);
     }
   }
 
@@ -174,7 +194,6 @@ class AIChatNotifier extends StateNotifier<AIChatState> {
       // Refresh session list so the new thread appears in drawer
       loadSessions();
     } catch (e) {
-      // Print error to console for instant debugging
       // ignore: avoid_print
       print('AI chat error: $e');
 
@@ -202,5 +221,13 @@ extension StringSlice on String {
 }
 
 final aiChatProvider = StateNotifierProvider<AIChatNotifier, AIChatState>(
-  (ref) => AIChatNotifier(),
+  (ref) {
+    final notifier = AIChatNotifier(ref);
+    ref.listen(authProvider, (previous, next) {
+      if (previous?.user?.id != next.user?.id || previous?.isAuthed != next.isAuthed) {
+        notifier.resetForUser();
+      }
+    });
+    return notifier;
+  },
 );

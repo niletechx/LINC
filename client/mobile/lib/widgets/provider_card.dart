@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../config/colors.dart';
 import '../config/text_styles.dart';
 import '../models/provider_model.dart';
+import 'user_avatar.dart';
 
 /// Provider card — used in Home "Verified Nearby" horizontal list & Search results
 /// Source: HomeScreen + SearchScreen in App.tsx
@@ -37,18 +38,12 @@ class ProviderCard extends StatelessWidget {
               height: 44,
               child: Stack(
                 children: [
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: provider.color,
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      provider.initials,
-                      style: AppTextStyles.label(color: Colors.white).copyWith(fontSize: 15),
-                    ),
+                  UserAvatar(
+                    avatarUrl: provider.avatarUrl,
+                    initials: provider.initials,
+                    size: 44,
+                    borderRadius: 14,
+                    backgroundColor: provider.color,
                   ),
                   if (provider.verified)
                     Positioned(
@@ -134,11 +129,12 @@ class ProviderListTile extends StatelessWidget {
         child: Row(
           children: [
             // Avatar
-            Container(
-              width: 46, height: 46,
-              decoration: BoxDecoration(color: provider.color, borderRadius: BorderRadius.circular(14)),
-              alignment: Alignment.center,
-              child: Text(provider.initials, style: AppTextStyles.label(color: Colors.white).copyWith(fontSize: 15)),
+            UserAvatar(
+              avatarUrl: provider.avatarUrl,
+              initials: provider.initials,
+              size: 46,
+              borderRadius: 14,
+              backgroundColor: provider.color,
             ),
             const SizedBox(width: 12),
             // Info

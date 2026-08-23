@@ -6,6 +6,8 @@ import '../../providers/app_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/data_providers.dart';
 import '../../services/provider_service.dart';
+import '../../widgets/user_avatar.dart';
+import '../../widgets/avatar_picker_dialog.dart';
 
 class ProviderSetupScreen extends ConsumerStatefulWidget {
   const ProviderSetupScreen({super.key});
@@ -256,6 +258,110 @@ class _ProviderSetupScreenState extends ConsumerState<ProviderSetupScreen> {
                         ),
                         const SizedBox(height: 16),
                       ],
+
+                      // 0. PROFILE PICTURE
+                      Builder(builder: (context) {
+                        final user = ref.watch(authProvider).user;
+                        return _buildSectionCard(
+                          title: 'Professional Profile Photo',
+                          subtitle: 'Upload a clear headshot or business logo to build trust',
+                          child: Row(
+                            children: [
+                              UserAvatar(
+                                avatarUrl: user?.avatarUrl,
+                                initials: user?.initials ?? 'SP',
+                                size: 64,
+                                borderRadius: 18,
+                                showEditBadge: true,
+                                onTap: () async {
+                                  if (user == null) return;
+                                  await AvatarPickerDialog.show(
+                                    context: context,
+                                    currentAvatarUrl: user.avatarUrl,
+                                    initials: user.initials,
+                                    onAvatarSelected: (newAvatarUrl) async {
+                                      try {
+                                        await ref.read(authProvider.notifier).updateProfile(avatarUrl: newAvatarUrl);
+                                        if (context.mounted) {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            const SnackBar(
+                                              content: Text('Profile photo updated!'),
+                                              backgroundColor: Color(0xFF10B981),
+                                              duration: Duration(seconds: 2),
+                                            ),
+                                          );
+                                        }
+                                      } catch (e) {
+                                        if (context.mounted) {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(content: Text('Failed to update photo: $e')),
+                                          );
+                                        }
+                                      }
+                                    },
+                                  );
+                                },
+                              ),
+                              const SizedBox(width: 14),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    ElevatedButton.icon(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: const Color(0xFFE0F2FE),
+                                        foregroundColor: const Color(0xFF0284C7),
+                                        elevation: 0,
+                                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                      ),
+                                      onPressed: () async {
+                                        if (user == null) return;
+                                        await AvatarPickerDialog.show(
+                                          context: context,
+                                          currentAvatarUrl: user.avatarUrl,
+                                          initials: user.initials,
+                                          onAvatarSelected: (newAvatarUrl) async {
+                                            try {
+                                              await ref.read(authProvider.notifier).updateProfile(avatarUrl: newAvatarUrl);
+                                              if (context.mounted) {
+                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                  const SnackBar(
+                                                    content: Text('Profile photo updated!'),
+                                                    backgroundColor: Color(0xFF10B981),
+                                                    duration: Duration(seconds: 2),
+                                                  ),
+                                                );
+                                              }
+                                            } catch (e) {
+                                              if (context.mounted) {
+                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                  SnackBar(content: Text('Failed to update photo: $e')),
+                                                );
+                                              }
+                                            }
+                                          },
+                                        );
+                                      },
+                                      icon: const Icon(Icons.camera_alt_outlined, size: 16),
+                                      label: Text(
+                                        user?.avatarUrl != null && user!.avatarUrl!.isNotEmpty ? 'Change Photo' : 'Upload Photo',
+                                        style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 3),
+                                    const Text(
+                                      'JPG or PNG · Up to 5MB',
+                                      style: TextStyle(fontSize: 11, color: Color(0xFF94A3B8)),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }),
+                      const SizedBox(height: 16),
 
                       // 1. SELECT TRADE / CATEGORY
                       _buildSectionCard(

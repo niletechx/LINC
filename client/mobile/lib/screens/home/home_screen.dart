@@ -10,6 +10,7 @@ import '../../services/booking_service.dart';
 import '../../services/message_service.dart';
 import '../../services/notification_service.dart';
 import '../../services/review_service.dart';
+import '../../widgets/user_avatar.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -940,19 +941,37 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
-                                    const SizedBox(width: 2),
                                     const Icon(Icons.keyboard_arrow_down, color: Color(0xFF1E5F7A), size: 16),
                                   ],
                                 ),
                               ),
-                              const SizedBox(height: 4),
-                              Text(
-                                isProvider ? 'Provider Dashboard' : 'Good morning, $firstName',
-                                style: const TextStyle(
-                                  color: Color(0xFF0F172A),
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w800,
-                                ),
+                              const SizedBox(height: 6),
+                              Row(
+                                children: [
+                                  if (!isGuest && user != null) ...[
+                                    UserAvatar(
+                                      avatarUrl: user.avatarUrl,
+                                      initials: user.initials,
+                                      size: 32,
+                                      borderRadius: 10,
+                                      backgroundColor: const Color(0x66FFFFFF),
+                                      textColor: const Color(0xFF0F172A),
+                                      onTap: () => context.go('/profile'),
+                                    ),
+                                    const SizedBox(width: 8),
+                                  ],
+                                  Expanded(
+                                    child: Text(
+                                      isProvider ? 'Provider Dashboard' : 'Good morning, $firstName',
+                                      style: const TextStyle(
+                                        color: Color(0xFF0F172A),
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w800,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),

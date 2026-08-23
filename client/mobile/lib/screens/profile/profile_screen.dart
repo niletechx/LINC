@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import '../../providers/app_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/data_providers.dart';
+import '../../widgets/user_avatar.dart';
+import '../../widgets/avatar_picker_dialog.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -327,6 +329,167 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
+  Future<void> _changeProfilePicture() async {
+    final user = ref.read(authProvider).user;
+    if (user == null) return;
+
+    await AvatarPickerDialog.show(
+      context: context,
+      currentAvatarUrl: user.avatarUrl,
+      initials: user.initials,
+      onAvatarSelected: (newAvatarUrl) async {
+        try {
+          await ref.read(authProvider.notifier).updateProfile(avatarUrl: newAvatarUrl);
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Profile picture updated successfully!'),
+                backgroundColor: Color(0xFF10B981),
+                duration: Duration(seconds: 2),
+              ),
+            );
+          }
+        } catch (e) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Failed to update photo: $e')),
+            );
+          }
+        }
+      },
+    );
+  }
+
+  void _showEditProfileDialog(BuildContext context) {
+    final user = ref.read(authProvider).user;
+    if (user == null) return;
+
+    final nameController = TextEditingController(text: user.fullName);
+    final phoneController = TextEditingController(text: user.phone ?? '');
+    final cityController = TextEditingController(text: user.locationCity ?? 'Addis Ababa');
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) => Padding(
+        padding: EdgeInsets.fromLTRB(20, 16, 20, MediaQuery.of(ctx).viewInsets.bottom + 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(width: 40, height: 4, decoration: BoxDecoration(color: const Color(0xFFCBD5E1), borderRadius: BorderRadius.circular(2))),
+            ),
+            const SizedBox(height: 16),
+            const Text('Edit Profile', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Color(0xFF0F172A))),
+            const SizedBox(height: 16),
+            Center(
+              child: UserAvatar(
+                avatarUrl: user.avatarUrl,
+                initials: user.initials,
+                size: 72,
+                borderRadius: 22,
+                showEditBadge: true,
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _changeProfilePicture();
+                },
+              ),
+            ),
+            const SizedBox(height: 6),
+            Center(
+              child: TextButton.icon(
+                onPressed: () {
+                  Navigator.pop(ctx);
+                  _changeProfilePicture();
+                },
+                icon: const Icon(Icons.camera_alt_outlined, size: 16, color: Color(0xFF0284C7)),
+                label: const Text('Change Photo', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Color(0xFF0284C7))),
+              ),
+            ),
+            const SizedBox(height: 10),
+            TextField(
+              controller: nameController,
+              decoration: const InputDecoration(
+                labelText: 'Full Name',
+                border: OutlineInputBorder(),
+                contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: phoneController,
+              decoration: const InputDecoration(
+                labelText: 'Phone Number',
+                hintText: '+251 91 122 3344',
+                border: OutlineInputBorder(),
+                contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: cityController,
+              decoration: const InputDecoration(
+                labelText: 'City / Location',
+                hintText: 'Addis Ababa, Bole',
+                border: OutlineInputBorder(),
+                contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              ),
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF0F172A),
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                onPressed: () async {
+                  final newName = nameController.text.trim();
+                  final newPhone = phoneController.text.trim();
+                  final newCity = cityController.text.trim();
+
+                  final messenger = ScaffoldMessenger.of(context);
+                  Navigator.pop(ctx);
+
+                  try {
+                    await ref.read(authProvider.notifier).updateProfile(
+                      fullName: newName.isNotEmpty ? newName : null,
+                      phone: newPhone.isNotEmpty ? newPhone : null,
+                      locationCity: newCity.isNotEmpty ? newCity : null,
+                    );
+                    if (mounted) {
+                      messenger.showSnackBar(
+                        const SnackBar(
+                          content: Text('Profile details updated!'),
+                          backgroundColor: Color(0xFF10B981),
+                          duration: Duration(seconds: 2),
+                        ),
+                      );
+                    }
+                  } catch (e) {
+                    if (mounted) {
+                      messenger.showSnackBar(
+                        SnackBar(content: Text('Failed to update profile: $e')),
+                      );
+                    }
+                  }
+                },
+                child: const Text('Save Changes', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
@@ -335,6 +498,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final isProvider = appMode == AppMode.provider;
 
     final group1 = [
+      {'icon': '👤', 'label': 'Edit Profile & Photo', 'badge': null, 'highlight': false, 'action': () => _showEditProfileDialog(context)},
       {'icon': '🔔', 'label': 'Notifications', 'badge': '3', 'highlight': false, 'action': () => _showHelpSupport(context)},
       {'icon': '📍', 'label': 'Saved Locations', 'badge': null, 'highlight': false, 'action': () {}},
       {'icon': '💳', 'label': 'Payment Methods & Escrow', 'badge': null, 'highlight': false, 'action': () => _showPaymentMethods(context)},
@@ -386,23 +550,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     const SizedBox(height: 14),
                     Row(
                       children: [
-                        Container(
-                          width: 62,
-                          height: 62,
-                          decoration: BoxDecoration(
-                            color: const Color(0x66FFFFFF),
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: const Color(0xB3FFFFFF), width: 3),
-                          ),
-                          alignment: Alignment.center,
-                          child: Text(
-                            user?.initials ?? 'YM',
-                            style: const TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.w800,
-                              color: Color(0xFF0F172A),
-                            ),
-                          ),
+                        UserAvatar(
+                          avatarUrl: user?.avatarUrl,
+                          initials: user?.initials ?? 'YM',
+                          size: 64,
+                          borderRadius: 20,
+                          backgroundColor: const Color(0x66FFFFFF),
+                          textColor: const Color(0xFF0F172A),
+                          showEditBadge: true,
+                          onTap: _changeProfilePicture,
                         ),
                         const SizedBox(width: 14),
                         Expanded(
@@ -439,6 +595,33 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                         fontWeight: FontWeight.w800,
                                         color: Color(0xFF0F172A),
                                         letterSpacing: 0.06,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  GestureDetector(
+                                    onTap: _changeProfilePicture,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: const Color(0x80FFFFFF),
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                      child: const Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(Icons.camera_alt_outlined, size: 10, color: Color(0xFF0F172A)),
+                                          SizedBox(width: 3),
+                                          Text(
+                                            'EDIT PHOTO',
+                                            style: TextStyle(
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.w800,
+                                              color: Color(0xFF0F172A),
+                                              letterSpacing: 0.06,
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ),

@@ -9,6 +9,7 @@ import '../../services/booking_service.dart';
 import '../../services/message_service.dart';
 import '../../services/notification_service.dart';
 import '../../services/request_service.dart';
+import '../../widgets/user_avatar.dart';
 
 final availabilityProvider = StateProvider<bool>((ref) => true);
 
@@ -284,11 +285,11 @@ class _ProviderDashboardState extends ConsumerState<ProviderDashboard> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // 1. CYAN HEADER
+                // 1. ROYAL BLUE HEADER (#0003BF)
                 Container(
                   width: double.infinity,
-                  color: const Color(0xFF7EC8E3),
-                  padding: EdgeInsets.fromLTRB(16, topPadding + 14, 16, 16),
+                  color: const Color(0xFF0003BF),
+                  padding: EdgeInsets.fromLTRB(16, topPadding + 14, 16, 18),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -297,14 +298,14 @@ class _ProviderDashboardState extends ConsumerState<ProviderDashboard> {
                         children: [
                           Row(
                             children: [
-                              const Icon(Icons.location_on, size: 14, color: Color(0xFF1E5F7A)),
+                              const Icon(Icons.location_on, size: 14, color: Color(0xFF93C5FD)),
                               const SizedBox(width: 4),
                               Text(
                                 user?.locationCity ?? 'Addis Ababa, ET',
-                                style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: Color(0xFF1E5F7A)),
+                                style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: Colors.white),
                               ),
                               const SizedBox(width: 2),
-                              const Icon(Icons.keyboard_arrow_down, size: 16, color: Color(0xFF1E5F7A)),
+                              const Icon(Icons.keyboard_arrow_down, size: 16, color: Color(0xFF93C5FD)),
                             ],
                           ),
                           Row(
@@ -313,7 +314,7 @@ class _ProviderDashboardState extends ConsumerState<ProviderDashboard> {
                                 onTap: () => _showNotificationsModal(context),
                                 child: Stack(
                                   children: [
-                                    const Icon(Icons.notifications_none, color: Color(0xFF0F172A), size: 24),
+                                    const Icon(Icons.notifications_none, color: Colors.white, size: 24),
                                     if (hasUnreadNotifs || pendingBookings.isNotEmpty)
                                       Positioned(
                                         top: 0,
@@ -333,13 +334,13 @@ class _ProviderDashboardState extends ConsumerState<ProviderDashboard> {
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 11),
                                   decoration: BoxDecoration(
-                                    color: Colors.white.withValues(alpha: 0.50),
-                                    border: Border.all(color: Colors.white.withValues(alpha: 0.70)),
+                                    color: Colors.white.withValues(alpha: 0.20),
+                                    border: Border.all(color: Colors.white.withValues(alpha: 0.40)),
                                     borderRadius: BorderRadius.circular(20),
                                   ),
                                   child: const Text(
                                     '💼 Provider Mode',
-                                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF0F172A)),
+                                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.white),
                                   ),
                                 ),
                               ),
@@ -348,11 +349,45 @@ class _ProviderDashboardState extends ConsumerState<ProviderDashboard> {
                         ],
                       ),
                       const SizedBox(height: 14),
-                      Text(
-                        user?.fullName != null && user!.fullName.trim().isNotEmpty
-                            ? 'Hello, ${user.fullName.split(' ').first}! 👋'
-                            : 'Provider Dashboard',
-                        style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: Color(0xFF0F172A), letterSpacing: -0.02),
+                      Row(
+                        children: [
+                          UserAvatar(
+                            avatarUrl: user?.avatarUrl,
+                            initials: user?.initials ?? 'SP',
+                            size: 46,
+                            borderRadius: 14,
+                            backgroundColor: Colors.white.withValues(alpha: 0.25),
+                            textColor: Colors.white,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  user?.fullName != null && user!.fullName.trim().isNotEmpty
+                                      ? 'Hello, ${user.fullName.split(' ').first}! 👋'
+                                      : 'Provider Dashboard',
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w800,
+                                    color: Colors.white,
+                                    letterSpacing: -0.02,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                const Text(
+                                  'Manage bookings, requests & earnings',
+                                  style: TextStyle(
+                                    fontSize: 11.5,
+                                    fontWeight: FontWeight.w500,
+                                    color: Color(0xFFBFDBFE),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),

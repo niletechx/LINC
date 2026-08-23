@@ -16,6 +16,7 @@ class ProviderModel {
   final int jobs;
   final String response;
   final String about;
+  final String? avatarUrl;
   final List<ServiceModel> services;
 
   const ProviderModel({
@@ -33,6 +34,7 @@ class ProviderModel {
     required this.jobs,
     required this.response,
     required this.about,
+    this.avatarUrl,
     required this.services,
   });
 }

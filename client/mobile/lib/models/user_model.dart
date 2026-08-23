@@ -52,6 +52,32 @@ class UserModel {
     };
   }
 
+  UserModel copyWith({
+    String? id,
+    String? email,
+    String? username,
+    String? fullName,
+    String? avatarUrl,
+    String? phone,
+    String? role,
+    bool? isAdmin,
+    bool? isActive,
+    String? locationCity,
+  }) {
+    return UserModel(
+      id: id ?? this.id,
+      email: email ?? this.email,
+      username: username ?? this.username,
+      fullName: fullName ?? this.fullName,
+      avatarUrl: avatarUrl ?? this.avatarUrl,
+      phone: phone ?? this.phone,
+      role: role ?? this.role,
+      isAdmin: isAdmin ?? this.isAdmin,
+      isActive: isActive ?? this.isActive,
+      locationCity: locationCity ?? this.locationCity,
+    );
+  }
+
   String get initials {
     if (fullName.trim().isEmpty) return username.isNotEmpty ? username.substring(0, 1).toUpperCase() : 'U';
     final parts = fullName.trim().split(RegExp(r'\s+'));
