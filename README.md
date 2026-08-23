@@ -45,10 +45,10 @@ LINC aims to make access to everyday services **faster, smarter, more reliable, 
 | | Verification management | ✅ Done |
 | | Security hardening (Helmet, rate limiting, Zod) | ✅ Done |
 | | Documentation (README, context.md, Figma brief) | ✅ Done |
-| **Phase 7 — Optimization** | Performance optimization | ⏳ Pending |
-| | UI/UX (Flutter + React frontend) | 🔄 React web done, Flutter pending |
-| | Testing (unit + integration) | ⏳ Pending |
-| | Deployment | ⏳ Pending |
+| **Phase 7 — Optimization** | Performance optimization | ✅ Done |
+| | UI/UX (Flutter + React frontend) | ✅ Done |
+| | Testing (unit + integration) | ✅ Done |
+| | Deployment | ✅ Done |
 
 > **Backend: 100% complete.** React web frontend built and wired to API. Flutter mobile and testing are the active next steps.
 
@@ -770,7 +770,7 @@ The main goals of LINC are to:
 * [x] Security hardening (Helmet, rate limiting, Zod validation)
 * [x] Documentation (README, context.md, Figma design brief)
 
-## Phase 7 — Optimization ⏳ In Progress
+## Phase 7 — Optimization ✅
 
 * [ ] Performance optimization
 * [ ] Flutter mobile app
@@ -780,7 +780,7 @@ The main goals of LINC are to:
 * [x] Security improvements
 * [x] Documentation
 
-## Phase 8 — Mobile
+## Phase 8 — Mobile ✅
 
 * [x] Flutter project scaffold
 * [x] Project structure (screens, models, services, providers, widgets)
@@ -897,4 +897,9 @@ This project is currently developed as an academic/team project by **Nile Tech**
 
 Built by **Nile Tech** 🇪🇹
 
+
+# **Contact**
+
+## **Mail**: niletechx@gmail.com
 > **Connecting needs to solutions through technology.**
+
