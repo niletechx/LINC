@@ -516,6 +516,7 @@ class _ProviderDashboardState extends ConsumerState<ProviderDashboard> {
                           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                           elevation: 0,
+                          minimumSize: const Size(0, 36),
                         ),
                         onPressed: () => context.push('/provider-setup'),
                         child: const Text('Edit', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800)),
