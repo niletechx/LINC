@@ -1,6 +1,9 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../../config/colors.dart';
 import '../../providers/auth_provider.dart';
 import '../../widgets/server_config_dialog.dart';
 
@@ -16,21 +19,46 @@ class WelcomeScreen extends ConsumerWidget {
     final canPop = context.canPop();
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0F172A),
+      backgroundColor: Colors.white,
       body: Stack(
         children: [
-          // 1. Ambient Background Glows
+          // 1. Soft Light Canvas Gradient
+          Container(
+            width: double.infinity,
+            height: double.infinity,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color(0xFFFAFDFF),
+                  Color(0xFFF1F8FC),
+                  Color(0xFFFFFFFF),
+                ],
+                stops: [0.0, 0.45, 1.0],
+              ),
+            ),
+          ),
+
+          // 2. Subtle Geometric Heritage Background Vector Overlay
+          Positioned.fill(
+            child: CustomPaint(
+              painter: _WelcomeGeometricArtPainter(),
+            ),
+          ),
+
+          // 3. Soft Ambient Glow
           Positioned(
-            top: -120,
-            left: -80,
+            top: -60,
+            right: -60,
             child: Container(
-              width: 320,
-              height: 320,
+              width: 260,
+              height: 260,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    const Color(0xFF0003BF).withValues(alpha: 0.45),
+                    AppColors.primaryBlue.withValues(alpha: 0.25),
                     Colors.transparent,
                   ],
                 ),
@@ -38,16 +66,16 @@ class WelcomeScreen extends ConsumerWidget {
             ),
           ),
           Positioned(
-            bottom: -100,
-            right: -60,
+            bottom: 120,
+            left: -80,
             child: Container(
-              width: 300,
-              height: 300,
+              width: 240,
+              height: 240,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    const Color(0xFF0284C7).withValues(alpha: 0.35),
+                    AppColors.cyan.withValues(alpha: 0.15),
                     Colors.transparent,
                   ],
                 ),
@@ -55,7 +83,7 @@ class WelcomeScreen extends ConsumerWidget {
             ),
           ),
 
-          // 2. Main Content
+          // 4. Main Content
           SafeArea(
             child: Column(
               children: [
@@ -72,12 +100,19 @@ class WelcomeScreen extends ConsumerWidget {
                             width: 38,
                             height: 38,
                             decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.10),
+                              color: Colors.white,
                               borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
+                              border: Border.all(color: const Color(0xFFE2E8F0)),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.04),
+                                  blurRadius: 6,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
                             ),
                             alignment: Alignment.center,
-                            child: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 16),
+                            child: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF0F172A), size: 16),
                           ),
                         )
                       else
@@ -88,18 +123,25 @@ class WelcomeScreen extends ConsumerWidget {
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.10),
+                            color: Colors.white,
                             borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
+                            border: Border.all(color: const Color(0xFFE2E8F0)),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.04),
+                                blurRadius: 6,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
                           ),
                           child: const Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.wifi_tethering, color: Color(0xFF7EC8E3), size: 14),
+                              Icon(Icons.wifi_tethering, color: Color(0xFF0284C7), size: 14),
                               SizedBox(width: 6),
                               Text(
                                 'Server IP',
-                                style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700),
+                                style: TextStyle(color: Color(0xFF0F172A), fontSize: 12, fontWeight: FontWeight.w700),
                               ),
                             ],
                           ),
@@ -113,27 +155,31 @@ class WelcomeScreen extends ConsumerWidget {
                 Expanded(
                   child: Center(
                     child: SingleChildScrollView(
-                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      padding: const EdgeInsets.symmetric(horizontal: 28),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          // App Icon Squircle
+                          // App Icon Emblem
                           Container(
-                            width: 86,
-                            height: 86,
+                            width: 84,
+                            height: 84,
                             decoration: BoxDecoration(
                               gradient: const LinearGradient(
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
-                                colors: [Color(0xFF0003BF), Color(0xFF0284C7)],
+                                colors: [
+                                  Color(0xFF1E5F7A),
+                                  Color(0xFF0284C7),
+                                  Color(0xFF7EC8E3),
+                                ],
                               ),
-                              borderRadius: BorderRadius.circular(26),
-                              border: Border.all(color: const Color(0xFF7EC8E3).withValues(alpha: 0.6), width: 2),
+                              borderRadius: BorderRadius.circular(24),
                               boxShadow: [
                                 BoxShadow(
-                                  color: const Color(0xFF0003BF).withValues(alpha: 0.4),
+                                  color: const Color(0xFF0284C7).withValues(alpha: 0.28),
                                   blurRadius: 28,
-                                  offset: const Offset(0, 12),
+                                  offset: const Offset(0, 10),
+                                  spreadRadius: 2,
                                 ),
                               ],
                             ),
@@ -143,37 +189,38 @@ class WelcomeScreen extends ConsumerWidget {
                           const SizedBox(height: 28),
 
                           // Brand Title
-                          const Text(
+                          Text(
                             'LINC',
-                            style: TextStyle(
-                              fontSize: 38,
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 36,
                               fontWeight: FontWeight.w900,
-                              color: Colors.white,
-                              letterSpacing: -0.5,
+                              color: const Color(0xFF0F172A),
+                              letterSpacing: 2.0,
                             ),
                           ),
                           const SizedBox(height: 8),
 
                           // Subtitle Badge
-                          const Text(
+                          Text(
                             'LIFE INFRASTRUCTURE NETWORK',
-                            style: TextStyle(
-                              fontSize: 12,
+                            style: GoogleFonts.inter(
+                              fontSize: 11.5,
                               fontWeight: FontWeight.w800,
-                              color: Color(0xFF7EC8E3),
-                              letterSpacing: 2.0,
+                              color: const Color(0xFF1E5F7A),
+                              letterSpacing: 2.2,
                             ),
                           ),
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 18),
 
                           // Description
-                          const Text(
+                          Text(
                             'Connect with verified professionals for your everyday needs in Addis Ababa. Fast, secure, and escrow-protected.',
                             textAlign: TextAlign.center,
-                            style: TextStyle(
+                            style: GoogleFonts.inter(
                               fontSize: 14.5,
-                              color: Color(0xFF94A3B8),
+                              color: const Color(0xFF64748B),
                               height: 1.55,
+                              fontWeight: FontWeight.w400,
                             ),
                           ),
                         ],
@@ -194,15 +241,15 @@ class WelcomeScreen extends ConsumerWidget {
                         child: ElevatedButton.icon(
                           onPressed: () => context.go('/signup'),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            foregroundColor: const Color(0xFF0F172A),
+                            backgroundColor: const Color(0xFF0F172A),
+                            foregroundColor: Colors.white,
                             elevation: 0,
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                           ),
                           icon: const Icon(Icons.person_add_outlined, size: 18),
-                          label: const Text(
+                          label: Text(
                             'Create an Account',
-                            style: TextStyle(fontSize: 15.5, fontWeight: FontWeight.w800),
+                            style: GoogleFonts.inter(fontSize: 15.5, fontWeight: FontWeight.w700),
                           ),
                         ),
                       ),
@@ -212,20 +259,18 @@ class WelcomeScreen extends ConsumerWidget {
                       SizedBox(
                         width: double.infinity,
                         height: 52,
-                        child: TextButton.icon(
+                        child: OutlinedButton.icon(
                           onPressed: () => context.go('/login'),
-                          style: TextButton.styleFrom(
-                            backgroundColor: const Color(0xFF1E293B),
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                              side: BorderSide(color: Colors.white.withValues(alpha: 0.12)),
-                            ),
+                          style: OutlinedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: const Color(0xFF0F172A),
+                            side: const BorderSide(color: Color(0xFFE2E8F0), width: 1.5),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                           ),
-                          icon: const Icon(Icons.login_rounded, size: 18, color: Color(0xFF94A3B8)),
-                          label: const Text(
+                          icon: const Icon(Icons.login_rounded, size: 18, color: Color(0xFF64748B)),
+                          label: Text(
                             'Sign In',
-                            style: TextStyle(fontSize: 15.5, fontWeight: FontWeight.w700),
+                            style: GoogleFonts.inter(fontSize: 15.5, fontWeight: FontWeight.w700),
                           ),
                         ),
                       ),
@@ -241,26 +286,31 @@ class WelcomeScreen extends ConsumerWidget {
                             context.go('/home');
                           },
                           style: TextButton.styleFrom(
-                            foregroundColor: const Color(0xFF7EC8E3),
+                            backgroundColor: const Color(0xFFF0F9FF),
+                            foregroundColor: const Color(0xFF0284C7),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
-                              side: BorderSide(color: const Color(0xFF7EC8E3).withValues(alpha: 0.35)),
+                              side: const BorderSide(color: Color(0xFFBAE6FD), width: 1.2),
                             ),
                           ),
                           icon: const Icon(Icons.explore_outlined, size: 18),
-                          label: const Text(
+                          label: Text(
                             'Explore Without Account',
-                            style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w700),
+                            style: GoogleFonts.inter(fontSize: 14.5, fontWeight: FontWeight.w700),
                           ),
                         ),
                       ),
                       const SizedBox(height: 16),
 
                       // Terms & Privacy Note
-                      const Text(
+                      Text(
                         'By continuing, you agree to our Terms of Service\nand Privacy Policy.',
                         textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 11, color: Color(0xFF64748B), height: 1.45),
+                        style: GoogleFonts.inter(
+                          fontSize: 11,
+                          color: const Color(0xFF94A3B8),
+                          height: 1.45,
+                        ),
                       ),
                     ],
                   ),
@@ -274,3 +324,41 @@ class WelcomeScreen extends ConsumerWidget {
   }
 }
 
+/// Subtle background painter for the light Welcome Screen
+class _WelcomeGeometricArtPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width * 0.5, size.height * 0.38);
+    final maxRadius = math.min(size.width, size.height) * 0.44;
+
+    final faintLinePaint = Paint()
+      ..color = const Color(0xFFE2E8F0).withValues(alpha: 0.6)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.0;
+
+    final accentLinePaint = Paint()
+      ..color = const Color(0xFF7EC8E3).withValues(alpha: 0.25)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.2;
+
+    // Concentric faint circles
+    canvas.drawCircle(center, maxRadius * 0.45, faintLinePaint);
+    canvas.drawCircle(center, maxRadius * 0.75, accentLinePaint);
+    canvas.drawCircle(center, maxRadius * 0.98, faintLinePaint);
+
+    // 8-point geometric nodes
+    const pointsCount = 8;
+    for (int i = 0; i < pointsCount; i++) {
+      final angle = (i * 2 * math.pi / pointsCount);
+      final x = center.dx + maxRadius * 0.75 * math.cos(angle);
+      final y = center.dy + maxRadius * 0.75 * math.sin(angle);
+      final point = Offset(x, y);
+
+      canvas.drawLine(center, point, faintLinePaint);
+      canvas.drawCircle(point, 2.0, Paint()..color = const Color(0xFF7EC8E3).withValues(alpha: 0.4));
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}

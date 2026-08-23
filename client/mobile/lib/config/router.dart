@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/auth_provider.dart';
+import '../screens/splash/splash_screen.dart';
 import '../screens/auth/welcome_screen.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/auth/signup_screen.dart';
@@ -102,9 +103,12 @@ final routerProvider = Provider<GoRouter>((ref) {
   final needsProviderSetup = ref.watch(needsProviderSetupProvider);
 
   return GoRouter(
-    initialLocation: '/home',
+    initialLocation: '/splash',
     redirect: (context, state) {
       final path = state.uri.path;
+
+      // Splash route — always allowed
+      if (path == '/splash') return null;
 
       // Auth routes — always accessible
       final isAuthRoute = path.startsWith('/welcome') ||
@@ -137,6 +141,9 @@ final routerProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
+      // ── Splash route ───────────────────────────────────────────────────────
+      GoRoute(path: '/splash', builder: (_, __) => const SplashScreen()),
+
       // ── Auth routes ────────────────────────────────────────────────────────
       GoRoute(path: '/welcome', builder: (_, __) => const WelcomeScreen()),
       GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
