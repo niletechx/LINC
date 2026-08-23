@@ -35,8 +35,8 @@ class AppShell extends ConsumerWidget {
     final isGuest = authState.isGuest && !authState.isAuthed;
 
     void gotoOrGate(String route, {bool requiresAuth = false}) {
-      if (requiresAuth && isGuest) {
-        context.go('/welcome');
+      if (requiresAuth && !authState.isAuthed) {
+        context.push('/login');
       } else {
         context.go(route);
       }
@@ -50,17 +50,17 @@ class AppShell extends ConsumerWidget {
           if (isProvider) {
             switch (index) {
               case 0: gotoOrGate('/home'); break;
-              case 1: gotoOrGate('/messages'); break;                      // guests allowed
-              case 2: gotoOrGate('/bookings', requiresAuth: true); break;
-              case 3: gotoOrGate('/profile', requiresAuth: true); break;
+              case 1: gotoOrGate('/messages', requiresAuth: true); break;  // Chat -> login required
+              case 2: gotoOrGate('/bookings', requiresAuth: true); break;  // Booking -> login required
+              case 3: gotoOrGate('/profile', requiresAuth: true); break;   // Me -> login required
             }
           } else {
             switch (index) {
               case 0: gotoOrGate('/home'); break;
-              case 1: gotoOrGate('/messages'); break;                      // guests allowed
-              case 2: gotoOrGate('/ai'); break;                            // guests allowed
-              case 3: gotoOrGate('/bookings', requiresAuth: true); break;
-              case 4: gotoOrGate('/profile', requiresAuth: true); break;
+              case 1: gotoOrGate('/messages', requiresAuth: true); break;  // Chat -> login required
+              case 2: gotoOrGate('/ai', requiresAuth: true); break;        // AI -> login required
+              case 3: gotoOrGate('/bookings', requiresAuth: true); break;  // Booking -> login required
+              case 4: gotoOrGate('/profile', requiresAuth: true); break;   // Me -> login required
             }
           }
         },
@@ -127,20 +127,17 @@ final routerProvider = Provider<GoRouter>((ref) {
           path.startsWith('/signup') ||
           path.startsWith('/forgot');
 
-      // Public / exploration routes — accessible without signing in
+      // Public / exploration routes — accessible without signing in (Home and search/viewing public profiles)
       final isPublicRoute = path.startsWith('/home') ||
           path.startsWith('/explore') ||
           path.startsWith('/search') ||
-          path.startsWith('/provider/') ||
-          path.startsWith('/ai') ||
-          path.startsWith('/messages') ||
-          path.startsWith('/dm/');
+          path.startsWith('/provider/');
 
       // Unauthenticated users: allow home and public explore routes
       if (!isAuthed) {
         if (isAuthRoute || isPublicRoute) return null;
-        // Only protected pages (bookings, profile, booking flow, provider setup) require sign-in
-        return '/welcome';
+        // All protected pages (chat, AI, bookings, profile, dm, booking flow, provider setup) redirect to /login
+        return '/login';
       }
 
       // Authenticated user landing on auth screen → go home (or provider setup)

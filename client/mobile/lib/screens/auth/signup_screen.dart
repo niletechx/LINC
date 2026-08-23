@@ -137,7 +137,11 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     if (_step > 1) {
       setState(() => _step--);
     } else {
-      context.go('/welcome');
+      if (context.canPop()) {
+        context.pop();
+      } else {
+        context.go('/home');
+      }
     }
   }
 

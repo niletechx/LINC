@@ -365,7 +365,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 onTap: () {
                   final authState = ref.read(authProvider);
                   if (!authState.isAuthed) {
-                    context.go('/welcome');
+                    context.push('/login');
                     return;
                   }
                   context.go('/bookings');
@@ -894,7 +894,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         ),
                       ),
                       GestureDetector(
-                        onTap: () => context.go('/welcome'),
+                        onTap: () => context.push('/login'),
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                           decoration: BoxDecoration(

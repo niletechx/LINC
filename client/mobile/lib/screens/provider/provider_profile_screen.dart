@@ -40,6 +40,11 @@ class _ProviderProfileScreenState extends ConsumerState<ProviderProfileScreen> {
   }
 
   Future<void> _startChatWithProvider(ProviderModel p) async {
+    final authState = ref.read(authProvider);
+    if (!authState.isAuthed) {
+      context.push('/login');
+      return;
+    }
     try {
       final user = ref.read(authProvider).user;
       final conv = await MessageService.instance.createOrGetConversation(
@@ -160,7 +165,7 @@ class _ProviderProfileScreenState extends ConsumerState<ProviderProfileScreen> {
                     onTap: () {
                       final authState = ref.read(authProvider);
                       if (!authState.isAuthed) {
-                        context.go('/welcome');
+                        context.push('/login');
                         return;
                       }
                       context.push('/booking/${p.id}');
@@ -545,7 +550,7 @@ class _ProviderProfileScreenState extends ConsumerState<ProviderProfileScreen> {
                                   onPressed: () {
                                     final authState = ref.read(authProvider);
                                     if (!authState.isAuthed) {
-                                      context.go('/welcome');
+                                      context.push('/login');
                                       return;
                                     }
                                     context.push('/booking/${p.id}');
