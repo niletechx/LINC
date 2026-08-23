@@ -57,7 +57,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     try {
       await StorageService.clear();
     } catch (_) {}
-    state = const AuthState(isInitialized: true, isAuthed: false, isGuest: false, user: null, token: null);
+    state = const AuthState(isInitialized: true, isAuthed: false, isGuest: true, user: null, token: null);
   }
 
   /// Let an unauthenticated user explore the app without an account.

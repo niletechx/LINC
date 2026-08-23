@@ -99,7 +99,6 @@ class HomeModeWrapper extends ConsumerWidget {
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authProvider);
   final isAuthed = authState.isAuthed;
-  final isGuest = authState.isGuest;
   final needsProviderSetup = ref.watch(needsProviderSetupProvider);
 
   return GoRouter(
@@ -113,25 +112,19 @@ final routerProvider = Provider<GoRouter>((ref) {
           path.startsWith('/signup') ||
           path.startsWith('/forgot');
 
-      // Routes accessible without signing in (explore + ai + chat)
-      final isPublicRoute = path.startsWith('/explore') ||
+      // Public / exploration routes — accessible without signing in
+      final isPublicRoute = path.startsWith('/home') ||
+          path.startsWith('/explore') ||
           path.startsWith('/search') ||
           path.startsWith('/provider/') ||
           path.startsWith('/ai') ||
           path.startsWith('/messages') ||
           path.startsWith('/dm/');
 
-      // Guest: allow home + all public routes; only /bookings and /profile need auth
-      if (!isAuthed && isGuest) {
-        if (isAuthRoute) return null;
-        if (isPublicRoute || path.startsWith('/home')) return null;
-        // Only bookings and profile require sign-in for guests
-        return '/welcome';
-      }
-
-      // Fully unauthenticated (no guest) → gate everything except auth + public
-      if (!isAuthed && !isGuest) {
+      // Unauthenticated users: allow home and public explore routes
+      if (!isAuthed) {
         if (isAuthRoute || isPublicRoute) return null;
+        // Only protected pages (bookings, profile, booking flow, provider setup) require sign-in
         return '/welcome';
       }
 
