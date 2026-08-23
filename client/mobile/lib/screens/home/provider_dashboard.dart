@@ -296,17 +296,22 @@ class _ProviderDashboardState extends ConsumerState<ProviderDashboard> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Row(
-                            children: [
-                              const Icon(Icons.location_on, size: 14, color: Color(0xFF93C5FD)),
-                              const SizedBox(width: 4),
-                              Text(
-                                user?.locationCity ?? 'Addis Ababa, ET',
-                                style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: Colors.white),
-                              ),
-                              const SizedBox(width: 2),
-                              const Icon(Icons.keyboard_arrow_down, size: 16, color: Color(0xFF93C5FD)),
-                            ],
+                          Flexible(
+                            child: Row(
+                              children: [
+                                const Icon(Icons.location_on, size: 14, color: Color(0xFF93C5FD)),
+                                const SizedBox(width: 4),
+                                Flexible(
+                                  child: Text(
+                                    user?.locationCity ?? 'Addis Ababa, ET',
+                                    style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: Colors.white),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                const SizedBox(width: 2),
+                                const Icon(Icons.keyboard_arrow_down, size: 16, color: Color(0xFF93C5FD)),
+                              ],
+                            ),
                           ),
                           Row(
                             children: [
@@ -531,21 +536,17 @@ class _ProviderDashboardState extends ConsumerState<ProviderDashboard> {
                     error: (_, __) => const SizedBox.shrink(),
                     data: (_) => Column(
                       children: [
-                        IntrinsicHeight(
-                          child: Row(
-                            children: [
-                              _buildMetricCell(Icons.payments_outlined, earningsStr, const Color(0xFF0284C7), 'Total Earnings', showRightBorder: true, showBottomBorder: true),
-                              _buildMetricCell(Icons.work_outline_rounded, '${activeBookings.length}', const Color(0xFF10B981), 'Active Jobs', showRightBorder: false, showBottomBorder: true),
-                            ],
-                          ),
+                        Row(
+                          children: [
+                            _buildMetricCell(Icons.payments_outlined, earningsStr, const Color(0xFF0284C7), 'Total Earnings', showRightBorder: true, showBottomBorder: true),
+                            _buildMetricCell(Icons.work_outline_rounded, '${activeBookings.length}', const Color(0xFF10B981), 'Active Jobs', showRightBorder: false, showBottomBorder: true),
+                          ],
                         ),
-                        IntrinsicHeight(
-                          child: Row(
-                            children: [
-                              _buildMetricCell(Icons.description_outlined, '${pendingBookings.length}', const Color(0xFFF59E0B), 'Pending Offers', showRightBorder: true, showBottomBorder: false),
-                              _buildMetricCell(Icons.check_circle_outline_rounded, '${completedBookings.length}', const Color(0xFF0891B2), 'Completed', showRightBorder: false, showBottomBorder: false),
-                            ],
-                          ),
+                        Row(
+                          children: [
+                            _buildMetricCell(Icons.description_outlined, '${pendingBookings.length}', const Color(0xFFF59E0B), 'Pending Offers', showRightBorder: true, showBottomBorder: false),
+                            _buildMetricCell(Icons.check_circle_outline_rounded, '${completedBookings.length}', const Color(0xFF0891B2), 'Completed', showRightBorder: false, showBottomBorder: false),
+                          ],
                         ),
                       ],
                     ),
