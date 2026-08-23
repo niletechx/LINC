@@ -204,7 +204,7 @@ class AIChatNotifier extends StateNotifier<AIChatState> {
           ...state.messages,
           ChatMessage(
             role: MessageRole.ai,
-            text: '⚠️ Unable to reach LINC AI service right now: $e. Please check your internet connection or try again.',
+            text: 'Unable to reach LINC AI service right now: $e. Please check your internet connection or try again.',
             hasProviders: false,
           ),
         ],

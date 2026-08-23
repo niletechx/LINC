@@ -21,7 +21,7 @@ class SocketService {
 
   void _onConfigChanged() {
     if (_socket != null) {
-      debugPrint('🔄 Socket.IO base URL changed to ${AppConfig.socketUrl}, reconnecting...');
+      debugPrint('[Socket.IO] Base URL changed to ${AppConfig.socketUrl}, reconnecting...');
       disconnect();
       connect();
     }
@@ -44,12 +44,12 @@ class SocketService {
 
     _socket!.onConnect((_) {
       _isConnected = true;
-      debugPrint('🟢 Socket.IO connected to $baseUrl');
+      debugPrint('[Socket.IO] Connected to $baseUrl');
     });
 
     _socket!.onDisconnect((_) {
       _isConnected = false;
-      debugPrint('🔴 Socket.IO disconnected');
+      debugPrint('[Socket.IO] Disconnected');
     });
 
     _socket!.connect();

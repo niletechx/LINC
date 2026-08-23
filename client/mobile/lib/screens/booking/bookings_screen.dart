@@ -73,7 +73,7 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     alignment: Alignment.center,
-                    child: const Text('🛡️', style: TextStyle(fontSize: 20)),
+                    child: const Icon(Icons.shield_outlined, size: 22, color: Color(0xFF059669)),
                   ),
                   const SizedBox(width: 12),
                   const Expanded(
@@ -613,7 +613,14 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
                     borderRadius: BorderRadius.circular(4),
                     border: Border.all(color: const Color(0xFFA7F3D0)),
                   ),
-                  child: const Text('🛡️ Escrow', style: TextStyle(color: Color(0xFF059669), fontSize: 9.5, fontWeight: FontWeight.w700)),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.shield_outlined, size: 11, color: Color(0xFF059669)),
+                      SizedBox(width: 3),
+                      Text('Escrow', style: TextStyle(color: Color(0xFF059669), fontSize: 9.5, fontWeight: FontWeight.w700)),
+                    ],
+                  ),
                 ),
                 const Spacer(),
                 Text(b.price, style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w800, color: Color(0xFF0F172A))),
@@ -692,7 +699,14 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
                               minimumSize: const Size(double.infinity, 44),
                             ),
                             onPressed: () => _showReviewModal(context, b),
-                            child: const Text('★ Leave Review', style: TextStyle(color: Color(0xFFD97706), fontSize: 12.5, fontWeight: FontWeight.w700)),
+                            child: const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.star_rounded, size: 16, color: Color(0xFFD97706)),
+                                SizedBox(width: 4),
+                                Text('Leave Review', style: TextStyle(color: Color(0xFFD97706), fontSize: 12.5, fontWeight: FontWeight.w700)),
+                              ],
+                            ),
                           )
                         : Container(
                             height: 44,

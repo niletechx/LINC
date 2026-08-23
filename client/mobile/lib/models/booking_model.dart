@@ -89,7 +89,7 @@ class BookingModel {
       statusLabel = 'Completed';
     } else if (rawStatus == 'confirmed' || rawStatus == 'paid_escrow' || rawStatus == 'in_progress') {
       bStatus = BookingStatus.confirmed;
-      statusLabel = rawStatus == 'paid_escrow' ? 'Escrow Held 🛡️' : 'Confirmed';
+      statusLabel = rawStatus == 'paid_escrow' ? 'Escrow Held' : 'Confirmed';
     } else if (rawStatus == 'cancelled') {
       bStatus = BookingStatus.cancelled;
       statusLabel = 'Cancelled';

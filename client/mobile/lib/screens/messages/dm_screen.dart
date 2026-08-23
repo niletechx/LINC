@@ -341,13 +341,19 @@ class _DmScreenState extends ConsumerState<DmScreen> {
                                         color: Color(0xFFE2E8F0),
                                       ),
                                     ),
-                                    Text(
-                                      '🔒 Only visible to you',
-                                      style: TextStyle(
-                                        fontSize: 10,
-                                        color: Color(0xFF94A3B8),
-                                      ),
-                                    ),
+                                     Row(
+                                       children: [
+                                         Icon(Icons.lock_outline, size: 11, color: Color(0xFF94A3B8)),
+                                         SizedBox(width: 3),
+                                         Text(
+                                           'Only visible to you',
+                                           style: TextStyle(
+                                             fontSize: 10,
+                                             color: Color(0xFF94A3B8),
+                                           ),
+                                         ),
+                                       ],
+                                     ),
                                   ],
                                 ),
                               ),
@@ -367,7 +373,7 @@ class _DmScreenState extends ConsumerState<DmScreen> {
                             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                             child: const Row(
                               children: [
-                                Text('🛡️', style: TextStyle(fontSize: 20)),
+                                Icon(Icons.shield_outlined, size: 22, color: Color(0xFF34D399)),
                                 SizedBox(width: 8),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -395,10 +401,10 @@ class _DmScreenState extends ConsumerState<DmScreen> {
                           const SizedBox(height: 12),
                           Column(
                             children: [
-                              _buildStatRow('⏱️', 'On-time completion', '98%'),
-                              _buildStatRow('📉', 'Complaints / Reports', '0'),
-                              _buildStatRow('💬', 'Avg. response time', '~5 min'),
-                              _buildStatRow('💰', 'Market rate check', 'Fair (280–350 ETB/hr)'),
+                              _buildStatRow(Icons.timer_outlined, 'On-time completion', '98%'),
+                              _buildStatRow(Icons.trending_down_outlined, 'Complaints / Reports', '0'),
+                              _buildStatRow(Icons.chat_bubble_outline_rounded, 'Avg. response time', '~5 min'),
+                              _buildStatRow(Icons.payments_outlined, 'Market rate check', 'Fair (280–350 ETB/hr)'),
                             ],
                           ),
                           const SizedBox(height: 8),
@@ -431,7 +437,7 @@ class _DmScreenState extends ConsumerState<DmScreen> {
                       ),
                     ),
                     alignment: Alignment.center,
-                    child: const Text('✨', style: TextStyle(fontSize: 7)),
+                    child: const Icon(Icons.auto_awesome, size: 9, color: Colors.white),
                   ),
                   const SizedBox(width: 6),
                   RichText(
@@ -462,7 +468,7 @@ class _DmScreenState extends ConsumerState<DmScreen> {
                   _buildQuickReplyChip('Are you available today?'),
                   _buildQuickReplyChip('Is price negotiable?'),
                   _buildQuickReplyChip('What is your location?'),
-                  _buildQuickReplyChip('I paid via Escrow 🛡️'),
+                  _buildQuickReplyChip('I paid via Escrow'),
                 ],
               ),
             ),
@@ -521,7 +527,7 @@ class _DmScreenState extends ConsumerState<DmScreen> {
                             borderRadius: BorderRadius.circular(10),
                           ),
                           alignment: Alignment.center,
-                          child: const Icon(Icons.send_rounded, color: Colors.white, size: 14),
+                          child: const Icon(Icons.send_rounded, color: Color(0xFF0F172A), size: 16),
                         ),
                       ),
                     ],
@@ -536,7 +542,7 @@ class _DmScreenState extends ConsumerState<DmScreen> {
     );
   }
 
-  Widget _buildStatRow(String emoji, String label, String value) {
+  Widget _buildStatRow(IconData icon, String label, String value) {
     return Container(
       decoration: const BoxDecoration(
         border: Border(bottom: BorderSide(color: Color(0x0DFFFFFF))),
@@ -547,7 +553,7 @@ class _DmScreenState extends ConsumerState<DmScreen> {
         children: [
           Row(
             children: [
-              Text(emoji, style: const TextStyle(fontSize: 13)),
+              Icon(icon, size: 14, color: const Color(0xFF94A3B8)),
               const SizedBox(width: 7),
               Text(label, style: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8))),
             ],

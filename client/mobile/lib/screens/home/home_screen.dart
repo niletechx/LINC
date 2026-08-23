@@ -78,7 +78,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     alignment: Alignment.center,
-                    child: const Text('🛡️', style: TextStyle(fontSize: 20)),
+                    child: const Icon(Icons.shield_outlined, size: 22, color: Color(0xFF059669)),
                   ),
                   const SizedBox(width: 12),
                   const Expanded(
@@ -398,32 +398,32 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     Color badgeText;
     String statusTitle;
     String statusSubtitle;
-    String statusIcon;
+    IconData statusIcon;
 
     if (isConfirmed && !isReleased) {
       badgeBg = const Color(0xFFECFDF5);
       badgeText = const Color(0xFF059669);
       statusTitle = 'Service in Progress';
-      statusSubtitle = 'Provider accepted · Escrow payment safely held 🛡️';
-      statusIcon = '🟢';
+      statusSubtitle = 'Provider accepted · Escrow payment safely held';
+      statusIcon = Icons.shield_outlined;
     } else if (isPending) {
       badgeBg = const Color(0xFFFFFBEB);
       badgeText = const Color(0xFFD97706);
       statusTitle = 'Booking Request Sent';
       statusSubtitle = 'Awaiting provider confirmation. Escrow protected.';
-      statusIcon = '⏳';
+      statusIcon = Icons.hourglass_top_outlined;
     } else if (isCancelled) {
       badgeBg = const Color(0xFFFEF2F2);
       badgeText = const Color(0xFFDC2626);
       statusTitle = 'Booking Request Declined';
       statusSubtitle = 'Provider was unavailable for this slot. Escrow refunded.';
-      statusIcon = '❌';
+      statusIcon = Icons.cancel_outlined;
     } else {
       badgeBg = const Color(0xFFF1F5F9);
       badgeText = const Color(0xFF475569);
       statusTitle = 'Completed';
       statusSubtitle = 'Payment released';
-      statusIcon = '✅';
+      statusIcon = Icons.check_circle_outline_rounded;
     }
 
     return Container(
@@ -459,7 +459,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
             child: Row(
               children: [
-                Text(statusIcon, style: const TextStyle(fontSize: 14)),
+                Icon(statusIcon, size: 16, color: badgeText),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Column(
@@ -790,7 +790,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           alignment: Alignment.center,
                           child: const Column(
                             children: [
-                              Text('🔔', style: TextStyle(fontSize: 28)),
+                              Icon(Icons.notifications_none_rounded, size: 30, color: Color(0xFF94A3B8)),
                               SizedBox(height: 8),
                               Text(
                                 'You\'re all caught up!',
@@ -809,7 +809,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
                       return Column(
                         children: notifs.map((n) {
-                          final icon = n.type == 'booking' ? '✅' : (n.type == 'message' ? '💬' : '🛡️');
+                          final icon = n.type == 'booking' ? Icons.check_circle_outline : (n.type == 'message' ? Icons.chat_bubble_outline_rounded : Icons.shield_outlined);
                           return Container(
                             margin: const EdgeInsets.only(bottom: 10),
                             padding: const EdgeInsets.all(12),
@@ -821,7 +821,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(icon, style: const TextStyle(fontSize: 20)),
+                                Icon(icon, size: 20, color: const Color(0xFF0284C7)),
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Column(
@@ -994,13 +994,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   border: Border.all(color: Colors.white.withValues(alpha: 0.70)),
                                   borderRadius: BorderRadius.circular(20),
                                 ),
-                                child: Text(
-                                  isProvider ? '💼 Provider' : '👤 Client',
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w700,
-                                    color: Color(0xFF0F172A),
-                                  ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      isProvider ? Icons.work_outline : Icons.person_outline,
+                                      size: 13,
+                                      color: const Color(0xFF0F172A),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      isProvider ? 'Provider' : 'Client',
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w700,
+                                        color: Color(0xFF0F172A),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
@@ -1058,13 +1069,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 color: const Color(0xFF7EC8E3),
                                 borderRadius: BorderRadius.circular(7),
                               ),
-                              child: const Text(
-                                '✨ AI',
-                                style: TextStyle(
-                                  color: Color(0xFF0F172A),
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w800,
-                                ),
+                              child: const Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.auto_awesome, size: 10, color: Color(0xFF0F172A)),
+                                  SizedBox(width: 2),
+                                  Text(
+                                    'AI',
+                                    style: TextStyle(
+                                      color: Color(0xFF0F172A),
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
@@ -1086,12 +1104,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: [
-                      _buildQuickChip(context, '🚨', 'Urgent', isUrgent: true, categorySlug: 'all', filter: 'verified'),
-                      _buildQuickChip(context, '🧹', 'Cleaning', categorySlug: 'cleaning'),
-                      _buildQuickChip(context, '📚', 'Tutoring', categorySlug: 'tutoring'),
-                      _buildQuickChip(context, '💻', 'IT & Tech', categorySlug: 'it-tech'),
-                      _buildQuickChip(context, '🔧', 'Plumbing', categorySlug: 'plumbing'),
-                      _buildQuickChip(context, '🚗', 'Transport', categorySlug: 'transport'),
+                      _buildQuickChip(context, Icons.bolt, 'Urgent', isUrgent: true, categorySlug: 'all', filter: 'verified'),
+                      _buildQuickChip(context, Icons.cleaning_services_outlined, 'Cleaning', categorySlug: 'cleaning'),
+                      _buildQuickChip(context, Icons.school_outlined, 'Tutoring', categorySlug: 'tutoring'),
+                      _buildQuickChip(context, Icons.computer_outlined, 'IT & Tech', categorySlug: 'it-tech'),
+                      _buildQuickChip(context, Icons.plumbing, 'Plumbing', categorySlug: 'plumbing'),
+                      _buildQuickChip(context, Icons.directions_car_outlined, 'Transport', categorySlug: 'transport'),
                     ],
                   ),
                 ),
@@ -1127,20 +1145,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     IntrinsicHeight(
                       child: Row(
                         children: [
-                          _buildCategoryCell(context, '🔧', 'Plumbing', 'plumbing', const Color(0xFF7EC8E3), showRightBorder: true, showBottomBorder: true),
-                          _buildCategoryCell(context, '🧹', 'Cleaning', 'cleaning', const Color(0xFF059669), showRightBorder: true, showBottomBorder: true),
-                          _buildCategoryCell(context, '💻', 'IT & Tech', 'it-tech', const Color(0xFF0891B2), showRightBorder: true, showBottomBorder: true),
-                          _buildCategoryCell(context, '📚', 'Tutoring', 'tutoring', const Color(0xFFD97706), showRightBorder: false, showBottomBorder: true),
+                          _buildCategoryCell(context, Icons.plumbing, 'Plumbing', 'plumbing', const Color(0xFF7EC8E3), showRightBorder: true, showBottomBorder: true),
+                          _buildCategoryCell(context, Icons.cleaning_services_outlined, 'Cleaning', 'cleaning', const Color(0xFF059669), showRightBorder: true, showBottomBorder: true),
+                          _buildCategoryCell(context, Icons.computer_outlined, 'IT & Tech', 'it-tech', const Color(0xFF0891B2), showRightBorder: true, showBottomBorder: true),
+                          _buildCategoryCell(context, Icons.school_outlined, 'Tutoring', 'tutoring', const Color(0xFFD97706), showRightBorder: false, showBottomBorder: true),
                         ],
                       ),
                     ),
                     IntrinsicHeight(
                       child: Row(
                         children: [
-                          _buildCategoryCell(context, '⚡', 'Electric', 'electric', const Color(0xFF7EC8E3), showRightBorder: true, showBottomBorder: false),
-                          _buildCategoryCell(context, '🚗', 'Transport', 'transport', const Color(0xFF7C3AED), showRightBorder: true, showBottomBorder: false),
-                          _buildCategoryCell(context, '💆', 'Wellness', 'wellness', const Color(0xFF0F766E), showRightBorder: true, showBottomBorder: false),
-                          _buildCategoryCell(context, '🎨', 'Creative', 'creative', const Color(0xFFBE185D), showRightBorder: false, showBottomBorder: false),
+                          _buildCategoryCell(context, Icons.bolt_outlined, 'Electric', 'electric', const Color(0xFF7EC8E3), showRightBorder: true, showBottomBorder: false),
+                          _buildCategoryCell(context, Icons.directions_car_outlined, 'Transport', 'transport', const Color(0xFF7C3AED), showRightBorder: true, showBottomBorder: false),
+                          _buildCategoryCell(context, Icons.spa_outlined, 'Wellness', 'wellness', const Color(0xFF0F766E), showRightBorder: true, showBottomBorder: false),
+                          _buildCategoryCell(context, Icons.brush_outlined, 'Creative', 'creative', const Color(0xFFBE185D), showRightBorder: false, showBottomBorder: false),
                         ],
                       ),
                     ),
@@ -1311,9 +1329,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         return Column(
                           children: requests.map((r) {
                             final isUrgent = r.urgency == 'urgent' || r.urgency == 'high';
-                            final emoji = _getEmojiForCategory(r.title);
+                            final icon = _getIconForCategory(r.title);
                             return _buildOpenRequestRow(
-                              emoji,
+                              icon,
                               r.title,
                               '${r.budgetMin.toInt()}–${r.budgetMax.toInt()} ${r.currency}',
                               r.time,
@@ -1336,7 +1354,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Widget _buildQuickChip(
     BuildContext context,
-    String emoji,
+    IconData icon,
     String label, {
     bool isUrgent = false,
     String categorySlug = 'all',
@@ -1360,8 +1378,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ),
         child: Row(
           children: [
-            Text(emoji, style: const TextStyle(fontSize: 12)),
-            const SizedBox(width: 4),
+            Icon(
+              icon,
+              size: 13,
+              color: isUrgent ? const Color(0xFFDC2626) : const Color(0xFF0284C7),
+            ),
+            const SizedBox(width: 5),
             Text(
               label,
               style: TextStyle(
@@ -1378,7 +1400,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Widget _buildCategoryCell(
     BuildContext context,
-    String emoji,
+    IconData icon,
     String label,
     String categorySlug,
     Color color, {
@@ -1407,7 +1429,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   borderRadius: BorderRadius.circular(14),
                 ),
                 alignment: Alignment.center,
-                child: Text(emoji, style: const TextStyle(fontSize: 20)),
+                child: Icon(icon, size: 22, color: color),
               ),
               const SizedBox(height: 5),
               Text(
@@ -1421,30 +1443,30 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  String _getEmojiForCategory(String title) {
+  IconData _getIconForCategory(String title) {
     final lower = title.toLowerCase();
     if (lower.contains('pipe') || lower.contains('water') || lower.contains('leak') || lower.contains('plumb')) {
-      return '🔧';
+      return Icons.plumbing;
     }
     if (lower.contains('electr') || lower.contains('wire') || lower.contains('light') || lower.contains('power')) {
-      return '⚡';
+      return Icons.bolt_outlined;
     }
     if (lower.contains('clean') || lower.contains('maid') || lower.contains('house')) {
-      return '🧹';
+      return Icons.cleaning_services_outlined;
     }
     if (lower.contains('laptop') || lower.contains('comput') || lower.contains('tech') || lower.contains('it')) {
-      return '💻';
+      return Icons.computer_outlined;
     }
     if (lower.contains('tutor') || lower.contains('teach') || lower.contains('lesson') || lower.contains('math')) {
-      return '📚';
+      return Icons.school_outlined;
     }
     if (lower.contains('car') || lower.contains('driv') || lower.contains('transport') || lower.contains('cargo')) {
-      return '🚗';
+      return Icons.directions_car_outlined;
     }
-    return '📋';
+    return Icons.description_outlined;
   }
 
-  Widget _buildOpenRequestRow(String emoji, String title, String budget, String time, String location, bool isUrgent) {
+  Widget _buildOpenRequestRow(IconData icon, String title, String budget, String time, String location, bool isUrgent) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 16),
       decoration: const BoxDecoration(
@@ -1461,7 +1483,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               borderRadius: BorderRadius.circular(12),
             ),
             alignment: Alignment.center,
-            child: Text(emoji, style: const TextStyle(fontSize: 18)),
+            child: Icon(
+              icon,
+              size: 18,
+              color: isUrgent ? const Color(0xFFEF4444) : const Color(0xFF0284C7),
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -1478,14 +1504,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           color: const Color(0xFFEF4444),
                           borderRadius: BorderRadius.circular(4),
                         ),
-                        child: const Text(
-                          '⚡URGENT',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 9,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 0.07,
-                          ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.bolt, size: 9, color: Colors.white),
+                            SizedBox(width: 1),
+                            Text(
+                              'URGENT',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 9,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 0.07,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],

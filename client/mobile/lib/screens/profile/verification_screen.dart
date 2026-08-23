@@ -13,10 +13,10 @@ class _VerificationScreenState extends State<VerificationScreen> {
   @override
   Widget build(BuildContext context) {
     final docs = [
-      {'id': 'phone', 'icon': '📱', 'label': 'Phone Number', 'status': 'done', 'note': 'Verified via OTP'},
-      {'id': 'id', 'icon': '🪪', 'label': 'National ID / Passport', 'status': 'required', 'note': 'Clear photo, all 4 corners visible'},
-      {'id': 'photo', 'icon': '🤳', 'label': 'Profile Photo', 'status': 'required', 'note': 'Face clearly visible, no sunglasses'},
-      {'id': 'address', 'icon': '🏠', 'label': 'Address Proof', 'status': 'optional', 'note': 'Utility bill or bank statement (optional)'},
+      {'id': 'phone', 'icon': Icons.smartphone_outlined, 'label': 'Phone Number', 'status': 'done', 'note': 'Verified via OTP'},
+      {'id': 'id', 'icon': Icons.badge_outlined, 'label': 'National ID / Passport', 'status': 'required', 'note': 'Clear photo, all 4 corners visible'},
+      {'id': 'photo', 'icon': Icons.account_circle_outlined, 'label': 'Profile Photo', 'status': 'required', 'note': 'Face clearly visible, no sunglasses'},
+      {'id': 'address', 'icon': Icons.home_outlined, 'label': 'Address Proof', 'status': 'optional', 'note': 'Utility bill or bank statement (optional)'},
     ];
 
     final steps = [
@@ -56,7 +56,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                           border: Border.all(color: const Color(0x40F59E0B)),
                         ),
                         alignment: Alignment.center,
-                        child: const Text('🛡️', style: TextStyle(fontSize: 24)),
+                        child: const Icon(Icons.shield_outlined, size: 28, color: Color(0xFF0F172A)),
                       ),
                       const SizedBox(width: 14),
                       const Expanded(
@@ -234,7 +234,11 @@ class _VerificationScreenState extends State<VerificationScreen> {
                                     borderRadius: BorderRadius.circular(11),
                                   ),
                                   alignment: Alignment.center,
-                                  child: Text(doc['icon'] as String, style: const TextStyle(fontSize: 16)),
+                                  child: Icon(
+                                    doc['icon'] as IconData,
+                                    size: 18,
+                                    color: isDone ? const Color(0xFF059669) : const Color(0xFF0284C7),
+                                  ),
                                 ),
                                 const SizedBox(width: 12),
                                 Expanded(
@@ -255,16 +259,26 @@ class _VerificationScreenState extends State<VerificationScreen> {
                                     borderRadius: BorderRadius.circular(5),
                                   ),
                                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                                  child: Text(
-                                    isDone ? '✓ Done' : (isRequired ? 'Needed' : 'Optional'),
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.w700,
-                                      color: isDone
-                                          ? const Color(0xFF059669)
-                                          : (isRequired ? const Color(0xFFD97706) : const Color(0xFF94A3B8)),
-                                    ),
-                                  ),
+                                  child: isDone
+                                      ? const Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(Icons.check, size: 11, color: Color(0xFF059669)),
+                                            SizedBox(width: 2),
+                                            Text(
+                                              'Done',
+                                              style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Color(0xFF059669)),
+                                            ),
+                                          ],
+                                        )
+                                      : Text(
+                                          isRequired ? 'Needed' : 'Optional',
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.w700,
+                                            color: isRequired ? const Color(0xFFD97706) : const Color(0xFF94A3B8),
+                                          ),
+                                        ),
                                 ),
                               ],
                             ),
@@ -316,7 +330,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
               margin: const EdgeInsets.only(bottom: 8),
               child: Row(
                 children: [
-                  const Text('🔒', style: TextStyle(fontSize: 20)),
+                  const Icon(Icons.lock_outline_rounded, size: 20, color: Color(0xFF64748B)),
                   const SizedBox(width: 10),
                   Expanded(
                     child: RichText(

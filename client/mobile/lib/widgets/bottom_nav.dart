@@ -156,7 +156,7 @@ class _AiNavItem extends StatelessWidget {
                         ],
                       ),
                       child: const Center(
-                        child: Text('✨', style: TextStyle(fontSize: 19)),
+                        child: Icon(Icons.auto_awesome, size: 20, color: Colors.white),
                       ),
                     ),
                     const SizedBox(height: 3),

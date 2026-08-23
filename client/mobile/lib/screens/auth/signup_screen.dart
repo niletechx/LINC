@@ -36,14 +36,14 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
   String _selectedAvailability = 'available';
 
   final List<Map<String, dynamic>> _categories = [
-    {'id': '1', 'slug': 'plumbing', 'name': 'Plumbing & Water', 'emoji': '🔧', 'suggestedHeadline': 'Master Plumber & Pipe Specialist'},
-    {'id': '3', 'slug': 'electric', 'name': 'Electrical Work', 'emoji': '⚡', 'suggestedHeadline': 'Certified Electrician & Wiring Pro'},
-    {'id': '2', 'slug': 'cleaning', 'name': 'Cleaning & Maid', 'emoji': '🧹', 'suggestedHeadline': 'Professional Deep Cleaning Specialist'},
-    {'id': '4', 'slug': 'it-tech', 'name': 'IT & Computer', 'emoji': '💻', 'suggestedHeadline': 'Computer Repair & IT Technician'},
-    {'id': '5', 'slug': 'tutoring', 'name': 'Tutoring & Skills', 'emoji': '📚', 'suggestedHeadline': 'Experienced Academic & Language Tutor'},
-    {'id': '6', 'slug': 'transport', 'name': 'Transport & Cargo', 'emoji': '🚗', 'suggestedHeadline': 'Safe Driver & Moving Logistics Pro'},
-    {'id': '7', 'slug': 'wellness', 'name': 'Health & Wellness', 'emoji': '💆', 'suggestedHeadline': 'Certified Personal Trainer & Wellness Pro'},
-    {'id': '8', 'slug': 'creative', 'name': 'Painting & Design', 'emoji': '🎨', 'suggestedHeadline': 'Interior Painter & Decorating Specialist'},
+    {'id': '1', 'slug': 'plumbing', 'name': 'Plumbing & Water', 'icon': Icons.plumbing, 'suggestedHeadline': 'Master Plumber & Pipe Specialist'},
+    {'id': '3', 'slug': 'electric', 'name': 'Electrical Work', 'icon': Icons.bolt_outlined, 'suggestedHeadline': 'Certified Electrician & Wiring Pro'},
+    {'id': '2', 'slug': 'cleaning', 'name': 'Cleaning & Maid', 'icon': Icons.cleaning_services_outlined, 'suggestedHeadline': 'Professional Deep Cleaning Specialist'},
+    {'id': '4', 'slug': 'it-tech', 'name': 'IT & Computer', 'icon': Icons.computer_outlined, 'suggestedHeadline': 'Computer Repair & IT Technician'},
+    {'id': '5', 'slug': 'tutoring', 'name': 'Tutoring & Skills', 'icon': Icons.school_outlined, 'suggestedHeadline': 'Experienced Academic & Language Tutor'},
+    {'id': '6', 'slug': 'transport', 'name': 'Transport & Cargo', 'icon': Icons.directions_car_outlined, 'suggestedHeadline': 'Safe Driver & Moving Logistics Pro'},
+    {'id': '7', 'slug': 'wellness', 'name': 'Health & Wellness', 'icon': Icons.spa_outlined, 'suggestedHeadline': 'Certified Personal Trainer & Wellness Pro'},
+    {'id': '8', 'slug': 'creative', 'name': 'Painting & Design', 'icon': Icons.brush_outlined, 'suggestedHeadline': 'Interior Painter & Decorating Specialist'},
   ];
 
   final List<String> _locationSuggestions = [
@@ -404,9 +404,9 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
   String _getButtonLabel() {
     if (_step == 1 || _step == 2) return 'Continue';
     if (_step == 3) {
-      return _mode == 'provider' ? 'Next: Service Details 👉' : 'Create My Account';
+      return _mode == 'provider' ? 'Next: Service Details' : 'Create My Account';
     }
-    return 'Create Provider Account 🚀';
+    return 'Create Provider Account';
   }
 
   Widget _buildStep1() {
@@ -446,15 +446,15 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
               child: Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
                     decoration: const BoxDecoration(
                       border: Border(right: BorderSide(color: AppColors.divider, width: 1.5)),
                     ),
                     child: const Text(
-                      '🇪🇹 +251',
+                      '+251',
                       style: TextStyle(
                         fontSize: 14,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w700,
                         color: AppColors.textPrimary,
                       ),
                     ),
@@ -538,14 +538,14 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
         _buildRoleCard(
           'client',
           'Client',
-          '👤',
+          Icons.person_outline_rounded,
           'I want to find and book services',
         ),
         const SizedBox(height: 16),
         _buildRoleCard(
           'provider',
           'Provider',
-          '💼',
+          Icons.work_outline_rounded,
           'I want to offer my services',
         ),
         const SizedBox(height: 24),
@@ -615,7 +615,11 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(cat['emoji'] as String, style: const TextStyle(fontSize: 14)),
+                      Icon(
+                        cat['icon'] as IconData,
+                        size: 14,
+                        color: isSelected ? Colors.white : const Color(0xFF0284C7),
+                      ),
                       const SizedBox(width: 6),
                       Text(
                         cat['name'] as String,
@@ -759,11 +763,11 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
           child: Row(
             children: [
               Expanded(
-                child: _buildAvailabilityChip('available', '🟢 Available', 'Accepting jobs now'),
+                child: _buildAvailabilityChip('available', const Color(0xFF10B981), 'Available', 'Accepting jobs now'),
               ),
               const SizedBox(width: 8),
               Expanded(
-                child: _buildAvailabilityChip('busy', '🟡 Busy', 'Book in advance'),
+                child: _buildAvailabilityChip('busy', const Color(0xFFF59E0B), 'Busy', 'Book in advance'),
               ),
             ],
           ),
@@ -794,7 +798,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     );
   }
 
-  Widget _buildAvailabilityChip(String id, String label, String sub) {
+  Widget _buildAvailabilityChip(String id, Color dotColor, String label, String sub) {
     final isSelected = _selectedAvailability == id;
     return GestureDetector(
       onTap: () => setState(() => _selectedAvailability = id),
@@ -811,7 +815,27 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(label, style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: Color(0xFF0F172A))),
+            Row(
+              children: [
+                Container(
+                  width: 8,
+                  height: 8,
+                  decoration: BoxDecoration(
+                    color: dotColor,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                const SizedBox(width: 5),
+                Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF0F172A),
+                  ),
+                ),
+              ],
+            ),
             const SizedBox(height: 2),
             Text(sub, style: const TextStyle(fontSize: 10, color: Color(0xFF64748B))),
           ],
@@ -820,7 +844,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     );
   }
 
-  Widget _buildRoleCard(String modeValue, String title, String emoji, String subtitle) {
+  Widget _buildRoleCard(String modeValue, String title, IconData icon, String subtitle) {
     bool isSelected = _mode == modeValue;
     return GestureDetector(
       onTap: () => setState(() => _mode = modeValue),
@@ -843,11 +867,15 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: const Color(0xFFF1F5F9),
+                color: isSelected ? const Color(0xFFE0F2FE) : const Color(0xFFF1F5F9),
                 borderRadius: BorderRadius.circular(12),
               ),
               alignment: Alignment.center,
-              child: Text(emoji, style: const TextStyle(fontSize: 24)),
+              child: Icon(
+                icon,
+                size: 24,
+                color: isSelected ? AppColors.primaryBlue : const Color(0xFF475569),
+              ),
             ),
             const SizedBox(width: 16),
             Expanded(

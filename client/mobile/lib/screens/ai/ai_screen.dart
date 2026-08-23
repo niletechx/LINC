@@ -379,7 +379,7 @@ class _AiScreenState extends ConsumerState<AiScreen> with SingleTickerProviderSt
               ],
             ),
             alignment: Alignment.center,
-            child: const Text('✨', style: TextStyle(fontSize: 15)),
+            child: const Icon(Icons.auto_awesome, size: 16, color: Colors.white),
           ),
           const SizedBox(width: 10),
           Expanded(
@@ -717,7 +717,7 @@ class _AiScreenState extends ConsumerState<AiScreen> with SingleTickerProviderSt
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Text('✨', style: TextStyle(fontSize: 11)),
+                        const Icon(Icons.auto_awesome, size: 12, color: Color(0xFF1D4ED8)),
                         const SizedBox(width: 4),
                         Text(
                           'Ask AI about @$username',
@@ -818,7 +818,7 @@ class _AiScreenState extends ConsumerState<AiScreen> with SingleTickerProviderSt
               borderRadius: BorderRadius.circular(10),
             ),
             alignment: Alignment.center,
-            child: const Text('✨', style: TextStyle(fontSize: 15)),
+            child: const Icon(Icons.auto_awesome, size: 16, color: Colors.white),
           ),
           const SizedBox(width: 10),
           Container(
@@ -859,12 +859,12 @@ class _AiScreenState extends ConsumerState<AiScreen> with SingleTickerProviderSt
   // ── SUGGESTIONS ROW ───────────────────────────────────────────────────────
   Widget _buildSuggestionsRow() {
     final suggestions = [
-      '🔧 Plumbers in Bole',
-      '💬 Review for @samuel_plumbing',
-      '🧹 House cleaning in Kazanchis',
-      '💬 Review for @helen_clean',
-      '💻 Laptop repair @dawit_tech',
-      '⚡ Electrician @abebe_electric',
+      {'icon': Icons.plumbing, 'text': 'Plumbers in Bole'},
+      {'icon': Icons.rate_review_outlined, 'text': 'Review for @samuel_plumbing'},
+      {'icon': Icons.cleaning_services_outlined, 'text': 'House cleaning in Kazanchis'},
+      {'icon': Icons.rate_review_outlined, 'text': 'Review for @helen_clean'},
+      {'icon': Icons.laptop_mac_outlined, 'text': 'Laptop repair @dawit_tech'},
+      {'icon': Icons.bolt_outlined, 'text': 'Electrician @abebe_electric'},
     ];
 
     return Container(
@@ -878,27 +878,36 @@ class _AiScreenState extends ConsumerState<AiScreen> with SingleTickerProviderSt
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         child: Row(
           children: suggestions.map((s) {
+            final text = s['text'] as String;
+            final icon = s['icon'] as IconData;
             return GestureDetector(
               onTap: () {
-                _textController.text = s;
-                ref.read(aiChatProvider.notifier).sendPrompt(s);
+                _textController.text = text;
+                ref.read(aiChatProvider.notifier).sendPrompt(text);
                 _textController.clear();
               },
               child: Container(
                 margin: const EdgeInsets.only(right: 8),
-                padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 14),
+                padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 12),
                 decoration: BoxDecoration(
                   color: const Color(0xFFF1F5F9),
                   border: Border.all(color: const Color(0xFFCBD5E1), width: 1.1),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: Text(
-                  s,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF334155),
-                  ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(icon, size: 14, color: const Color(0xFF0284C7)),
+                    const SizedBox(width: 6),
+                    Text(
+                      text,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF334155),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             );

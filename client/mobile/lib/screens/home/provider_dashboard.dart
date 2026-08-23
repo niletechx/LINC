@@ -95,7 +95,7 @@ class _ProviderDashboardState extends ConsumerState<ProviderDashboard> {
                           alignment: Alignment.center,
                           child: const Column(
                             children: [
-                              Text('🔔', style: TextStyle(fontSize: 28)),
+                              Icon(Icons.notifications_none_rounded, size: 30, color: Color(0xFF94A3B8)),
                               SizedBox(height: 8),
                               Text(
                                 "You're all caught up!",
@@ -131,7 +131,7 @@ class _ProviderDashboardState extends ConsumerState<ProviderDashboard> {
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 alignment: Alignment.center,
-                                child: const Text('📋', style: TextStyle(fontSize: 18)),
+                                child: const Icon(Icons.description_outlined, size: 20, color: Color(0xFF0284C7)),
                               ),
                               title: Text(
                                 n.title,
@@ -163,7 +163,7 @@ class _ProviderDashboardState extends ConsumerState<ProviderDashboard> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('✅ Booking accepted for ${b.clientName}! Client has been notified.'),
+            content: Text('Booking accepted for ${b.clientName}! Client has been notified.'),
             backgroundColor: const Color(0xFF10B981),
             duration: const Duration(seconds: 3),
           ),
@@ -212,7 +212,7 @@ class _ProviderDashboardState extends ConsumerState<ProviderDashboard> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('🎉 Job completed for ${b.clientName}! 72h escrow release initiated.'),
+            content: Text('Job completed for ${b.clientName}! 72h escrow release initiated.'),
             backgroundColor: const Color(0xFF10B981),
             duration: const Duration(seconds: 3),
           ),
@@ -338,9 +338,16 @@ class _ProviderDashboardState extends ConsumerState<ProviderDashboard> {
                                     border: Border.all(color: Colors.white.withValues(alpha: 0.40)),
                                     borderRadius: BorderRadius.circular(20),
                                   ),
-                                  child: const Text(
-                                    '💼 Provider Mode',
-                                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.white),
+                                  child: const Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(Icons.work_outline_rounded, size: 13, color: Colors.white),
+                                      SizedBox(width: 4),
+                                      Text(
+                                        'Provider Mode',
+                                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.white),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
@@ -366,7 +373,7 @@ class _ProviderDashboardState extends ConsumerState<ProviderDashboard> {
                               children: [
                                 Text(
                                   user?.fullName != null && user!.fullName.trim().isNotEmpty
-                                      ? 'Hello, ${user.fullName.split(' ').first}! 👋'
+                                      ? 'Hello, ${user.fullName.split(' ').first}!'
                                       : 'Provider Dashboard',
                                   style: const TextStyle(
                                     fontSize: 20,
@@ -468,15 +475,14 @@ class _ProviderDashboardState extends ConsumerState<ProviderDashboard> {
                   ),
                 ),
 
-                // 2.5 PROFILE & SERVICES SETUP BANNER
+                // 2. QUICK PROFILE SETUP / EDIT BANNER
                 Container(
                   margin: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-                  padding: const EdgeInsets.all(14),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: const Color(0xFFBAE6FD)),
-                    boxShadow: [BoxShadow(color: const Color(0xFF0284C7).withValues(alpha: 0.05), blurRadius: 8, offset: const Offset(0, 2))],
+                    border: Border.all(color: const Color(0xFFE2E8F0)),
                   ),
                   child: Row(
                     children: [
@@ -485,7 +491,7 @@ class _ProviderDashboardState extends ConsumerState<ProviderDashboard> {
                         height: 40,
                         decoration: BoxDecoration(color: const Color(0xFFE0F2FE), borderRadius: BorderRadius.circular(10)),
                         alignment: Alignment.center,
-                        child: const Text('🔧', style: TextStyle(fontSize: 20)),
+                        child: const Icon(Icons.handyman_outlined, size: 20, color: Color(0xFF0284C7)),
                       ),
                       const SizedBox(width: 12),
                       const Expanded(
@@ -528,16 +534,16 @@ class _ProviderDashboardState extends ConsumerState<ProviderDashboard> {
                         IntrinsicHeight(
                           child: Row(
                             children: [
-                              _buildMetricCell('💰', earningsStr, const Color(0xFF0284C7), 'Total Earnings', showRightBorder: true, showBottomBorder: true),
-                              _buildMetricCell('💼', '${activeBookings.length}', const Color(0xFF10B981), 'Active Jobs', showRightBorder: false, showBottomBorder: true),
+                              _buildMetricCell(Icons.payments_outlined, earningsStr, const Color(0xFF0284C7), 'Total Earnings', showRightBorder: true, showBottomBorder: true),
+                              _buildMetricCell(Icons.work_outline_rounded, '${activeBookings.length}', const Color(0xFF10B981), 'Active Jobs', showRightBorder: false, showBottomBorder: true),
                             ],
                           ),
                         ),
                         IntrinsicHeight(
                           child: Row(
                             children: [
-                              _buildMetricCell('📋', '${pendingBookings.length}', const Color(0xFFF59E0B), 'Pending Offers', showRightBorder: true, showBottomBorder: false),
-                              _buildMetricCell('✅', '${completedBookings.length}', const Color(0xFF0891B2), 'Completed', showRightBorder: false, showBottomBorder: false),
+                              _buildMetricCell(Icons.description_outlined, '${pendingBookings.length}', const Color(0xFFF59E0B), 'Pending Offers', showRightBorder: true, showBottomBorder: false),
+                              _buildMetricCell(Icons.check_circle_outline_rounded, '${completedBookings.length}', const Color(0xFF0891B2), 'Completed', showRightBorder: false, showBottomBorder: false),
                             ],
                           ),
                         ),
@@ -598,7 +604,7 @@ class _ProviderDashboardState extends ConsumerState<ProviderDashboard> {
                               child: Center(
                                 child: Column(
                                   children: [
-                                    Text('📨', style: TextStyle(fontSize: 28)),
+                                    Icon(Icons.mark_email_unread_outlined, size: 30, color: Color(0xFF94A3B8)),
                                     SizedBox(height: 8),
                                     Text('No direct booking requests yet', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Color(0xFF334155))),
                                     SizedBox(height: 4),
@@ -621,58 +627,55 @@ class _ProviderDashboardState extends ConsumerState<ProviderDashboard> {
                 // 5. OPEN MARKETPLACE REQUESTS
                 Container(
                   color: Colors.white,
-                  margin: const EdgeInsets.only(bottom: 24),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-                        decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Color(0xFFE2E8F0)))),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                         child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text('Marketplace Job Feed', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: Color(0xFF0F172A))),
+                            const Text('Open Requests in Addis', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: Color(0xFF0F172A))),
+                            const Spacer(),
                             GestureDetector(
-                              onTap: () => ref.invalidate(requestListProvider),
-                              child: const Icon(Icons.refresh_rounded, size: 18, color: Color(0xFF64748B)),
+                              onTap: () => context.push('/search'),
+                              child: const Text('View All >', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700, color: Color(0xFF0284C7))),
                             ),
                           ],
                         ),
                       ),
+                      const Divider(height: 1, color: Color(0xFFE2E8F0)),
                       requestsAsync.when(
                         loading: () => const Padding(
-                          padding: EdgeInsets.all(24),
+                          padding: EdgeInsets.all(32),
                           child: Center(child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF0284C7))),
                         ),
                         error: (err, _) => Padding(
-                          padding: const EdgeInsets.all(20),
-                          child: Text(
-                            'Unable to load marketplace requests: $err',
-                            style: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
-                            textAlign: TextAlign.center,
-                          ),
+                          padding: const EdgeInsets.all(16),
+                          child: Text('Unable to load requests: $err', style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 12), textAlign: TextAlign.center),
                         ),
                         data: (reqs) {
                           if (reqs.isEmpty) {
                             return const Padding(
                               padding: EdgeInsets.all(24),
                               child: Center(
-                                child: Text(
-                                  'No open client requests right now.\\nCheck back soon!',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(fontSize: 13, color: Color(0xFF94A3B8), height: 1.5),
+                                child: Column(
+                                  children: [
+                                    Icon(Icons.feed_outlined, size: 28, color: Color(0xFF94A3B8)),
+                                    SizedBox(height: 8),
+                                    Text('No open requests right now', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Color(0xFF64748B))),
+                                  ],
                                 ),
                               ),
                             );
                           }
                           return Column(
-                            children: reqs.take(5).map((r) => _buildLiveRequest(context, r)).toList(),
+                            children: reqs.take(4).map((r) => _buildLiveRequest(context, r)).toList(),
                           );
                         },
                       ),
                     ],
                   ),
                 ),
+                const SizedBox(height: 24),
               ],
             ),
           ),
@@ -682,14 +685,12 @@ class _ProviderDashboardState extends ConsumerState<ProviderDashboard> {
   }
 
   Widget _buildDirectBookingCard(BuildContext context, BookingModel b) {
-    final clientName = b.clientName.trim().isNotEmpty ? b.clientName : 'Client';
-    final initials = clientName.split(' ').map((w) => w.isNotEmpty ? w[0] : '').take(2).join().toUpperCase();
-    final isPending = b.status == BookingStatus.upcoming || b.status == BookingStatus.pending || b.statusText.toLowerCase().contains('pending');
+    final isPending = b.status == BookingStatus.pending;
     final isConfirmed = b.status == BookingStatus.confirmed;
     final isCompleted = b.status == BookingStatus.completed;
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(14),
       decoration: const BoxDecoration(
         border: Border(bottom: BorderSide(color: Color(0xFFE2E8F0))),
       ),
@@ -698,77 +699,38 @@ class _ProviderDashboardState extends ConsumerState<ProviderDashboard> {
         children: [
           Row(
             children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF0284C7).withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                alignment: Alignment.center,
-                child: Text(
-                  initials.isNotEmpty ? initials : 'C',
-                  style: const TextStyle(color: Color(0xFF0284C7), fontWeight: FontWeight.w800, fontSize: 16),
-                ),
+              UserAvatar(
+                avatarUrl: null,
+                initials: b.clientName.trim().isNotEmpty ? b.clientName.trim()[0].toUpperCase() : 'C',
+                size: 38,
+                borderRadius: 12,
+                backgroundColor: const Color(0xFF0284C7).withValues(alpha: 0.12),
+                textColor: const Color(0xFF0284C7),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 10),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Flexible(
-                          child: Text(
-                            clientName,
-                            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        Text(
-                          b.price,
-                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: Color(0xFF10B981)),
-                        ),
-                      ],
-                    ),
+                    Text(b.clientName, style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w800, color: Color(0xFF0F172A))),
                     const SizedBox(height: 2),
-                    Text(
-                      b.title,
-                      style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: Color(0xFF475569)),
-                    ),
-                    const SizedBox(height: 2),
-                    Row(
-                      children: [
-                        const Icon(Icons.calendar_today_outlined, size: 12, color: Color(0xFF94A3B8)),
-                        const SizedBox(width: 4),
-                        Text(
-                          b.date,
-                          style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
-                        ),
-                      ],
-                    ),
+                    Text('${b.title} · ${b.date}', style: const TextStyle(fontSize: 11, color: Color(0xFF64748B))),
                   ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF1F5F9),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  b.price,
+                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
                 ),
               ),
             ],
           ),
-          if (b.notes != null && b.notes!.trim().isNotEmpty) ...[
-            const SizedBox(height: 10),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF8FAFC),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: const Color(0xFFE2E8F0)),
-              ),
-              child: Text(
-                'Note: ${b.notes!}',
-                style: const TextStyle(fontSize: 12, color: Color(0xFF475569), fontStyle: FontStyle.italic),
-              ),
-            ),
-          ],
           const SizedBox(height: 12),
           Row(
             children: [
@@ -783,14 +745,14 @@ class _ProviderDashboardState extends ConsumerState<ProviderDashboard> {
                       elevation: 0,
                     ),
                     onPressed: () => _acceptBooking(b),
-                    child: const Text('Accept Offer', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w800)),
+                    child: const Text('Accept Booking', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w800)),
                   ),
                 ),
                 const SizedBox(width: 8),
                 OutlinedButton(
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: const Color(0xFFEF4444),
-                    side: const BorderSide(color: Color(0xFFFECACA)),
+                    foregroundColor: const Color(0xFF64748B),
+                    side: const BorderSide(color: Color(0xFFCBD5E1)),
                     padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   ),
@@ -808,14 +770,28 @@ class _ProviderDashboardState extends ConsumerState<ProviderDashboard> {
                       elevation: 0,
                     ),
                     onPressed: () => _completeBooking(b),
-                    child: const Text('Mark Job Complete ✅', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w800)),
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.check_circle_outline, size: 16),
+                        SizedBox(width: 4),
+                        Text('Mark Job Complete', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w800)),
+                      ],
+                    ),
                   ),
                 ),
               ] else if (isCompleted) ...[
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(color: const Color(0xFFECFDF5), borderRadius: BorderRadius.circular(8)),
-                  child: const Text('✅ Completed', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF059669))),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.check, size: 14, color: Color(0xFF059669)),
+                      SizedBox(width: 3),
+                      Text('Completed', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF059669))),
+                    ],
+                  ),
                 ),
               ],
               const SizedBox(width: 8),
@@ -831,7 +807,7 @@ class _ProviderDashboardState extends ConsumerState<ProviderDashboard> {
     );
   }
 
-  Widget _buildMetricCell(String emoji, String value, Color valueColor, String label, {required bool showRightBorder, required bool showBottomBorder}) {
+  Widget _buildMetricCell(IconData icon, String value, Color valueColor, String label, {required bool showRightBorder, required bool showBottomBorder}) {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.all(16),
@@ -844,7 +820,7 @@ class _ProviderDashboardState extends ConsumerState<ProviderDashboard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(emoji, style: const TextStyle(fontSize: 17)),
+            Icon(icon, size: 18, color: valueColor),
             const SizedBox(height: 8),
             Text(value, style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: valueColor, letterSpacing: -0.02)),
             const SizedBox(height: 2),

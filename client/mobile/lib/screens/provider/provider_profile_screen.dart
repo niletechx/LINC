@@ -316,13 +316,20 @@ class _ProviderProfileScreenState extends ConsumerState<ProviderProfileScreen> {
                             border: Border.all(color: const Color(0xFFF59E0B).withValues(alpha: 0.25)),
                             borderRadius: BorderRadius.circular(6),
                           ),
-                          child: const Text(
-                            '🛡️ VERIFIED',
-                            style: TextStyle(
-                              color: Color(0xFFF59E0B),
-                              fontSize: 10,
-                              fontWeight: FontWeight.w700,
-                            ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.verified, size: 11, color: Color(0xFFF59E0B)),
+                              SizedBox(width: 3),
+                              Text(
+                                'VERIFIED',
+                                style: TextStyle(
+                                  color: Color(0xFFF59E0B),
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                         const SizedBox(width: 6),
@@ -333,13 +340,20 @@ class _ProviderProfileScreenState extends ConsumerState<ProviderProfileScreen> {
                             border: Border.all(color: const Color(0xFF10B981).withValues(alpha: 0.20)),
                             borderRadius: BorderRadius.circular(6),
                           ),
-                          child: Text(
-                            '⚡ ${p.response}',
-                            style: const TextStyle(
-                              color: Color(0xFF065F46),
-                              fontSize: 10,
-                              fontWeight: FontWeight.w700,
-                            ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.bolt, size: 12, color: Color(0xFF065F46)),
+                              const SizedBox(width: 2),
+                              Text(
+                                p.response,
+                                style: const TextStyle(
+                                  color: Color(0xFF065F46),
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
@@ -370,7 +384,14 @@ class _ProviderProfileScreenState extends ConsumerState<ProviderProfileScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text('★ ${p.rating}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Color(0xFFF59E0B))),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.star_rounded, size: 16, color: Color(0xFFF59E0B)),
+                        const SizedBox(width: 2),
+                        Text('${p.rating}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Color(0xFFF59E0B))),
+                      ],
+                    ),
                     Text('${p.reviews} reviews', style: const TextStyle(fontSize: 10.5, color: Color(0xFF94A3B8))),
                   ],
                 ),
@@ -567,7 +588,14 @@ class _ProviderProfileScreenState extends ConsumerState<ProviderProfileScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text('Reviews', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: Color(0xFF0F172A))),
-                Text('★ ${p.rating} · ${p.reviews} total', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFFF59E0B))),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.star_rounded, size: 14, color: Color(0xFFF59E0B)),
+                    const SizedBox(width: 2),
+                    Text('${p.rating} · ${p.reviews} total', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFFF59E0B))),
+                  ],
+                ),
               ],
             ),
           ),
@@ -652,13 +680,10 @@ class _ProviderProfileScreenState extends ConsumerState<ProviderProfileScreen> {
                           const SizedBox(height: 2),
                           Row(
                             children: List.generate(5, (starIdx) {
-                              return Text(
-                                '★',
-                                style: TextStyle(
-                                  color: starIdx < stars ? const Color(0xFFF59E0B) : const Color(0xFFE2E8F0),
-                                  fontSize: 11.5,
-                                  letterSpacing: 0.04,
-                                ),
+                              return Icon(
+                                Icons.star_rounded,
+                                size: 14,
+                                color: starIdx < stars ? const Color(0xFFF59E0B) : const Color(0xFFE2E8F0),
                               );
                             }),
                           ),

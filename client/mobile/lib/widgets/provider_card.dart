@@ -81,7 +81,9 @@ class ProviderCard extends StatelessWidget {
             // Rating + distance
             Row(
               children: [
-                Text('★ ${provider.rating}', style: AppTextStyles.captionBold(color: AppColors.amber)),
+                const Icon(Icons.star_rounded, size: 13, color: AppColors.amber),
+                const SizedBox(width: 2),
+                Text('${provider.rating}', style: AppTextStyles.captionBold(color: AppColors.amber)),
                 const SizedBox(width: 4),
                 Text('·', style: AppTextStyles.caption(color: AppColors.borderMuted)),
                 const SizedBox(width: 4),
@@ -151,7 +153,7 @@ class ProviderListTile extends StatelessWidget {
                       ),
                       if (provider.verified) ...[
                         const SizedBox(width: 4),
-                        const Text('🛡️', style: TextStyle(fontSize: 11)),
+                        const Icon(Icons.verified, size: 13, color: Color(0xFF0284C7)),
                       ],
                     ],
                   ),
@@ -160,11 +162,15 @@ class ProviderListTile extends StatelessWidget {
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      Text('★ ${provider.rating}', style: AppTextStyles.captionBold(color: AppColors.amber).copyWith(fontSize: 11.5)),
+                      const Icon(Icons.star_rounded, size: 13, color: AppColors.amber),
+                      const SizedBox(width: 2),
+                      Text('${provider.rating}', style: AppTextStyles.captionBold(color: AppColors.amber).copyWith(fontSize: 11.5)),
                       const SizedBox(width: 4),
                       Text('·', style: AppTextStyles.caption(color: AppColors.borderMuted).copyWith(fontSize: 11)),
                       const SizedBox(width: 4),
-                      Text('📍 ${provider.distance}', style: AppTextStyles.caption().copyWith(fontSize: 11)),
+                      const Icon(Icons.location_on_outlined, size: 12, color: AppColors.slateBlue),
+                      const SizedBox(width: 2),
+                      Text(provider.distance, style: AppTextStyles.caption().copyWith(fontSize: 11)),
                       const SizedBox(width: 4),
                       Text('·', style: AppTextStyles.caption(color: AppColors.borderMuted).copyWith(fontSize: 11)),
                       const SizedBox(width: 4),

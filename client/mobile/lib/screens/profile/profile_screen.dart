@@ -19,11 +19,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
   void _showLanguageSelector(BuildContext context) {
     final languages = [
-      {'name': 'English (US)', 'native': 'English', 'flag': '🇺🇸'},
-      {'name': 'Amharic', 'native': 'አማርኛ', 'flag': '🇪🇹'},
-      {'name': 'Afaan Oromoo', 'native': 'Afaan Oromoo', 'flag': '🇪🇹'},
-      {'name': 'Tigrinya', 'native': 'ትግርኛ', 'flag': '🇪🇹'},
-      {'name': 'Somali', 'native': 'Soomaali', 'flag': '🇸🇴'},
+      {'name': 'English (US)', 'native': 'English', 'code': 'EN'},
+      {'name': 'Amharic', 'native': 'አማርኛ', 'code': 'AM'},
+      {'name': 'Afaan Oromoo', 'native': 'Afaan Oromoo', 'code': 'OM'},
+      {'name': 'Tigrinya', 'native': 'ትግርኛ', 'code': 'TI'},
+      {'name': 'Somali', 'native': 'Soomaali', 'code': 'SO'},
     ];
 
     showModalBottomSheet(
@@ -59,7 +59,23 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 final isSelected = _selectedLanguage == lang['name'];
                 return ListTile(
                   contentPadding: EdgeInsets.zero,
-                  leading: Text(lang['flag']!, style: const TextStyle(fontSize: 24)),
+                  leading: Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: isSelected ? const Color(0xFFE0F2FE) : const Color(0xFFF1F5F9),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      lang['code']!,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 12,
+                        color: isSelected ? const Color(0xFF0284C7) : const Color(0xFF475569),
+                      ),
+                    ),
+                  ),
                   title: Text(
                     lang['name']!,
                     style: TextStyle(
@@ -141,7 +157,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 ),
                 child: const Row(
                   children: [
-                    Text('🛡️', style: TextStyle(fontSize: 20)),
+                    Icon(Icons.shield_outlined, size: 20, color: Color(0xFF059669)),
                     SizedBox(width: 10),
                     Expanded(
                       child: Text(
@@ -153,10 +169,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 ),
               ),
               const SizedBox(height: 14),
-              _buildPaymentOption('Chapa Escrow (Safe Pay)', 'Cards, Telebirr, CBEBirr, Awash', '💳', true),
-              _buildPaymentOption('Telebirr Direct', '+251 91 **** 782', '📱', false),
-              _buildPaymentOption('CBE Birr', '+251 91 **** 782', '🏦', false),
-              _buildPaymentOption('Cash on Delivery', 'Pay provider in cash upon completion', '💵', false),
+              _buildPaymentOption('Chapa Escrow (Safe Pay)', 'Cards, Telebirr, CBEBirr, Awash', Icons.credit_card_outlined, true),
+              _buildPaymentOption('Telebirr Direct', '+251 91 **** 782', Icons.phone_android_outlined, false),
+              _buildPaymentOption('CBE Birr', '+251 91 **** 782', Icons.account_balance_outlined, false),
+              _buildPaymentOption('Cash on Delivery', 'Pay provider in cash upon completion', Icons.payments_outlined, false),
             ],
           ),
         );
@@ -164,7 +180,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
-  Widget _buildPaymentOption(String title, String subtitle, String icon, bool isDefault) {
+  Widget _buildPaymentOption(String title, String subtitle, IconData icon, bool isDefault) {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -175,7 +191,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       ),
       child: Row(
         children: [
-          Text(icon, style: const TextStyle(fontSize: 20)),
+          Icon(icon, size: 20, color: const Color(0xFF0284C7)),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -244,7 +260,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   height: 36,
                   decoration: BoxDecoration(color: const Color(0xFFE0F2FE), borderRadius: BorderRadius.circular(10)),
                   alignment: Alignment.center,
-                  child: const Text('🤖', style: TextStyle(fontSize: 18)),
+                  child: const Icon(Icons.auto_awesome, size: 18, color: Color(0xFF0284C7)),
                 ),
                 title: const Text('Ask LINC AI Assistant', style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700)),
                 subtitle: const Text('Instant answers to booking & service questions', style: TextStyle(fontSize: 11.5, color: Color(0xFF64748B))),
@@ -498,22 +514,22 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final isProvider = appMode == AppMode.provider;
 
     final group1 = [
-      {'icon': '👤', 'label': 'Edit Profile & Photo', 'badge': null, 'highlight': false, 'action': () => _showEditProfileDialog(context)},
-      {'icon': '🔔', 'label': 'Notifications', 'badge': '3', 'highlight': false, 'action': () => _showHelpSupport(context)},
-      {'icon': '📍', 'label': 'Saved Locations', 'badge': null, 'highlight': false, 'action': () {}},
-      {'icon': '💳', 'label': 'Payment Methods & Escrow', 'badge': null, 'highlight': false, 'action': () => _showPaymentMethods(context)},
-      {'icon': '🌐', 'label': 'Language / ቋንቋ', 'badge': _selectedLanguage.split(' ').first, 'highlight': false, 'action': () => _showLanguageSelector(context)},
+      {'icon': Icons.person_outline_rounded, 'label': 'Edit Profile & Photo', 'badge': null, 'highlight': false, 'action': () => _showEditProfileDialog(context)},
+      {'icon': Icons.notifications_none_rounded, 'label': 'Notifications', 'badge': '3', 'highlight': false, 'action': () => _showHelpSupport(context)},
+      {'icon': Icons.location_on_outlined, 'label': 'Saved Locations', 'badge': null, 'highlight': false, 'action': () {}},
+      {'icon': Icons.payment_outlined, 'label': 'Payment Methods & Escrow', 'badge': null, 'highlight': false, 'action': () => _showPaymentMethods(context)},
+      {'icon': Icons.language_outlined, 'label': 'Language / ቋንቋ', 'badge': _selectedLanguage.split(' ').first, 'highlight': false, 'action': () => _showLanguageSelector(context)},
     ];
 
     final group2 = [
       if (isProvider)
-        {'icon': '🛠️', 'label': 'Edit Provider Profile & Trade', 'badge': null, 'highlight': false, 'action': () => context.push('/provider-setup')},
-      {'icon': '🛡️', 'label': 'Trust & Verification', 'badge': 'Recommended', 'highlight': true, 'action': () => context.push('/verification')},
-      {'icon': isProvider ? '👤' : '💼', 'label': isProvider ? 'Switch to Client View' : 'Switch to Provider Dashboard', 'badge': null, 'highlight': false, 'action': () {
+        {'icon': Icons.handyman_outlined, 'label': 'Edit Provider Profile & Trade', 'badge': null, 'highlight': false, 'action': () => context.push('/provider-setup')},
+      {'icon': Icons.shield_outlined, 'label': 'Trust & Verification', 'badge': 'Recommended', 'highlight': true, 'action': () => context.push('/verification')},
+      {'icon': isProvider ? Icons.person_outline_rounded : Icons.work_outline_rounded, 'label': isProvider ? 'Switch to Client View' : 'Switch to Provider Dashboard', 'badge': null, 'highlight': false, 'action': () {
         ref.read(appModeProvider.notifier).state = isProvider ? AppMode.client : AppMode.provider;
         context.go('/home');
       }},
-      {'icon': '❓', 'label': 'Help & Support', 'badge': null, 'highlight': false, 'action': () => _showHelpSupport(context)},
+      {'icon': Icons.help_outline_rounded, 'label': 'Help & Support', 'badge': null, 'highlight': false, 'action': () => _showHelpSupport(context)},
     ];
 
     return Scaffold(
@@ -588,14 +604,21 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                       borderRadius: BorderRadius.circular(6),
                                     ),
                                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                                    child: const Text(
-                                      '✓ VERIFIED',
-                                      style: TextStyle(
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.w800,
-                                        color: Color(0xFF0F172A),
-                                        letterSpacing: 0.06,
-                                      ),
+                                    child: const Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(Icons.verified, size: 11, color: Color(0xFF0F172A)),
+                                        SizedBox(width: 3),
+                                        Text(
+                                          'VERIFIED',
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.w800,
+                                            color: Color(0xFF0F172A),
+                                            letterSpacing: 0.06,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                   const SizedBox(width: 6),
@@ -632,13 +655,20 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                       borderRadius: BorderRadius.circular(6),
                                     ),
                                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                                    child: Text(
-                                      isProvider ? '💼 Provider' : '👤 Client',
-                                      style: const TextStyle(
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.w700,
-                                        color: Color(0xFF0F172A),
-                                      ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(isProvider ? Icons.work_outline : Icons.person_outline, size: 11, color: const Color(0xFF0F172A)),
+                                        const SizedBox(width: 3),
+                                        Text(
+                                          isProvider ? 'Provider' : 'Client',
+                                          style: const TextStyle(
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.w700,
+                                            color: Color(0xFF0F172A),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ],
@@ -690,7 +720,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: Color(0xFF0F172A), letterSpacing: -0.02),
                               ),
                               SizedBox(height: 2),
-                              Text('Rating ★', style: TextStyle(fontSize: 11, color: Color(0xFF94A3B8), fontWeight: FontWeight.w600)),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text('Rating', style: TextStyle(fontSize: 11, color: Color(0xFF94A3B8), fontWeight: FontWeight.w600)),
+                                  SizedBox(width: 2),
+                                  Icon(Icons.star_rounded, size: 12, color: Color(0xFFF59E0B)),
+                                ],
+                              ),
                             ],
                           ),
                         ),
@@ -780,7 +817,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     alignment: Alignment.center,
-                    child: Text(item['icon'] as String, style: const TextStyle(fontSize: 16)),
+                    child: Icon(
+                      item['icon'] as IconData,
+                      size: 18,
+                      color: isHighlight ? const Color(0xFF0284C7) : const Color(0xFF475569),
+                    ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(

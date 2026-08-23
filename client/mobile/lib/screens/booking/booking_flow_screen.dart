@@ -247,7 +247,19 @@ class _BookingFlowScreenState extends ConsumerState<BookingFlowScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('${p.name} 🛡️', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: Colors.white)),
+                Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        p.name,
+                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: Colors.white),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    const Icon(Icons.verified, size: 14, color: Colors.white),
+                  ],
+                ),
                 Text(p.headline, style: const TextStyle(fontSize: 11.5, color: Color(0xFF1E5F7A))),
               ],
             ),
@@ -255,7 +267,14 @@ class _BookingFlowScreenState extends ConsumerState<BookingFlowScreen> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Text('★ ${p.rating}', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFFF59E0B))),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.star_rounded, size: 13, color: Color(0xFFF59E0B)),
+                  const SizedBox(width: 2),
+                  Text('${p.rating}', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFFF59E0B))),
+                ],
+              ),
               Text(p.distance, style: const TextStyle(fontSize: 11, color: Color(0xFF1E5F7A))),
             ],
           ),
@@ -474,9 +493,9 @@ class _BookingFlowScreenState extends ConsumerState<BookingFlowScreen> {
           const SizedBox(height: 12),
           Row(
             children: [
-              _buildPaymentCard('cash', '💵', 'Cash on Delivery'),
+              _buildPaymentCard('cash', Icons.payments_outlined, 'Cash on Delivery'),
               const SizedBox(width: 8),
-              _buildPaymentCard('escrow', '🔒', 'Escrow (Safe Pay)'),
+              _buildPaymentCard('escrow', Icons.lock_outline_rounded, 'Escrow (Safe Pay)'),
             ],
           ),
         ],
@@ -484,7 +503,7 @@ class _BookingFlowScreenState extends ConsumerState<BookingFlowScreen> {
     );
   }
 
-  Widget _buildPaymentCard(String id, String emoji, String label) {
+  Widget _buildPaymentCard(String id, IconData icon, String label) {
     final isSelected = paymentMethod == id;
     return Expanded(
       child: GestureDetector(
@@ -499,7 +518,11 @@ class _BookingFlowScreenState extends ConsumerState<BookingFlowScreen> {
           alignment: Alignment.center,
           child: Column(
             children: [
-              Text(emoji, style: const TextStyle(fontSize: 20)),
+              Icon(
+                icon,
+                size: 22,
+                color: isSelected ? const Color(0xFF0284C7) : const Color(0xFF64748B),
+              ),
               const SizedBox(height: 5),
               Text(
                 label,
@@ -508,7 +531,6 @@ class _BookingFlowScreenState extends ConsumerState<BookingFlowScreen> {
                   fontWeight: FontWeight.w700,
                   color: isSelected ? const Color(0xFF0284C7) : const Color(0xFF475569),
                 ),
-                textAlign: TextAlign.center,
               ),
             ],
           ),

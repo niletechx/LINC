@@ -29,14 +29,14 @@ class _ProviderSetupScreenState extends ConsumerState<ProviderSetupScreen> {
   String? _errorMessage;
 
   final List<Map<String, dynamic>> _categories = [
-    {'id': '1', 'slug': 'plumbing', 'name': 'Plumbing & Water', 'emoji': '🔧', 'suggestedHeadline': 'Master Plumber & Pipe Specialist'},
-    {'id': '3', 'slug': 'electric', 'name': 'Electrical Work', 'emoji': '⚡', 'suggestedHeadline': 'Certified Electrician & Wiring Pro'},
-    {'id': '2', 'slug': 'cleaning', 'name': 'Cleaning & Maid', 'emoji': '🧹', 'suggestedHeadline': 'Professional Deep Cleaning Specialist'},
-    {'id': '4', 'slug': 'it-tech', 'name': 'IT & Computer', 'emoji': '💻', 'suggestedHeadline': 'Computer Repair & IT Technician'},
-    {'id': '5', 'slug': 'tutoring', 'name': 'Tutoring & Skills', 'emoji': '📚', 'suggestedHeadline': 'Experienced Academic & Language Tutor'},
-    {'id': '6', 'slug': 'transport', 'name': 'Transport & Cargo', 'emoji': '🚗', 'suggestedHeadline': 'Safe Driver & Moving Logistics Pro'},
-    {'id': '7', 'slug': 'wellness', 'name': 'Health & Wellness', 'emoji': '💆', 'suggestedHeadline': 'Certified Personal Trainer & Wellness Pro'},
-    {'id': '8', 'slug': 'creative', 'name': 'Painting & Design', 'emoji': '🎨', 'suggestedHeadline': 'Interior Painter & Decorating Specialist'},
+    {'id': '1', 'slug': 'plumbing', 'name': 'Plumbing & Water', 'icon': Icons.plumbing, 'suggestedHeadline': 'Master Plumber & Pipe Specialist'},
+    {'id': '3', 'slug': 'electric', 'name': 'Electrical Work', 'icon': Icons.bolt_outlined, 'suggestedHeadline': 'Certified Electrician & Wiring Pro'},
+    {'id': '2', 'slug': 'cleaning', 'name': 'Cleaning & Maid', 'icon': Icons.cleaning_services_outlined, 'suggestedHeadline': 'Professional Deep Cleaning Specialist'},
+    {'id': '4', 'slug': 'it-tech', 'name': 'IT & Computer', 'icon': Icons.computer_outlined, 'suggestedHeadline': 'Computer Repair & IT Technician'},
+    {'id': '5', 'slug': 'tutoring', 'name': 'Tutoring & Skills', 'icon': Icons.school_outlined, 'suggestedHeadline': 'Experienced Academic & Language Tutor'},
+    {'id': '6', 'slug': 'transport', 'name': 'Transport & Cargo', 'icon': Icons.directions_car_outlined, 'suggestedHeadline': 'Safe Driver & Moving Logistics Pro'},
+    {'id': '7', 'slug': 'wellness', 'name': 'Health & Wellness', 'icon': Icons.spa_outlined, 'suggestedHeadline': 'Certified Personal Trainer & Wellness Pro'},
+    {'id': '8', 'slug': 'creative', 'name': 'Painting & Design', 'icon': Icons.brush_outlined, 'suggestedHeadline': 'Interior Painter & Decorating Specialist'},
   ];
 
   final List<String> _locationSuggestions = [
@@ -131,7 +131,7 @@ class _ProviderSetupScreenState extends ConsumerState<ProviderSetupScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('🎉 Provider profile created successfully! Welcome aboard.'),
+            content: Text('Provider profile created successfully! Welcome aboard.'),
             backgroundColor: Color(0xFF10B981),
             duration: Duration(seconds: 3),
           ),
@@ -206,7 +206,7 @@ class _ProviderSetupScreenState extends ConsumerState<ProviderSetupScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Welcome, $firstName! 💼',
+                    'Welcome, $firstName!',
                     style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w800,
@@ -395,7 +395,11 @@ class _ProviderSetupScreenState extends ConsumerState<ProviderSetupScreen> {
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Text(cat['emoji'] as String, style: const TextStyle(fontSize: 15)),
+                                    Icon(
+                                      cat['icon'] as IconData,
+                                      size: 15,
+                                      color: isSelected ? Colors.white : const Color(0xFF0284C7),
+                                    ),
                                     const SizedBox(width: 6),
                                     Text(
                                       cat['name'] as String,
@@ -567,11 +571,11 @@ class _ProviderSetupScreenState extends ConsumerState<ProviderSetupScreen> {
                         child: Row(
                           children: [
                             Expanded(
-                              child: _buildAvailabilityCard('available', '🟢 Available', 'Accepting jobs now'),
+                              child: _buildAvailabilityCard('available', const Color(0xFF10B981), 'Available', 'Accepting jobs now'),
                             ),
                             const SizedBox(width: 8),
                             Expanded(
-                              child: _buildAvailabilityCard('busy', '🟡 Busy', 'Book in advance'),
+                              child: _buildAvailabilityCard('busy', const Color(0xFFF59E0B), 'Busy', 'Book in advance'),
                             ),
                           ],
                         ),
@@ -596,7 +600,7 @@ class _ProviderSetupScreenState extends ConsumerState<ProviderSetupScreen> {
                                   child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                                 )
                               : const Text(
-                                  'Save & Launch Provider Profile 🚀',
+                                  'Save & Launch Provider Profile',
                                   style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w800),
                                 ),
                         ),
@@ -634,7 +638,7 @@ class _ProviderSetupScreenState extends ConsumerState<ProviderSetupScreen> {
     );
   }
 
-  Widget _buildAvailabilityCard(String id, String label, String sub) {
+  Widget _buildAvailabilityCard(String id, Color dotColor, String label, String sub) {
     final isSelected = _selectedAvailability == id;
     return GestureDetector(
       onTap: () => setState(() => _selectedAvailability = id),
@@ -651,7 +655,27 @@ class _ProviderSetupScreenState extends ConsumerState<ProviderSetupScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(label, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Color(0xFF0F172A))),
+            Row(
+              children: [
+                Container(
+                  width: 8,
+                  height: 8,
+                  decoration: BoxDecoration(
+                    color: dotColor,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF0F172A),
+                  ),
+                ),
+              ],
+            ),
             const SizedBox(height: 2),
             Text(sub, style: const TextStyle(fontSize: 10.5, color: Color(0xFF64748B))),
           ],

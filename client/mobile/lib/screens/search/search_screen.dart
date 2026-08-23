@@ -214,15 +214,15 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   children: [
-                    _buildCategoryChip('all', 'All Services'),
-                    _buildCategoryChip('plumbing', '🔧 Plumbing'),
-                    _buildCategoryChip('electric', '⚡ Electric'),
-                    _buildCategoryChip('cleaning', '🧹 Cleaning'),
-                    _buildCategoryChip('it-tech', '💻 Tech & IT'),
-                    _buildCategoryChip('tutoring', '📚 Tutoring'),
-                    _buildCategoryChip('transport', '🚗 Transport'),
-                    _buildCategoryChip('wellness', '💆 Wellness'),
-                    _buildCategoryChip('creative', '🎨 Painting & Design'),
+                    _buildCategoryChip('all', 'All Services', icon: Icons.grid_view_rounded),
+                    _buildCategoryChip('plumbing', 'Plumbing', icon: Icons.plumbing),
+                    _buildCategoryChip('electric', 'Electric', icon: Icons.bolt_outlined),
+                    _buildCategoryChip('cleaning', 'Cleaning', icon: Icons.cleaning_services_outlined),
+                    _buildCategoryChip('it-tech', 'Tech & IT', icon: Icons.computer_outlined),
+                    _buildCategoryChip('tutoring', 'Tutoring', icon: Icons.school_outlined),
+                    _buildCategoryChip('transport', 'Transport', icon: Icons.directions_car_outlined),
+                    _buildCategoryChip('wellness', 'Wellness', icon: Icons.spa_outlined),
+                    _buildCategoryChip('creative', 'Painting & Design', icon: Icons.brush_outlined),
                   ],
                 ),
               ),
@@ -243,9 +243,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                 child: Row(
                   children: [
                     _buildFilterBadge('all', 'Everything'),
-                    _buildFilterBadge('verified', '🛡️ Verified Only'),
-                    _buildFilterBadge('nearby', '📍 Near Me (< 2 km)'),
-                    _buildFilterBadge('toprated', '★ 4.8+ Rated'),
+                    _buildFilterBadge('verified', 'Verified Only', icon: Icons.verified),
+                    _buildFilterBadge('nearby', 'Near Me (< 2 km)', icon: Icons.location_on_outlined),
+                    _buildFilterBadge('toprated', '4.8+ Rated', icon: Icons.star_rounded),
                   ],
                 ),
               ),
@@ -388,9 +388,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                                           borderRadius: BorderRadius.circular(20),
                                         ),
                                         alignment: Alignment.center,
-                                        child: Text(
-                                          isCategoryEmpty ? '📂' : '🔍',
-                                          style: const TextStyle(fontSize: 28),
+                                        child: Icon(
+                                          isCategoryEmpty ? Icons.folder_open_rounded : Icons.search_off_rounded,
+                                          size: 28,
+                                          color: const Color(0xFF94A3B8),
                                         ),
                                       ),
                                       const SizedBox(height: 16),
@@ -459,7 +460,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     );
   }
 
-  Widget _buildCategoryChip(String id, String label) {
+  Widget _buildCategoryChip(String id, String label, {IconData? icon}) {
     final isActive = _activeCategory == id;
     return GestureDetector(
       onTap: () => setState(() => _activeCategory = id),
@@ -470,19 +471,32 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           color: isActive ? const Color(0xFF7EC8E3) : const Color(0xFFF1F5F9),
           borderRadius: BorderRadius.circular(20),
         ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 11.5,
-            fontWeight: isActive ? FontWeight.w800 : FontWeight.w600,
-            color: isActive ? Colors.white : const Color(0xFF334155),
-          ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (icon != null) ...[
+              Icon(
+                icon,
+                size: 13,
+                color: isActive ? Colors.white : const Color(0xFF0284C7),
+              ),
+              const SizedBox(width: 5),
+            ],
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 11.5,
+                fontWeight: isActive ? FontWeight.w800 : FontWeight.w600,
+                color: isActive ? Colors.white : const Color(0xFF334155),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildFilterBadge(String id, String label) {
+  Widget _buildFilterBadge(String id, String label, {IconData? icon}) {
     final isActive = _activeFilter == id;
     return GestureDetector(
       onTap: () => setState(() => _activeFilter = id),
@@ -494,13 +508,26 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           borderRadius: BorderRadius.circular(8),
           border: Border.all(color: isActive ? const Color(0xFF0F172A) : const Color(0xFFE2E8F0)),
         ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 11,
-            fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
-            color: isActive ? Colors.white : const Color(0xFF475569),
-          ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (icon != null) ...[
+              Icon(
+                icon,
+                size: 12,
+                color: isActive ? Colors.white : (id == 'toprated' ? const Color(0xFFF59E0B) : const Color(0xFF0284C7)),
+              ),
+              const SizedBox(width: 4),
+            ],
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
+                color: isActive ? Colors.white : const Color(0xFF475569),
+              ),
+            ),
+          ],
         ),
       ),
     );
