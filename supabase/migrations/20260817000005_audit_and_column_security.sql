@@ -23,16 +23,24 @@ CREATE TABLE IF NOT EXISTS public.audit_logs (
   new_data     JSONB       DEFAULT NULL,  -- NULL for DELETE
   changed_cols TEXT[]      DEFAULT NULL,  -- populated on UPDATE only
   performed_by UUID        DEFAULT NULL,  -- NULL = system / service_role
-  performed_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-
-  -- Partition-friendly: keep index on performed_at
-  CONSTRAINT audit_logs_operation_check
-    CHECK (
-      (operation = 'INSERT' AND old_data IS NULL  AND new_data IS NOT NULL) OR
-      (operation = 'UPDATE' AND old_data IS NOT NULL AND new_data IS NOT NULL) OR
-      (operation = 'DELETE' AND old_data IS NOT NULL AND new_data IS NULL)
-    )
+  performed_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'audit_logs_operation_check'
+  ) THEN
+    ALTER TABLE public.audit_logs
+      ADD CONSTRAINT audit_logs_operation_check
+      CHECK (
+        (operation = 'INSERT' AND old_data IS NULL  AND new_data IS NOT NULL) OR
+        (operation = 'UPDATE' AND old_data IS NOT NULL AND new_data IS NOT NULL) OR
+        (operation = 'DELETE' AND old_data IS NOT NULL AND new_data IS NULL)
+      );
+  END IF;
+END;
+$$;
 
 COMMENT ON TABLE public.audit_logs IS
   'Immutable audit trail. All INSERTs come from fn_audit_log() triggers. '
@@ -263,9 +271,12 @@ SELECT
   -- Decrypt phone for admin display if encrypted
   CASE
     WHEN u.phone_encrypted IS NOT NULL THEN
-      pgp_sym_decrypt(
-        u.phone_encrypted,
-        current_setting('app.phone_encrypt_key', true)
+      COALESCE(
+        extensions.pgp_sym_decrypt(
+          u.phone_encrypted,
+          current_setting('app.phone_encrypt_key', true)
+        ),
+        u.phone
       )
     ELSE u.phone
   END AS phone_decrypted
@@ -402,7 +413,7 @@ CREATE OR REPLACE FUNCTION public.backfill_phone_encryption()
 RETURNS INTEGER
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = public, extensions
 AS $$
 DECLARE
   _key     TEXT;
@@ -421,7 +432,7 @@ BEGIN
 
   WITH updated AS (
     UPDATE public.users
-    SET    phone_encrypted = pgp_sym_encrypt(phone, _key)
+    SET    phone_encrypted = extensions.pgp_sym_encrypt(phone, _key)
     WHERE  phone         IS NOT NULL
     AND    phone          != ''
     AND    phone_encrypted IS NULL

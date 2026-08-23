@@ -8,10 +8,14 @@ build/
 .next/
 
 # ─── Environment variables ────────────────────────────────────────────────────
+# .env files at any depth (covers server/.env, client/web/.env, etc.)
 .env
 .env.local
 .env.production
 .env.staging
+# Keep .env.example files — they are safe to commit
+!.env.example
+!.env.*.example
 
 # ─── Logs ─────────────────────────────────────────────────────────────────────
 logs/
@@ -31,5 +35,5 @@ Thumbs.db
 *.sln
 
 # ─── Supabase ─────────────────────────────────────────────────────────────────
+# Temp files only — migrations ARE tracked in git (source of truth for DB schema)
 supabase/.temp/
-supabase/migrations/  # will be tracked — remove this line if you want migrations in git

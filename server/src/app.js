@@ -23,13 +23,17 @@ app.use(cors({
     if (allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
       return callback(null, true);
     }
-    return callback(null, true); // Permissive in dev fallback
+    // In development with no explicit CORS_ORIGIN set, be permissive
+    if (process.env.NODE_ENV !== 'production') {
+      return callback(null, true);
+    }
+    return callback(new Error(`CORS: origin '${origin}' not allowed`));
   },
   credentials: true,
 }));
 
-// Logging
-app.use(morgan('dev'));
+// Logging — use structured 'combined' format in production for log aggregators
+app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 
 // Body parsing
 app.use(express.json({ limit: '10mb' }));

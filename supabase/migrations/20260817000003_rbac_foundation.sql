@@ -14,7 +14,75 @@
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 -- ============================================================
--- SECTION 1 — JWT CLAIM HELPER FUNCTIONS
+-- SECTION 1 — SOFT DELETE: ADD deleted_at TO ALL TABLES
+--
+-- Why ALTER TABLE ADD COLUMN IF NOT EXISTS?
+--   Idempotent — repeated migrations won't fail.
+--
+-- Why DEFAULT NULL?
+--   NULL = active record. NOT NULL = logically deleted.
+--   This lets us distinguish "never deleted" from "deleted".
+-- ============================================================
+
+ALTER TABLE public.users               ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ DEFAULT NULL;
+ALTER TABLE public.provider_profiles   ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ DEFAULT NULL;
+ALTER TABLE public.provider_categories ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ DEFAULT NULL;
+ALTER TABLE public.businesses          ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ DEFAULT NULL;
+ALTER TABLE public.business_members    ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ DEFAULT NULL;
+ALTER TABLE public.organizations       ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ DEFAULT NULL;
+ALTER TABLE public.organization_members ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ DEFAULT NULL;
+ALTER TABLE public.categories          ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ DEFAULT NULL;
+ALTER TABLE public.services            ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ DEFAULT NULL;
+ALTER TABLE public.requests            ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ DEFAULT NULL;
+ALTER TABLE public.matches             ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ DEFAULT NULL;
+ALTER TABLE public.bookings            ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ DEFAULT NULL;
+ALTER TABLE public.conversations       ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ DEFAULT NULL;
+ALTER TABLE public.messages            ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ DEFAULT NULL;
+ALTER TABLE public.ai_conversations    ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ DEFAULT NULL;
+ALTER TABLE public.ai_messages         ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ DEFAULT NULL;
+ALTER TABLE public.reviews             ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ DEFAULT NULL;
+ALTER TABLE public.verification_requests ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ DEFAULT NULL;
+ALTER TABLE public.reports             ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ DEFAULT NULL;
+ALTER TABLE public.notifications       ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ DEFAULT NULL;
+ALTER TABLE public.escrow_transactions ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ DEFAULT NULL;
+ALTER TABLE public.escrow_disputes     ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ DEFAULT NULL;
+
+-- ============================================================
+-- SECTION 2 — PARTIAL INDEXES ON deleted_at
+--
+-- Why partial indexes (WHERE deleted_at IS NULL)?
+--   99% of all queries only touch active (non-deleted) rows.
+--   A partial index covering only active rows is dramatically
+--   smaller and faster than a full-column index.
+--   Planner uses this index for `WHERE deleted_at IS NULL`
+--   queries, which appears in every RLS SELECT policy.
+-- ============================================================
+
+CREATE INDEX IF NOT EXISTS idx_users_active               ON public.users(id)               WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_provider_profiles_active   ON public.provider_profiles(id)   WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_provider_categories_active ON public.provider_categories(id) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_businesses_active          ON public.businesses(id)          WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_business_members_active    ON public.business_members(id)    WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_organizations_active       ON public.organizations(id)       WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_org_members_active         ON public.organization_members(id) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_categories_active          ON public.categories(id)          WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_services_active            ON public.services(id)            WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_requests_active            ON public.requests(id)            WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_matches_active             ON public.matches(id)             WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_bookings_active            ON public.bookings(id)            WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_conversations_active       ON public.conversations(id)       WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_messages_active            ON public.messages(id)            WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_ai_conversations_active    ON public.ai_conversations(id)   WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_ai_messages_active         ON public.ai_messages(id)        WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_reviews_active             ON public.reviews(id)            WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_verification_active        ON public.verification_requests(id) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_reports_active             ON public.reports(id)            WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_notifications_active       ON public.notifications(id)      WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_escrow_transactions_active ON public.escrow_transactions(id) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_escrow_disputes_active     ON public.escrow_disputes(id)    WHERE deleted_at IS NULL;
+
+-- ============================================================
+-- SECTION 3 — JWT CLAIM HELPER FUNCTIONS
 --
 -- LINC uses a custom JWT signed with JWT_SECRET (not Supabase
 -- native auth). Express middleware sets the GUC
@@ -270,74 +338,6 @@ AS $$
     )
   );
 $$;
-
--- ============================================================
--- SECTION 2 — SOFT DELETE: ADD deleted_at TO ALL TABLES
---
--- Why ALTER TABLE ADD COLUMN IF NOT EXISTS?
---   Idempotent — repeated migrations won't fail.
---
--- Why DEFAULT NULL?
---   NULL = active record. NOT NULL = logically deleted.
---   This lets us distinguish "never deleted" from "deleted".
--- ============================================================
-
-ALTER TABLE public.users               ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ DEFAULT NULL;
-ALTER TABLE public.provider_profiles   ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ DEFAULT NULL;
-ALTER TABLE public.provider_categories ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ DEFAULT NULL;
-ALTER TABLE public.businesses          ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ DEFAULT NULL;
-ALTER TABLE public.business_members    ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ DEFAULT NULL;
-ALTER TABLE public.organizations       ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ DEFAULT NULL;
-ALTER TABLE public.organization_members ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ DEFAULT NULL;
-ALTER TABLE public.categories          ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ DEFAULT NULL;
-ALTER TABLE public.services            ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ DEFAULT NULL;
-ALTER TABLE public.requests            ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ DEFAULT NULL;
-ALTER TABLE public.matches             ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ DEFAULT NULL;
-ALTER TABLE public.bookings            ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ DEFAULT NULL;
-ALTER TABLE public.conversations       ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ DEFAULT NULL;
-ALTER TABLE public.messages            ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ DEFAULT NULL;
-ALTER TABLE public.ai_conversations    ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ DEFAULT NULL;
-ALTER TABLE public.ai_messages         ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ DEFAULT NULL;
-ALTER TABLE public.reviews             ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ DEFAULT NULL;
-ALTER TABLE public.verification_requests ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ DEFAULT NULL;
-ALTER TABLE public.reports             ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ DEFAULT NULL;
-ALTER TABLE public.notifications       ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ DEFAULT NULL;
-ALTER TABLE public.escrow_transactions ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ DEFAULT NULL;
-ALTER TABLE public.escrow_disputes     ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ DEFAULT NULL;
-
--- ============================================================
--- SECTION 3 — PARTIAL INDEXES ON deleted_at
---
--- Why partial indexes (WHERE deleted_at IS NULL)?
---   99% of all queries only touch active (non-deleted) rows.
---   A partial index covering only active rows is dramatically
---   smaller and faster than a full-column index.
---   Planner uses this index for `WHERE deleted_at IS NULL`
---   queries, which appears in every RLS SELECT policy.
--- ============================================================
-
-CREATE INDEX IF NOT EXISTS idx_users_active               ON public.users(id)               WHERE deleted_at IS NULL;
-CREATE INDEX IF NOT EXISTS idx_provider_profiles_active   ON public.provider_profiles(id)   WHERE deleted_at IS NULL;
-CREATE INDEX IF NOT EXISTS idx_provider_categories_active ON public.provider_categories(id) WHERE deleted_at IS NULL;
-CREATE INDEX IF NOT EXISTS idx_businesses_active          ON public.businesses(id)          WHERE deleted_at IS NULL;
-CREATE INDEX IF NOT EXISTS idx_business_members_active    ON public.business_members(id)    WHERE deleted_at IS NULL;
-CREATE INDEX IF NOT EXISTS idx_organizations_active       ON public.organizations(id)       WHERE deleted_at IS NULL;
-CREATE INDEX IF NOT EXISTS idx_org_members_active         ON public.organization_members(id) WHERE deleted_at IS NULL;
-CREATE INDEX IF NOT EXISTS idx_categories_active          ON public.categories(id)          WHERE deleted_at IS NULL;
-CREATE INDEX IF NOT EXISTS idx_services_active            ON public.services(id)            WHERE deleted_at IS NULL;
-CREATE INDEX IF NOT EXISTS idx_requests_active            ON public.requests(id)            WHERE deleted_at IS NULL;
-CREATE INDEX IF NOT EXISTS idx_matches_active             ON public.matches(id)             WHERE deleted_at IS NULL;
-CREATE INDEX IF NOT EXISTS idx_bookings_active            ON public.bookings(id)            WHERE deleted_at IS NULL;
-CREATE INDEX IF NOT EXISTS idx_conversations_active       ON public.conversations(id)       WHERE deleted_at IS NULL;
-CREATE INDEX IF NOT EXISTS idx_messages_active            ON public.messages(id)            WHERE deleted_at IS NULL;
-CREATE INDEX IF NOT EXISTS idx_ai_conversations_active    ON public.ai_conversations(id)   WHERE deleted_at IS NULL;
-CREATE INDEX IF NOT EXISTS idx_ai_messages_active         ON public.ai_messages(id)        WHERE deleted_at IS NULL;
-CREATE INDEX IF NOT EXISTS idx_reviews_active             ON public.reviews(id)            WHERE deleted_at IS NULL;
-CREATE INDEX IF NOT EXISTS idx_verification_active        ON public.verification_requests(id) WHERE deleted_at IS NULL;
-CREATE INDEX IF NOT EXISTS idx_reports_active             ON public.reports(id)            WHERE deleted_at IS NULL;
-CREATE INDEX IF NOT EXISTS idx_notifications_active       ON public.notifications(id)      WHERE deleted_at IS NULL;
-CREATE INDEX IF NOT EXISTS idx_escrow_transactions_active ON public.escrow_transactions(id) WHERE deleted_at IS NULL;
-CREATE INDEX IF NOT EXISTS idx_escrow_disputes_active     ON public.escrow_disputes(id)    WHERE deleted_at IS NULL;
 
 -- ============================================================
 -- SECTION 4 — SOFT DELETE TRIGGER

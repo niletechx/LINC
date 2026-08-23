@@ -34,13 +34,13 @@ USER node
 
 # Step 6: Environment defaults & Port exposure
 ENV NODE_ENV=production \
-    PORT=3000
+    PORT=10000
 
-EXPOSE 3000
+EXPOSE 10000
 
 # Step 7: Built-in Healthcheck
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1
+  CMD wget --no-verbose --tries=1 --spider http://localhost:10000/health || exit 1
 
 # Step 8: Define entrypoint command
 CMD ["node", "server.js"]

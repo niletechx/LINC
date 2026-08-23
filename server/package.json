@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "nodemon server.js",
     "start": "node server.js",
-    "test": "node --test tests/api.test.js"
+    "test": "node --test tests/api.test.js",
+    "seed:providers": "node src/scripts/seed_providers.js"
   },
   "dependencies": {
     "@google/generative-ai": "^0.21.0",

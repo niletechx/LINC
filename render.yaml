@@ -1,4 +1,4 @@
-﻿# ==============================================================================
+# ==============================================================================
 # LINC — Render Blueprint Configuration (render.yaml)
 # https://render.com/docs/blueprint-spec
 # ==============================================================================
@@ -21,20 +21,32 @@ services:
       - key: NODE_ENV
         value: production
       - key: PORT
-        value: 5000
-      - key: SKIP_ENV_VALIDATION
-        value: false
+        value: 10000
+      # Server & client public URLs — used by Chapa callback/return URLs
+      # Replace with your actual Render service URLs after first deploy
+      - key: SERVER_URL
+        value: https://linc-backend.onrender.com
+      - key: CLIENT_URL
+        value: https://linc-web.onrender.com
+      # CORS: comma-separated list of allowed origins
+      - key: CORS_ORIGIN
+        value: https://linc-web.onrender.com
+      # JWT — auto-generated strong secret on first deploy
       - key: JWT_SECRET
         generateValue: true
-      - key: CORS_ORIGIN
-        value: "*"
-      # Optional: live Supabase / Chapa / Gemini credentials can be configured in Render dashboard
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      # Supabase — set these in the Render Dashboard (Environment tab)
       - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
         sync: false
       - key: SUPABASE_SERVICE_ROLE_KEY
         sync: false
+      # Google Gemini AI — set in Render Dashboard
       - key: GEMINI_API_KEY
         sync: false
+      # Chapa Payment Gateway — set in Render Dashboard
       - key: CHAPA_SECRET_KEY
         sync: false
 
@@ -53,8 +65,6 @@ services:
         source: /*
         destination: /index.html
     envVars:
+      # Full HTTPS URL pointing to the backend API — consumed by Vite at build time
       - key: VITE_API_URL
-        fromService:
-          type: web
-          name: linc-backend
-          property: host
+        value: https://linc-backend.onrender.com/api
