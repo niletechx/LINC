@@ -76,6 +76,11 @@ class _ServerConfigDialogState extends State<ServerConfigDialog> {
               runSpacing: 6,
               children: [
                 _buildPresetChip(
+                  label: 'Vercel Cloud',
+                  url: 'https://linc-backend.vercel.app',
+                  icon: Icons.bolt_rounded,
+                ),
+                _buildPresetChip(
                   label: 'Render Cloud',
                   url: 'https://linc-backend.onrender.com',
                   icon: Icons.cloud_done_rounded,

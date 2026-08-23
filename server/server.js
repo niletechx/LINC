@@ -11,13 +11,15 @@ const PORT = process.env.PORT || 5000;
 const server = http.createServer(app);
 const io = initSocket(server);
 
-// Start server
-server.listen(PORT, '0.0.0.0', () => {
-  logger.info(`🚀 LINC server running on port ${PORT} [${process.env.NODE_ENV || 'development'}]`);
+// Start server only in standalone/container mode (not in Vercel serverless functions or tests)
+if (!process.env.VERCEL && process.env.NODE_ENV !== 'test') {
+  server.listen(PORT, '0.0.0.0', () => {
+    logger.info(`🚀 LINC server running on port ${PORT} [${process.env.NODE_ENV || 'development'}]`);
 
-  // Start background jobs
-  startAutoReleaseJob();
-});
+    // Start background jobs
+    startAutoReleaseJob();
+  });
+}
 
 // ── Graceful Shutdown ──────────────────────────────────────────────────────────
 let isShuttingDown = false;
@@ -78,3 +80,5 @@ process.on('uncaughtException', (err) => {
   // In production, give winston time to log before exit
   setTimeout(() => process.exit(1), 1000);
 });
+
+module.exports = app;
