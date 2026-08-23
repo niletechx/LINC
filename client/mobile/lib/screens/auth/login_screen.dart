@@ -377,8 +377,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             Expanded(
                               child: GestureDetector(
                                 onTap: () {
-                                  ref.read(authProvider.notifier).signIn();
-                                  context.go('/home');
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('Google Sign-In is coming soon. Please sign in with your email and password.'),
+                                      backgroundColor: Color(0xFF0F172A),
+                                      behavior: SnackBarBehavior.floating,
+                                    ),
+                                  );
                                 },
                                 child: _buildSocialBtn(
                                   iconWidget: const Text(
@@ -397,8 +402,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             Expanded(
                               child: GestureDetector(
                                 onTap: () {
-                                  ref.read(authProvider.notifier).signIn();
-                                  context.go('/home');
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('Apple Sign-In is coming soon. Please sign in with your email and password.'),
+                                      backgroundColor: Color(0xFF0F172A),
+                                      behavior: SnackBarBehavior.floating,
+                                    ),
+                                  );
                                 },
                                 child: _buildSocialBtn(
                                   iconWidget: const Icon(Icons.apple, color: Color(0xFF0F172A), size: 20),

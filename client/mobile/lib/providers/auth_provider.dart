@@ -168,10 +168,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
     await StorageService.clear();
     state = const AuthState(isInitialized: true, isAuthed: false, isGuest: false, user: null, token: null);
   }
-
-  void signIn() {
-    state = state.copyWith(isAuthed: true, isGuest: false);
-  }
 }
 
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>(
