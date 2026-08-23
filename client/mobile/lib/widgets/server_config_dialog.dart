@@ -82,7 +82,7 @@ class _ServerConfigDialogState extends State<ServerConfigDialog> {
                 ),
                 _buildPresetChip(
                   label: 'Render Cloud',
-                  url: 'https://linc-backend.onrender.com',
+                  url: 'https://linc-backend-2zcf.onrender.com',
                   icon: Icons.cloud_done_rounded,
                 ),
                 _buildPresetChip(

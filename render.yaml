@@ -25,7 +25,7 @@ services:
       # Server & client public URLs — used by Chapa callback/return URLs
       # Replace with your actual Render service URLs after first deploy
       - key: SERVER_URL
-        value: https://linc-backend.onrender.com
+        value: https://linc-backend-2zcf.onrender.com
       - key: CLIENT_URL
         value: https://linc-web.onrender.com
       # CORS: comma-separated list of allowed origins
@@ -67,4 +67,4 @@ services:
     envVars:
       # Full HTTPS URL pointing to the backend API — consumed by Vite at build time
       - key: VITE_API_URL
-        value: https://linc-backend.onrender.com/api
+        value: https://linc-backend-2zcf.onrender.com/api

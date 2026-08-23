@@ -12,7 +12,7 @@ class AppConfig {
   AppConfig._();
 
   static const String defaultDevHost = 'http://127.0.0.1:5000';
-  static const String defaultRenderHost = 'https://linc-backend.onrender.com';
+  static const String defaultRenderHost = 'https://linc-backend-2zcf.onrender.com';
   static const String _envBaseUrl = String.fromEnvironment('BASE_URL');
 
   static String? _overrideBaseUrl;
