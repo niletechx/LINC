@@ -656,7 +656,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                               const SizedBox(height: 2),
                               Text(
                                 isProvider
-                                    ? '${user?.role?.toUpperCase() ?? 'VERIFIED SPECIALIST'} · ${user?.locationCity ?? 'Addis Ababa'}'
+                                    ? '${user?.role.toUpperCase() ?? 'VERIFIED SPECIALIST'} · ${user?.locationCity ?? 'Addis Ababa'}'
                                     : (user?.email.isNotEmpty == true ? user!.email : 'yonas.molla@email.com'),
                                 style: TextStyle(
                                   fontSize: 12,

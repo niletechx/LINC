@@ -32,7 +32,6 @@ class AppShell extends ConsumerWidget {
     final mode = ref.watch(appModeProvider);
     final isProvider = mode == AppMode.provider;
     final authState = ref.watch(authProvider);
-    final isGuest = authState.isGuest && !authState.isAuthed;
 
     void gotoOrGate(String route, {bool requiresAuth = false}) {
       if (requiresAuth && !authState.isAuthed) {

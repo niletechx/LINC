@@ -28,18 +28,40 @@ const initiateEscrow = asyncHandler(async (req, res) => {
   return success(res, result, 'Escrow initiated. Redirect user to checkout URL.');
 });
 
+const crypto = require('crypto');
+
 /**
  * POST /api/payments/chapa/webhook
- * Receives Chapa payment webhook — verifies and marks funds as held.
- * This endpoint must NOT require auth (Chapa calls it directly).
+ * Receives Chapa payment webhook — securely verifies with Chapa API and marks funds as held.
+ * This endpoint must NOT require user auth (Chapa calls it directly).
  */
 const chapaWebhook = async (req, res) => {
   try {
-    const { tx_ref, status } = req.body;
+    const { tx_ref, status } = req.body || {};
     logger.info(`Chapa webhook received: tx_ref=${tx_ref} status=${status}`);
 
-    if (status === 'success' && tx_ref) {
+    if (!tx_ref) {
+      return res.status(400).json({ success: false, message: 'Missing tx_ref' });
+    }
+
+    // 1. Check webhook signature if provided
+    const signature = req.headers['x-chapa-signature'] || req.headers['chapa-signature'];
+    const secret = process.env.CHAPA_WEBHOOK_SECRET || process.env.CHAPA_SECRET_KEY;
+    if (signature && secret) {
+      const hash = crypto.createHmac('sha256', secret).update(JSON.stringify(req.body)).digest('hex');
+      if (hash !== signature && signature !== secret) {
+        logger.warn(`Invalid Chapa webhook signature for tx_ref=${tx_ref}`);
+        return res.status(400).json({ success: false, message: 'Invalid signature' });
+      }
+    }
+
+    // 2. Active server-to-server verification with Chapa API before updating state
+    const verification = await chapaClient.verifyPayment(tx_ref);
+    if (verification && verification.status === 'success') {
       await escrowService.handleWebhook({ txRef: tx_ref });
+      logger.info(`Chapa payment verified successfully for tx_ref=${tx_ref}`);
+    } else {
+      logger.warn(`Chapa verification failed or not completed for tx_ref=${tx_ref}: status=${verification?.status}`);
     }
 
     // Always return 200 to Chapa

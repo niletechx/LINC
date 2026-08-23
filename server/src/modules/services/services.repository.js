@@ -53,8 +53,10 @@ async function findAll(filters = {}) {
   }
 
   if (filters.q) {
-    const q = filters.q.trim();
-    query = query.or(`title.ilike.%${q}%,description.ilike.%${q}%`);
+    const q = String(filters.q).replace(/[%,()]/g, '').trim();
+    if (q) {
+      query = query.or(`title.ilike.%${q}%,description.ilike.%${q}%`);
+    }
   }
 
   if (filters.city) {

@@ -5,12 +5,13 @@ const membersRouter = require('./members/members.routes');
 const authMiddleware = require('../../middleware/auth.middleware');
 
 router.get('/', organizationsController.listOrganizations);
-router.get('/:id', organizationsController.getById);
 
-router.use(authMiddleware);
-router.get('/me', organizationsController.getMe);
-router.post('/me', organizationsController.createMe);
-router.put('/me', organizationsController.updateMe);
-router.use('/:id/members', membersRouter);
+// Authenticated /me routes MUST be registered before /:id
+router.get('/me', authMiddleware, organizationsController.getMe);
+router.post('/me', authMiddleware, organizationsController.createMe);
+router.put('/me', authMiddleware, organizationsController.updateMe);
+
+router.get('/:id', organizationsController.getById);
+router.use('/:id/members', authMiddleware, membersRouter);
 
 module.exports = router;

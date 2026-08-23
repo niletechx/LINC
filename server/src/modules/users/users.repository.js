@@ -50,10 +50,13 @@ async function updateUser(id, updates) {
 }
 
 async function searchUsers(query, limit = 20) {
+  const sanitized = String(query || '').replace(/[%,()]/g, '').trim();
+  if (!sanitized) return [];
+
   const { data, error } = await supabase
     .from('users')
     .select(PUBLIC_FIELDS)
-    .or(`full_name.ilike.%${query}%,username.ilike.%${query}%`)
+    .or(`full_name.ilike.%${sanitized}%,username.ilike.%${sanitized}%`)
     .eq('is_active', true)
     .limit(limit);
   if (error) throw error;

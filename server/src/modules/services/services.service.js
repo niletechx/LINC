@@ -105,14 +105,14 @@ async function updateService(userId, id, payload = {}) {
     providerProfile = await providersRepo.findByUserId(userId);
   }
 
-  if (!providerProfile && !existing.business_id && !existing.organization_id) {
+  if (existing.provider_id) {
+    if (!providerProfile || existing.provider_id !== providerProfile.id) {
+      const err = new Error('You can only update your own service');
+      err.statusCode = 403;
+      throw err;
+    }
+  } else if (!existing.business_id && !existing.organization_id) {
     const err = new Error('Forbidden');
-    err.statusCode = 403;
-    throw err;
-  }
-
-  if (existing.provider_id && providerProfile && existing.provider_id !== providerProfile.id) {
-    const err = new Error('You can only update your own service');
     err.statusCode = 403;
     throw err;
   }
@@ -136,8 +136,14 @@ async function deleteService(userId, id) {
   }
 
   const providerProfile = await providersRepo.findByUserId(userId);
-  if (existing.provider_id && providerProfile && existing.provider_id !== providerProfile.id) {
-    const err = new Error('You can only delete your own service');
+  if (existing.provider_id) {
+    if (!providerProfile || existing.provider_id !== providerProfile.id) {
+      const err = new Error('You can only delete your own service');
+      err.statusCode = 403;
+      throw err;
+    }
+  } else if (!existing.business_id && !existing.organization_id) {
+    const err = new Error('Forbidden');
     err.statusCode = 403;
     throw err;
   }

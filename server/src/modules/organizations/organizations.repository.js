@@ -58,8 +58,10 @@ async function listOrganizations(filters = {}) {
   }
 
   if (filters.q) {
-    const q = filters.q.trim();
-    query = query.or(`name.ilike.%${q}%,description.ilike.%${q}%`);
+    const q = String(filters.q).replace(/[%,()]/g, '').trim();
+    if (q) {
+      query = query.or(`name.ilike.%${q}%,description.ilike.%${q}%`);
+    }
   }
 
   const { data, error } = await query

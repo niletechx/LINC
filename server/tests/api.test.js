@@ -71,13 +71,36 @@ describe('LINC Backend Production API Test Suite', () => {
 
   // ── 2. Authentication Flow ──────────────────────────────────────────────────
   describe('Authentication Module', () => {
+    const testEmail = `test.user.${Date.now()}@example.com`;
+    const testPassword = 'Password123!';
+
+    test('POST /api/auth/register creates a new user account', async () => {
+      const res = await fetch(`${baseUrl}/api/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: testEmail,
+          password: testPassword,
+          full_name: 'Security Test User',
+          username: `testuser_${Date.now()}`,
+          role: 'client',
+        }),
+      });
+
+      assert.equal(res.status, 201);
+      const body = await res.json();
+      assert.equal(body.success, true);
+      assert.ok(body.data.token, 'Expected JWT token in response');
+      authToken = body.data.token;
+    });
+
     test('POST /api/auth/login succeeds with valid credentials', async () => {
       const res = await fetch(`${baseUrl}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          email: 'yonas.molla@email.com',
-          password: 'password123',
+          email: testEmail,
+          password: testPassword,
         }),
       });
 
@@ -85,7 +108,7 @@ describe('LINC Backend Production API Test Suite', () => {
       const body = await res.json();
       assert.equal(body.success, true);
       assert.ok(body.data.token, 'Expected JWT token in response');
-      assert.equal(body.data.user.email, 'yonas.molla@email.com');
+      assert.equal(body.data.user.email, testEmail);
       authToken = body.data.token;
     });
 
@@ -94,8 +117,8 @@ describe('LINC Backend Production API Test Suite', () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          email: 'yonas.molla@email.com',
-          password: 'wrongpassword',
+          email: testEmail,
+          password: 'wrongpassword999',
         }),
       });
 
@@ -114,7 +137,7 @@ describe('LINC Backend Production API Test Suite', () => {
       assert.equal(res.status, 200);
       const body = await res.json();
       assert.equal(body.success, true);
-      assert.equal(body.data.email, 'yonas.molla@email.com');
+      assert.equal(body.data.email, testEmail);
     });
 
     test('GET /api/auth/me returns 401 without token', async () => {
@@ -190,12 +213,19 @@ describe('LINC Backend Production API Test Suite', () => {
       assert.deepEqual(body.data, []);
     });
 
-    test('GET /api/messaging/conversations returns empty list for unauthenticated guests', async () => {
+    test('GET /api/messaging/conversations is blocked for unauthenticated users', async () => {
       const res = await fetch(`${baseUrl}/api/messaging/conversations`);
+      assert.equal(res.status, 401);
+    });
+
+    test('GET /api/messaging/conversations succeeds with valid token', async () => {
+      const res = await fetch(`${baseUrl}/api/messaging/conversations`, {
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
       assert.equal(res.status, 200);
       const body = await res.json();
       assert.equal(body.success, true);
-      assert.deepEqual(body.data, []);
+      assert.ok(Array.isArray(body.data));
     });
 
     test('POST /api/bookings is blocked for unauthenticated users', async () => {
@@ -212,6 +242,14 @@ describe('LINC Backend Production API Test Suite', () => {
       });
 
       assert.equal(res.status, 401);
+    });
+
+    test('GET /api/reports is blocked for non-admin users', async () => {
+      const res = await fetch(`${baseUrl}/api/reports`, {
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+      // Standard client user should receive 403 Forbidden
+      assert.ok([401, 403].includes(res.status));
     });
   });
 
