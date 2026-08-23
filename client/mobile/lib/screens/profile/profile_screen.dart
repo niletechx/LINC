@@ -532,6 +532,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       {'icon': Icons.help_outline_rounded, 'label': 'Help & Support', 'badge': null, 'highlight': false, 'action': () => _showHelpSupport(context)},
     ];
 
+    final topPadding = MediaQuery.of(context).padding.top;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF1F5F9),
       body: SafeArea(
@@ -540,30 +542,91 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Cyan Profile Header
+              // Profile Header
               Container(
                 width: double.infinity,
-                decoration: const BoxDecoration(color: Color(0xFF7EC8E3)),
-                padding: const EdgeInsets.fromLTRB(16, 14, 16, 20),
+                decoration: BoxDecoration(
+                  color: isProvider ? const Color(0xFF0003BF) : const Color(0xFF7EC8E3),
+                ),
+                padding: EdgeInsets.fromLTRB(16, isProvider ? topPadding + 14 : 14, 16, 20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text('Profile', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: Color(0xFF0F172A))),
-                        GestureDetector(
-                          onTap: () => _showHelpSupport(context),
-                          child: Container(
-                            width: 36,
-                            height: 36,
-                            decoration: BoxDecoration(color: const Color(0x26FFFFFF), borderRadius: BorderRadius.circular(10)),
-                            child: const Icon(Icons.help_outline_rounded, color: Color(0xFF0F172A), size: 20),
+                    if (isProvider) ...[
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Flexible(
+                            child: Row(
+                              children: [
+                                const Icon(Icons.location_on, size: 14, color: Color(0xFF93C5FD)),
+                                const SizedBox(width: 4),
+                                Flexible(
+                                  child: Text(
+                                    user?.locationCity ?? 'Addis Ababa, ET',
+                                    style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: Colors.white),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 14),
+                          Row(
+                            children: [
+                              GestureDetector(
+                                onTap: () => _showHelpSupport(context),
+                                child: Container(
+                                  padding: const EdgeInsets.all(6),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withValues(alpha: 0.20),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: const Icon(Icons.help_outline_rounded, color: Colors.white, size: 16),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 10),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.20),
+                                  border: Border.all(color: Colors.white.withValues(alpha: 0.40)),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: const Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(Icons.work_outline_rounded, size: 12, color: Colors.white),
+                                    SizedBox(width: 4),
+                                    Text(
+                                      'Provider Mode',
+                                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Colors.white),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                    ],
+                    if (!isProvider)
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text('Profile', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: Color(0xFF0F172A))),
+                          GestureDetector(
+                            onTap: () => _showHelpSupport(context),
+                            child: Container(
+                              width: 36,
+                              height: 36,
+                              decoration: BoxDecoration(color: const Color(0x26FFFFFF), borderRadius: BorderRadius.circular(10)),
+                              child: const Icon(Icons.help_outline_rounded, color: Color(0xFF0F172A), size: 20),
+                            ),
+                          ),
+                        ],
+                      ),
+                    const SizedBox(height: 10),
                     Row(
                       children: [
                         UserAvatar(
@@ -571,8 +634,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           initials: user?.initials ?? 'YM',
                           size: 64,
                           borderRadius: 20,
-                          backgroundColor: const Color(0x66FFFFFF),
-                          textColor: const Color(0xFF0F172A),
+                          backgroundColor: isProvider ? Colors.white.withValues(alpha: 0.25) : const Color(0x66FFFFFF),
+                          textColor: isProvider ? Colors.white : const Color(0xFF0F172A),
                           showEditBadge: true,
                           onTap: _changeProfilePicture,
                         ),
@@ -582,39 +645,45 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                user?.fullName.isNotEmpty == true ? user!.fullName : 'Yonas Molla',
-                                style: const TextStyle(
+                                user?.fullName.isNotEmpty == true ? user!.fullName : 'Specialist Provider',
+                                style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.w800,
-                                  color: Color(0xFF0F172A),
+                                  color: isProvider ? Colors.white : const Color(0xFF0F172A),
                                   letterSpacing: -0.02,
                                 ),
                               ),
                               const SizedBox(height: 2),
                               Text(
-                                user?.email.isNotEmpty == true ? user!.email : 'yonas.molla@email.com',
-                                style: const TextStyle(fontSize: 12, color: Color(0xFF1E5F7A)),
+                                isProvider
+                                    ? '${user?.role?.toUpperCase() ?? 'VERIFIED SPECIALIST'} · ${user?.locationCity ?? 'Addis Ababa'}'
+                                    : (user?.email.isNotEmpty == true ? user!.email : 'yonas.molla@email.com'),
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                  color: isProvider ? const Color(0xFFBFDBFE) : const Color(0xFF1E5F7A),
+                                ),
                               ),
                               const SizedBox(height: 7),
                               Row(
                                 children: [
                                   Container(
                                     decoration: BoxDecoration(
-                                      color: const Color(0x80FFFFFF),
+                                      color: isProvider ? Colors.white.withValues(alpha: 0.20) : const Color(0x80FFFFFF),
                                       borderRadius: BorderRadius.circular(6),
                                     ),
                                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                                    child: const Row(
+                                    child: Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        Icon(Icons.verified, size: 11, color: Color(0xFF0F172A)),
-                                        SizedBox(width: 3),
+                                        Icon(Icons.verified, size: 11, color: isProvider ? Colors.white : const Color(0xFF0F172A)),
+                                        const SizedBox(width: 3),
                                         Text(
                                           'VERIFIED',
                                           style: TextStyle(
                                             fontSize: 10,
                                             fontWeight: FontWeight.w800,
-                                            color: Color(0xFF0F172A),
+                                            color: isProvider ? Colors.white : const Color(0xFF0F172A),
                                             letterSpacing: 0.06,
                                           ),
                                         ),
@@ -626,21 +695,21 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                     onTap: _changeProfilePicture,
                                     child: Container(
                                       decoration: BoxDecoration(
-                                        color: const Color(0x80FFFFFF),
+                                        color: isProvider ? Colors.white.withValues(alpha: 0.20) : const Color(0x80FFFFFF),
                                         borderRadius: BorderRadius.circular(6),
                                       ),
                                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                                      child: const Row(
+                                      child: Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          Icon(Icons.camera_alt_outlined, size: 10, color: Color(0xFF0F172A)),
-                                          SizedBox(width: 3),
+                                          Icon(Icons.camera_alt_outlined, size: 10, color: isProvider ? Colors.white : const Color(0xFF0F172A)),
+                                          const SizedBox(width: 3),
                                           Text(
                                             'EDIT PHOTO',
                                             style: TextStyle(
                                               fontSize: 10,
                                               fontWeight: FontWeight.w800,
-                                              color: Color(0xFF0F172A),
+                                              color: isProvider ? Colors.white : const Color(0xFF0F172A),
                                               letterSpacing: 0.06,
                                             ),
                                           ),
@@ -651,21 +720,22 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                   const SizedBox(width: 6),
                                   Container(
                                     decoration: BoxDecoration(
-                                      color: const Color(0x80FFFFFF),
+                                      color: isProvider ? Colors.white.withValues(alpha: 0.20) : const Color(0x80FFFFFF),
                                       borderRadius: BorderRadius.circular(6),
                                     ),
                                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                     child: Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        Icon(isProvider ? Icons.work_outline : Icons.person_outline, size: 11, color: const Color(0xFF0F172A)),
+                                        Icon(isProvider ? Icons.work_outline : Icons.person_outline, size: 11, color: isProvider ? Colors.white : const Color(0xFF0F172A)),
                                         const SizedBox(width: 3),
                                         Text(
-                                          isProvider ? 'Provider' : 'Client',
-                                          style: const TextStyle(
+                                          isProvider ? 'PROVIDER' : 'CLIENT',
+                                          style: TextStyle(
                                             fontSize: 10,
-                                            fontWeight: FontWeight.w700,
-                                            color: Color(0xFF0F172A),
+                                            fontWeight: FontWeight.w800,
+                                            color: isProvider ? Colors.white : const Color(0xFF0F172A),
+                                            letterSpacing: 0.06,
                                           ),
                                         ),
                                       ],

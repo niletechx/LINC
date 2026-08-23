@@ -314,6 +314,9 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
   Widget build(BuildContext context) {
     final currentTab = ref.watch(bookingTabProvider);
     final bookingsAsync = ref.watch(bookingListProvider);
+    final isProvider = ref.watch(appModeProvider) == AppMode.provider;
+    final user = ref.watch(authProvider).user;
+    final topPadding = MediaQuery.of(context).padding.top;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF1F5F9),
@@ -325,24 +328,112 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
             // Bookings header
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
-              decoration: const BoxDecoration(
-                color: Color(0xFF7EC8E3),
+              padding: EdgeInsets.fromLTRB(16, isProvider ? topPadding + 14 : 14, 16, isProvider ? 18 : 14),
+              decoration: BoxDecoration(
+                color: isProvider ? const Color(0xFF0003BF) : const Color(0xFF7EC8E3),
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Bookings', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: Color(0xFF0F172A))),
-                  GestureDetector(
-                    onTap: () => ref.refresh(bookingListProvider),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: const Color(0x26000000),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: const Icon(Icons.refresh_rounded, color: Color(0xFF0F172A), size: 16),
+                  if (isProvider) ...[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Flexible(
+                          child: Row(
+                            children: [
+                              const Icon(Icons.location_on, size: 14, color: Color(0xFF93C5FD)),
+                              const SizedBox(width: 4),
+                              Flexible(
+                                child: Text(
+                                  user?.locationCity ?? 'Addis Ababa, ET',
+                                  style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: Colors.white),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            GestureDetector(
+                              onTap: () => ref.refresh(bookingListProvider),
+                              child: Container(
+                                padding: const EdgeInsets.all(6),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.20),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: const Icon(Icons.refresh_rounded, color: Colors.white, size: 16),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 10),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.20),
+                                border: Border.all(color: Colors.white.withValues(alpha: 0.40)),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: const Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.work_outline_rounded, size: 12, color: Colors.white),
+                                  SizedBox(width: 4),
+                                  Text(
+                                    'Provider Mode',
+                                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Colors.white),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
+                    const SizedBox(height: 12),
+                  ],
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            isProvider ? 'Jobs & Bookings' : 'Bookings',
+                            style: TextStyle(
+                              fontSize: isProvider ? 20 : 22,
+                              fontWeight: FontWeight.w800,
+                              color: isProvider ? Colors.white : const Color(0xFF0F172A),
+                              letterSpacing: -0.02,
+                            ),
+                          ),
+                          if (isProvider) ...[
+                            const SizedBox(height: 2),
+                            const Text(
+                              'Manage client contracts, escrow & schedules',
+                              style: TextStyle(
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.w500,
+                                color: Color(0xFFBFDBFE),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                      if (!isProvider)
+                        GestureDetector(
+                          onTap: () => ref.refresh(bookingListProvider),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: const Color(0x26000000),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: const Icon(Icons.refresh_rounded, color: Color(0xFF0F172A), size: 16),
+                          ),
+                        ),
+                    ],
                   ),
                 ],
               ),

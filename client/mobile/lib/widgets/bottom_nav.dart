@@ -33,10 +33,10 @@ class LincBottomNav extends StatelessWidget {
             children: isProvider
                 ? [
                     // Provider: 4 tabs — Home | Chat | Bookings | Me
-                    _NavItem(icon: _homeIcon, label: 'Home', active: currentIndex == 0, onTap: () => onTap(0)),
-                    _NavItem(icon: _chatIcon, label: 'Chat', active: currentIndex == 1, onTap: () => onTap(1)),
-                    _NavItem(icon: _bookingsIcon, label: 'Bookings', active: currentIndex == 2, onTap: () => onTap(2)),
-                    _NavItem(icon: _profileIcon, label: 'Me', active: currentIndex == 3, onTap: () => onTap(3)),
+                    _NavItem(icon: _homeIcon, label: 'Home', active: currentIndex == 0, onTap: () => onTap(0), activeColor: _activeColor),
+                    _NavItem(icon: _chatIcon, label: 'Chat', active: currentIndex == 1, onTap: () => onTap(1), activeColor: _activeColor),
+                    _NavItem(icon: _bookingsIcon, label: 'Bookings', active: currentIndex == 2, onTap: () => onTap(2), activeColor: _activeColor),
+                    _NavItem(icon: _profileIcon, label: 'Me', active: currentIndex == 3, onTap: () => onTap(3), activeColor: _activeColor),
                   ]
                 : [
                     // Client: 5 tabs — Home | Chat | AI | Bookings | Me
@@ -52,27 +52,29 @@ class LincBottomNav extends StatelessWidget {
     );
   }
 
+  Color get _activeColor => isProvider ? const Color(0xFF0003BF) : AppColors.primaryBlue;
+
   Widget _homeIcon(bool active) => Icon(
     active ? Icons.home_rounded : Icons.home_outlined,
-    color: active ? AppColors.primaryBlue : AppColors.textMuted,
+    color: active ? _activeColor : AppColors.textMuted,
     size: 24,
   );
 
   Widget _chatIcon(bool active) => Icon(
     active ? Icons.chat_bubble_rounded : Icons.chat_bubble_outline_rounded,
-    color: active ? AppColors.primaryBlue : AppColors.textMuted,
+    color: active ? _activeColor : AppColors.textMuted,
     size: 22,
   );
 
   Widget _bookingsIcon(bool active) => Icon(
     active ? Icons.calendar_month_rounded : Icons.calendar_month_outlined,
-    color: active ? AppColors.primaryBlue : AppColors.textMuted,
+    color: active ? _activeColor : AppColors.textMuted,
     size: 22,
   );
 
   Widget _profileIcon(bool active) => Icon(
     active ? Icons.person_rounded : Icons.person_outline_rounded,
-    color: active ? AppColors.primaryBlue : AppColors.textMuted,
+    color: active ? _activeColor : AppColors.textMuted,
     size: 23,
   );
 }
@@ -82,7 +84,8 @@ class _NavItem extends StatelessWidget {
   final String label;
   final bool active;
   final VoidCallback onTap;
-  const _NavItem({required this.icon, required this.label, required this.active, required this.onTap});
+  final Color? activeColor;
+  const _NavItem({required this.icon, required this.label, required this.active, required this.onTap, this.activeColor});
 
   @override
   Widget build(BuildContext context) {
@@ -100,7 +103,9 @@ class _NavItem extends StatelessWidget {
             Text(
               label,
               style: active
-                  ? AppTextStyles.navLabelActive()
+                  ? (activeColor != null
+                      ? AppTextStyles.navLabelActive().copyWith(color: activeColor)
+                      : AppTextStyles.navLabelActive())
                   : AppTextStyles.navLabel(),
             ),
           ],
